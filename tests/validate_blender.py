@@ -16,11 +16,17 @@ from unittest.mock import patch
 def main() -> None:
     import bpy
 
+    # Load before patching sys.modules; patch.dict otherwise undoes newly loaded modules.
+    try:
+        import numpy  # noqa: F401
+    except ImportError:
+        pass
+
     root = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(root))
     sys.path.insert(0, str(root / "src"))
     entry = root / "prototypes" / "001_resonant_surface" / "build.py"
-    sys.argv = ["blender"]  # Keep validation script arguments out of build.py's CLI.
+    sys.argv = ["blender", "--", "--no-osc"]  # Independent of local OSC preferences.
 
     def unrelated_handler(_scene: object) -> None:
         pass
@@ -102,7 +108,9 @@ def main() -> None:
         assert content.count("facet normal") > 1000
 
     prototype = importlib.import_module("prototypes.001_resonant_surface.build")
-    sculpture = prototype.build(prototype.load_config("002_close_frequencies"))
+    close_config = prototype.load_config("002_close_frequencies")
+    close_config.osc["enabled"] = False
+    sculpture = prototype.build(close_config)
     assert scene.render.fps == 240 and scene.frame_end == 14400
     assert [obj["frequency_hz"] for obj in sculpture.exciters] == [59, 59.08, 59.17]
     # Optional network failures disable the sender while presentation remains usable.
@@ -114,8 +122,56 @@ def main() -> None:
             prototype.build(config)
     assert any("OSC output disabled" in str(warning.message) for warning in caught)
     assert not visualization._adapter.transport.enabled
+    # Live mode consumes external state; timeline scrubbing cannot change its clock.
+    from spatial_sculptures.transport.state_file import write_state
+
+    with tempfile.TemporaryDirectory(prefix="spatial-sculptures-live-test-") as directory:
+        path = Path(directory) / "state.json"
+        config = prototype.load_config(preview=True)
+        producer = simulation.ResonantField(config)
+        write_state(path, producer.step(3.0))
+        with patch(
+            "spatial_sculptures.transport.osc.socket.socket",
+            side_effect=AssertionError("Live Blender tried to send OSC"),
+        ):
+            prototype.build(config, state_file=path)
+            first_callback = visualization.resonant_surface_live_update
+            assert bpy.app.timers.is_registered(first_callback)
+            scene.frame_set(100)
+            assert visualization._adapter.state.time == 3.0
+            write_state(path, producer.step(3.5))
+            first_callback()
+            assert visualization._adapter.state.time == 3.5
+            water = visualization._adapter.sculpture.water
+            x, y, z = visualization._adapter.sculpture.water_base[100]
+            assert abs(water.data.vertices[100].co.z - (z + producer.sample(x, y))) < 1e-7
+            # A module reload creates a new callback identity; clear_scene removes the old one.
+            importlib.reload(visualization)
+            prototype.build(config, state_file=path)
+            assert not bpy.app.timers.is_registered(first_callback)
+            assert bpy.app.timers.is_registered(visualization.resonant_surface_live_update)
+            assert not any(
+                handler.__name__ == visualization.FRAME_HANDLER_NAME
+                for handler in bpy.app.handlers.frame_change_pre
+            )
+            live_callback = visualization.resonant_surface_live_update
+            config.osc["enabled"] = False
+            prototype.build(config)
+            assert not bpy.app.timers.is_registered(live_callback)
+            # Blender's dependency-free path must also work when NumPy is unavailable.
+            with patch.dict(sys.modules, {"numpy": None}):
+                prototype.build(config)
+                assert visualization._adapter.sampler.backend == "python"
+                scene.frame_set(53)
+                state = visualization._adapter.state
+                water = visualization._adapter.sculpture.water
+                x, y, z = visualization._adapter.sculpture.water_base[100]
+                expected = simulation.displacement(x, y, state.time, config)
+                assert abs(water.data.vertices[100].co.z - (z + expected)) < 1e-7
     bpy.app.handlers.frame_change_pre.remove(unrelated_handler)
-    print("Blender integration passed: rebuilds, scrubbing, field state, optional OSC, export.")
+    print(
+        "Blender integration passed: timeline/live rebuilds, batched field, no NumPy/OSC, export."
+    )
 
 
 if __name__ == "__main__":

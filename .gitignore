@@ -22,3 +22,5 @@ data/recordings/*
 data/fem/*
 !data/fem/.gitkeep
 
+# Regenerated study outputs; curated figures and summaries live in docs/research/.
+studies/**/results/

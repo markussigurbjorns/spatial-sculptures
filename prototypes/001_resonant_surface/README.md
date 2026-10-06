@@ -57,8 +57,9 @@ control-rate simulated values.
 
 `simulation.py` is ordinary Python: equations, exciter influence, droplet impulses,
 virtual hydrophone sampling, and state calculations. It imports neither `bpy` nor
-the Blender helpers. `visualization.py` contains the named Blender frame handler,
-mesh deformation, and visible droplet updates. Materials, camera, lights, and
+the Blender helpers. `runtime.py` runs its wall clock and OSC outside Blender.
+`visualization.py` contains the Blender timeline handler/live timer, mesh
+deformation, and droplet updates. Materials, camera, lights, and
 visible components remain presentation concerns.
 
 ```python
@@ -114,10 +115,19 @@ The 20-second baseline has 600 frames at 30 FPS. Its `time_scale=0.06` deliberat
 slows visible phase motion; the displayed 59 Hz settings are not 59 Hz physical
 water motion. Beat periods are also stretched by this factor.
 
+In **live mode**, elapsed wall-clock time replaces frame time. The sculpture runs
+continuously, including past 20 seconds, until its launcher stops. Virtual
+hydrophones and OSC update in the independent Python worker even when Blender's
+view is slow or its timeline is paused. The baseline worker ticks at 60 Hz;
+Blender requests the latest snapshot at up to 30 Hz (15 in preview). The worker
+uses actual elapsed time and skips missed deadlines without catch-up bursts.
+SuperCollider owns audio-rate synthesis; this Python loop is control-rate.
+
 ## Configuration and experiments
 
 Edit [config.py](config.py) to change animation, basin, water, exciters,
-hydrophones, drip, rendering, or OSC. Values use metres, seconds, Hz, and radians.
+hydrophones, drip, rendering, runtime rates, or OSC. Values use metres, seconds,
+Hz, and radians.
 `default_config()` supplies independent deep copies of every section.
 
 From the repository root:
@@ -132,8 +142,26 @@ python tools/render.py 001_resonant_surface prototypes/001_resonant_surface/rend
 For a lightweight first look:
 
 ```bash
-python tools/run_blender.py 001_resonant_surface --preview
+python tools/run_blender.py 001_resonant_surface --preview --live --osc
 ```
+
+Live motion starts automatically; leave timeline playback stopped. This command
+owns both the Python worker and Blender; closing Blender shuts down its worker.
+Use `--no-osc` to preview without networking. `--osc` enables OSC for this run
+without editing configuration. See the [SuperCollider setup](supercollider/README.md)
+to start the listening sketch.
+
+For audio/control experiments without Blender:
+
+```bash
+python tools/run_simulation.py 001_resonant_surface --osc
+python tools/run_simulation.py 001_resonant_surface --no-osc --duration 20
+```
+
+Ctrl+C stops the worker. `--experiment` also works here. Timeline rendering uses
+the commands above without `--live`; live mode rejects frame/render arguments
+because its clock keeps advancing. For a scripted external viewer, the runtime
+can publish a latest-state file using `--state-file /tmp/resonant-state.json`.
 
 Preview uses a 12-ring × 64-segment water mesh (769 vertices), a coarser basin,
 solid material colors, and Workbench rendering at half resolution. Baseline
@@ -142,9 +170,37 @@ drip timing in seconds, and sensor sampling are preserved; surface detail is low
 Higher-frequency experiments keep their original FPS to avoid aliasing, so begin
 with the baseline preview if the close-frequency experiment is too demanding.
 
+Prepared samples in `sampling.py` cache source distances, attenuation, spatial
+phases, drop radii and edge taper. NumPy batches these arrays when available;
+cached standard-library math remains a supported fallback. The adapter writes
+all coordinates with Blender's `foreach_set`, always starting from base Z.
+Rebuild after changing static field parameters; amplitude and frequency can
+vary per snapshot. Both paths reproduce the original scalar equation.
+
+One local Blender 4.5.9 comparison (median of 12 updates, NumPy enabled):
+
+| Water mesh | Original per-vertex update | Cached/bulk update |
+| --- | --- | --- |
+| Detailed, 6,913 vertices | 41.9 ms | 2.2 ms |
+| Preview, 769 vertices | 5.5 ms | 0.55 ms |
+
+The measurement includes mesh writes and mesh data updates, but excludes viewport
+draws, rendering, and OSC. Results depend on hardware. The original scalar model
+is retained for reference/equivalence tests. Sensor/metric state generation took
+about 0.2–0.3 ms here, independently of mesh density.
+
+The live launcher shares a single configuration snapshot and an atomic JSON
+latest-state file in a temporary directory. It sends only `FieldState`, not
+mesh coordinates. Blender reconstructs the analytic surface using the snapshot's
+time and exciter controls; hydrophone values and metrics come from the worker.
+Blender never sends OSC in live mode. Closing the launcher removes the exchange
+directory. This small local exchange can later be replaced if real measurements
+or a different solver require richer field data.
+
 The close-frequency experiment uses 59.00, 59.08, and 59.17 Hz with a common
 wavelength. It sets `time_scale=1`, a 60-second duration, and 240 FPS to sample the
-fast carrier while showing slow envelopes. Pairwise beat periods are about 12.5,
+fast carrier while showing slow envelopes. Live tick/display rates are also
+240 Hz for this experiment. Pairwise beat periods are about 12.5,
 11.1, and 5.9 seconds. Interactive playback may run slower than real time; the
 timing refers to the animation clock. A full rendered animation is intentionally
 outside this initial toolchain.
@@ -167,9 +223,10 @@ prototype = importlib.import_module("prototypes.001_resonant_surface.build")
 sculpture = prototype.build(prototype.load_config("002_close_frequencies"))
 ```
 
-The named callback `resonant_surface_frame_change` is removed and replaced at
-each build, including callbacks left by re-executed scripts. `clear_scene()` also
-removes tagged research callbacks. Unrelated add-on callbacks are retained.
+The named callback `resonant_surface_frame_change` and live timer
+`resonant_surface_live_update` are removed and replaced at each build, including
+callbacks left by re-executed/reloaded modules. `clear_scene()` removes tracked
+research timers as well as tagged frame callbacks. Unrelated callbacks are retained.
 Rebuild after reopening a saved `.blend` to restore the Python animation handler.
 
 ## Code map
@@ -180,7 +237,9 @@ Rebuild after reopening a saved `.blend` to restore the Python animation handler
 | `config.py` | Sculpture-specific editable parameters |
 | `geometry.py` | Basin, water, exciters, hydrophones, supports, drip structure |
 | `simulation.py` | Blender-free combined field, drip clock, virtual hydrophones, and FieldState |
-| `visualization.py` | Blender adapter and named timeline callback; optional OSC output |
+| `sampling.py` | Cached fixed-position field sampling; optional NumPy batching |
+| `runtime.py` | Independent wall-clock loop, state publication, and OSC output |
+| `visualization.py` | Bulk mesh updates; timeline callback or live state consumer |
 | `feedback.py` | Virtual hydrophone sampling and opt-in processing proposals |
 | `scene.py` | Floor, camera, lights, world, timing, and render settings |
 | `supercollider/` | Receiver, small SynthDef, entry point, and future spatial routing |
@@ -192,16 +251,17 @@ alongside this prototype. No sculpture-specific geometry lives in the library.
 ## Optional OSC and SuperCollider
 
 The reusable `src/spatial_sculptures/transport/` layer contains message paths and
-a small standard-library OSC sender. Set `OSC["enabled"] = True` in `config.py`,
-then load the [SuperCollider entry point](supercollider/main.scd). Match `host`
+a small standard-library OSC sender. Use `--osc` or set `OSC["enabled"] = True`
+in `config.py`, then load the [SuperCollider entry point](supercollider/main.scd). Match `host`
 and `port` to its language listener; default is `127.0.0.1:57120`. Audio-server
 port 57110 is a separate endpoint.
 
-OSC is disabled by default, creates no socket when disabled, and has no
-`python-osc` dependency. An enabled sender caps bundles at `send_rate` per
-wall-clock second. UDP does not acknowledge delivery; these snapshots and impact
+`--no-osc` overrides the configured OSC setting for one run. Disabled transport
+creates no socket and has no `python-osc` dependency. An enabled sender caps bundles
+at `send_rate` per wall-clock second. UDP does not acknowledge delivery; these snapshots and impact
 envelopes are not a reliable event log. Blender keeps working if a network error
-disables optional output.
+disables optional output. In live mode the worker continues sending independently
+of Blender display rate; in timeline mode OSC follows displayed frames.
 
 Each bundle carries hydrophone amplitudes, each exciter's amplitude/frequency,
 water activity/max displacement, drop impact, and simulation time. Indexes are

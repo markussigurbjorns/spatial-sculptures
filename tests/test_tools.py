@@ -4,6 +4,7 @@ import contextlib
 import importlib
 import io
 import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -62,6 +63,33 @@ class ToolTests(unittest.TestCase):
             with patch.dict(os.environ, {"BLENDER_BIN": str(Path(directory) / "missing")}):
                 with contextlib.redirect_stderr(io.StringIO()):
                     self.assertEqual(run("001_resonant_surface"), 127)
+
+    @unittest.skipIf(os.name == "nt", "Test executable is a POSIX shell script")
+    def test_live_exit_status_and_worker_cleanup(self) -> None:
+        original_popen = subprocess.Popen
+        processes = []
+
+        def launch(*args, **kwargs):
+            process = original_popen(*args, **kwargs, stdout=subprocess.DEVNULL)
+            processes.append(process)
+            return process
+
+        with tempfile.TemporaryDirectory() as directory:
+            executable = Path(directory) / "fake blender"
+            executable.write_text("#!/bin/sh\nexit 7\n", encoding="utf-8")
+            executable.chmod(0o755)
+            with patch.dict(os.environ, {"BLENDER_BIN": str(executable)}):
+                with patch("tools.run_blender.subprocess.Popen", side_effect=launch):
+                    self.assertEqual(run("001_resonant_surface", live=True, osc=False), 7)
+            self.assertEqual(len(processes), 2)
+            self.assertTrue(all(process.poll() is not None for process in processes))
+            worker_command = processes[0].args
+            state_path = Path(worker_command[worker_command.index("--state-file") + 1])
+            self.assertFalse(state_path.parent.exists(), "Temporary exchange directory leaked")
+
+    def test_live_rendering_requires_timeline_mode(self) -> None:
+        with self.assertRaisesRegex(ValueError, "timeline mode"):
+            run("001_resonant_surface", live=True, frame=97)
 
 
 if __name__ == "__main__":

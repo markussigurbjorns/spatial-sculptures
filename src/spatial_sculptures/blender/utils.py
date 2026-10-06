@@ -1,9 +1,35 @@
 """Small Blender scene and primitive utilities, independent of any sculpture."""
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from typing import Any
 
 HANDLER_TAG = "_spatial_sculptures_handler"
+_TIMER_REGISTRY = "_spatial_sculptures_timers"
+
+
+def remove_timers(names: Iterable[str] = (), *, tagged: bool = False) -> int:
+    """Remove tracked research timers, including callbacks from older module reloads."""
+    import bpy
+
+    names = set(names)
+    callbacks = bpy.app.driver_namespace.setdefault(_TIMER_REGISTRY, [])
+    removed = 0
+    for callback in list(callbacks):
+        if callback.__name__ in names or (tagged and getattr(callback, HANDLER_TAG, False)):
+            if bpy.app.timers.is_registered(callback):
+                bpy.app.timers.unregister(callback)
+                removed += 1
+            callbacks.remove(callback)
+    return removed
+
+
+def register_timer(callback: Callable[[], float | None], *, first_interval: float = 0.0) -> None:
+    """Register and track a research timer so clear_scene can cancel it on rebuild."""
+    import bpy
+
+    setattr(callback, HANDLER_TAG, True)
+    bpy.app.timers.register(callback, first_interval=first_interval)
+    bpy.app.driver_namespace.setdefault(_TIMER_REGISTRY, []).append(callback)
 
 
 def remove_frame_handlers(names: Iterable[str] = (), *, tagged: bool = False) -> int:
@@ -29,6 +55,7 @@ def clear_scene(handler_names: Iterable[str] = ()) -> None:
     import bpy
 
     remove_frame_handlers(handler_names, tagged=True)
+    remove_timers(tagged=True)
     for obj in list(bpy.context.scene.objects):
         bpy.data.objects.remove(obj, do_unlink=True)
     for collection in (bpy.data.meshes, bpy.data.materials, bpy.data.cameras, bpy.data.lights):

@@ -18,4 +18,5 @@ def configure(config: PrototypeConfig) -> PrototypeConfig:
     config.animation["seconds"] = 60
     # More temporal samples reduce aliasing of the ~59 Hz visual phase motion.
     config.animation["fps"] = 240
+    config.runtime.update(tick_rate=240.0, display_rate=240.0)
     return config

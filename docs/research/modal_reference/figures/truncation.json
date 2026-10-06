@@ -1,0 +1,38 @@
+[
+  {
+    "modes_per_axis": 2,
+    "mode_count": 4,
+    "initial_energy_j": 5.473968241089944e-05,
+    "highest_frequency_hz": 57.114052649498966
+  },
+  {
+    "modes_per_axis": 4,
+    "mode_count": 16,
+    "initial_energy_j": 0.00012828647494004316,
+    "highest_frequency_hz": 228.45621059799586
+  },
+  {
+    "modes_per_axis": 6,
+    "mode_count": 36,
+    "initial_energy_j": 0.0002955628622108096,
+    "highest_frequency_hz": 514.0264738454906
+  },
+  {
+    "modes_per_axis": 8,
+    "mode_count": 64,
+    "initial_energy_j": 0.0003974103661180826,
+    "highest_frequency_hz": 913.8248423919835
+  },
+  {
+    "modes_per_axis": 12,
+    "mode_count": 144,
+    "initial_energy_j": 0.0009104098503162823,
+    "highest_frequency_hz": 2056.1058953819625
+  },
+  {
+    "modes_per_axis": 16,
+    "mode_count": 256,
+    "initial_energy_j": 0.001388345568373003,
+    "highest_frequency_hz": 3655.299369567934
+  }
+]

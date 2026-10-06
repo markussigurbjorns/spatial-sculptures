@@ -9,14 +9,34 @@ feedback is sent to Python and no final spatial-audio composition is defined.
 1. Open `main.scd` in the SuperCollider IDE and evaluate the whole block. It loads
    routing and receivers, boots the audio server, and loads the SynthDef. It does
    not start a synth automatically.
-2. In the prototype's `config.py`, set `OSC["enabled"] = True`. Match `port` to
-   the language port printed by the receiver (normally 57120), then launch Blender
-   normally and play the timeline. An ordinary Python loop may step `ResonantField`
-   and call `OSCTransport.send_state(state)` instead.
+2. Match `OSC["port"]` in the prototype's `config.py` to the language port printed
+   by the receiver (normally 57120). From the repository root, start either the
+   live Blender view or the simulation alone using the commands below. `--osc`
+   enables output for this run; editing `OSC["enabled"]` is also supported.
 3. Inspect `~hydrophone1`, `~hydrophone2`, `~waterTotalEnergy`, and `~dropImpact`.
    Set `~oscDebug = true` to post incoming values.
 4. Optionally evaluate `~startResonantPreview.value` to start the resonant/noise
    listening sketch. Evaluate `~stopResonantPreview.value` to stop it.
+
+With a lightweight live view:
+
+```bash
+python tools/run_blender.py 001_resonant_surface --preview --live --osc
+```
+
+Motion starts automatically; keep timeline playback stopped. Python runs the
+clock and OSC in a separate process, so the view can skip frames while the
+sensor stream continues. Closing Blender stops its simulation worker.
+
+For listening without Blender:
+
+```bash
+python tools/run_simulation.py 001_resonant_surface --osc
+```
+
+Stop with Ctrl+C. Stop the SuperCollider preview synth separately using
+`~stopResonantPreview.value`; its last control values remain stored when Python
+stops. The synthesis mapping remains the same as the original listening sketch.
 
 For receiver-only use, evaluate `osc.scd` directly. An audio server is unnecessary
 for storing values. `sclang`'s language port and `scsynth`'s audio-server port
@@ -58,7 +78,8 @@ basin modes. A 30 Hz control stream cannot represent the full excitation wavefor
 No pressure-to-voltage calibration is claimed.
 
 UDP may lose snapshots. Impact is a short envelope rather than a guaranteed event.
-The sender is disabled by default and opens no socket until an enabled send.
+The sender follows prototype configuration; `--osc`/`--no-osc` override it.
+It opens no socket until an enabled send.
 
 ## Files
 

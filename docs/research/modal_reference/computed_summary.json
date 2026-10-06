@@ -1,0 +1,63 @@
+{
+  "model": "linear simply supported Kirchhoff-Love reference plate; dry",
+  "parameters": {
+    "plate": {
+      "length_x": 1.44,
+      "length_y": 1.16,
+      "thickness": 0.005,
+      "youngs_modulus": 193000000000.0,
+      "density": 8030.0,
+      "poisson_ratio": 0.3
+    },
+    "modes_per_axis": 6,
+    "damping_ratio": 0.005,
+    "impulses": [
+      {
+        "time": 0.0,
+        "x": -0.34,
+        "y": 0.14,
+        "impulse_ns": 0.03,
+        "patch_width": 0.05
+      }
+    ],
+    "drives": [],
+    "pickups": [
+      [
+        -0.2,
+        -0.04
+      ],
+      [
+        0.25,
+        -0.1
+      ]
+    ],
+    "duration": 4.0,
+    "sample_rate": 48000,
+    "display_fps": 30,
+    "visual_time_scale": 0.02,
+    "visual_gain": 2000.0
+  },
+  "mode_count": 36,
+  "fundamental_frequency_hz": 14.278513162374741,
+  "highest_retained_frequency_hz": 514.0264738454906,
+  "initial_retained_energy_j": 0.0002955628622108096,
+  "final_retained_energy_j": 3.547756162224513e-07,
+  "maximum_energy_increase_j": -1.9213976674436903e-13,
+  "pickup_units": "m/s; virtual contact velocity, not hydrophone pressure",
+  "measurements": "none; material properties and damping are provisional",
+  "provenance": {
+    "python_version": "3.13.13",
+    "sampling_backend": "numpy",
+    "config_sha256": "4eacb203a11f2e2afc4c1876fbff6069583ddcf6e4c63c15b67734a3d74dd1b4",
+    "source_sha256": {
+      "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+      "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
+      "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
+      "studies/plates/001_modal_reference/config.py": "35907aeb213920cd41afe30e079bcb37f9985fbd56acf7fda2b2ed0c56ac74e7",
+      "studies/plates/001_modal_reference/simulation.py": "afe21584dc8d7ba95a4eac8e1a71349a47e3200b930b6b68484326f548b1444c",
+      "tools/run_modal_study.py": "cb25a09aa6a7531e34304ae37d1cb28fb6537985307af78b444d6e349b2b11f2"
+    }
+  },
+  "audio_gain_per_m_per_s": 105.09737831434347,
+  "audio_note": "Channel 1/2 are pickups, not binaural or loudspeaker spatialization"
+}

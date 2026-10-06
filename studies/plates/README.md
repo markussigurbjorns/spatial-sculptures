@@ -2,4 +2,9 @@
 
 Future investigations: plate modes, Chladni patterns, excitation location, and
 material/thickness comparisons. Distinguish measured boundary conditions from
-visual approximations. No plate solver is implemented yet.
+visual approximations. The first implementation is an analytical dry-plate reference.
+
+Implemented: [001_modal_reference](001_modal_reference/README.md) models a dry,
+simply supported rectangular plate. It includes analytical modes, physical impulse
+and harmonic responses, contact-velocity pickups, and a referenced working paper.
+It is a reference study rather than a prediction of the curved basin.

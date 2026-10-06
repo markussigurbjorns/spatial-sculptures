@@ -7,7 +7,7 @@ Prototype modules use relative imports so their names never shadow other prototy
 from __future__ import annotations
 
 import argparse
-import importlib
+import json
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -32,23 +32,12 @@ if not __package__:
 
 def load_config(experiment: str | None = None, *, preview: bool = False) -> PrototypeConfig:
     """Start from independent defaults and optionally apply one local experiment."""
-    from .config import apply_preview, default_config
+    from .config import load_config as select_config
 
-    config = default_config()
-    if experiment:
-        name = Path(experiment).stem
-        directory = Path(__file__).resolve().parent / "experiments"
-        if not name.replace("_", "").isalnum() or not (directory / f"{name}.py").is_file():
-            raise ValueError(f"Unknown experiment: {experiment}")
-        module = importlib.import_module(f"{__package__}.experiments.{name}")
-        config = module.configure(config)
-    if preview:
-        config = apply_preview(config)
-    config.validate()
-    return config
+    return select_config(experiment, preview=preview)
 
 
-def build(config: PrototypeConfig | None = None) -> Sculpture:
+def build(config: PrototypeConfig | None = None, *, state_file: Path | None = None) -> Sculpture:
     """Rebuild the complete scene, returning its sculpture for interactive exploration."""
     from spatial_sculptures.blender.utils import clear_scene
     from spatial_sculptures.transport.osc import OSCTransport
@@ -66,7 +55,9 @@ def build(config: PrototypeConfig | None = None) -> Sculpture:
     sculpture = create_sculpture(materials=materials, config=config)
     field = ResonantField(config)
     transport = OSCTransport(**config.osc)
-    setup_visualization(sculpture=sculpture, field=field, transport=transport)
+    setup_visualization(
+        sculpture=sculpture, field=field, transport=transport, state_file=state_file
+    )
     setup_scene(materials=materials, config=config)
     print_summary(sculpture, config)
     return sculpture
@@ -91,6 +82,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--experiment", help="Experiment filename stem")
     parser.add_argument("--preview", action="store_true", help="Use a lightweight solid preview")
+    osc = parser.add_mutually_exclusive_group()
+    osc.add_argument("--osc", dest="osc", action="store_true", help="Enable OSC for this run")
+    osc.add_argument("--no-osc", dest="osc", action="store_false", help="Disable OSC for this run")
+    parser.set_defaults(osc=None)
+    parser.add_argument("--state-file", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--config-file", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--frame", type=int, help="Frame to display/render after building")
     parser.add_argument("--render-output", type=Path, help="Render one PNG to this path")
     parser.add_argument(
@@ -98,7 +95,15 @@ def main() -> None:
     )
     arguments = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     args = parser.parse_args(arguments)
-    build(load_config(args.experiment, preview=args.preview))
+    if args.config_file:
+        from .config import PrototypeConfig
+
+        config = PrototypeConfig(**json.loads(args.config_file.read_text(encoding="utf-8")))
+    else:
+        config = load_config(args.experiment, preview=args.preview)
+    if args.osc is not None:
+        config.osc["enabled"] = args.osc
+    build(config, state_file=args.state_file)
     if args.frame is not None:
         bpy.context.scene.frame_set(args.frame)
     if args.save_blend is not None:

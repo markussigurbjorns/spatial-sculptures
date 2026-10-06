@@ -4,14 +4,18 @@ These are artistic parameters, not material measurements or calibrated acoustics
 Every build receives a deep copy so experiments never mutate the defaults.
 """
 
+import importlib
 from copy import deepcopy
 from dataclasses import dataclass
+from math import isfinite
+from pathlib import Path
 from typing import Any
 
 FPS = 30
 ANIMATION_SECONDS = 20
 
 ANIMATION = {"fps": FPS, "seconds": ANIMATION_SECONDS, "frame_start": 1}
+RUNTIME = {"tick_rate": 60.0, "display_rate": 30.0}
 
 BASIN = {
     "radius_x": 0.72,
@@ -123,6 +127,7 @@ class PrototypeConfig:
     drip: dict[str, Any]
     rendering: dict[str, Any]
     osc: dict[str, Any]
+    runtime: dict[str, Any]
 
     def validate(self) -> None:
         """Catch basic parameter errors before creating Blender objects."""
@@ -153,6 +158,8 @@ class PrototypeConfig:
             raise ValueError("Exciter wavelengths must be positive")
         if not 1 <= self.osc["port"] <= 65535 or self.osc["send_rate"] <= 0:
             raise ValueError("OSC port must be 1..65535 and send rate must be positive")
+        if any(not isfinite(value) or value <= 0 for value in self.runtime.values()):
+            raise ValueError("Runtime rates must be finite and positive")
 
 
 def default_config() -> PrototypeConfig:
@@ -166,6 +173,7 @@ def default_config() -> PrototypeConfig:
         drip=deepcopy(DRIP),
         rendering=deepcopy(RENDERING),
         osc=deepcopy(OSC),
+        runtime=deepcopy(RUNTIME),
     )
 
 
@@ -191,4 +199,20 @@ def apply_preview(config: PrototypeConfig) -> PrototypeConfig:
     )
     if effective_frequency < 15 / 2:
         config.animation["fps"] = min(config.animation["fps"], 15)
+    return config
+
+
+def load_config(experiment: str | None = None, *, preview: bool = False) -> PrototypeConfig:
+    """Select an experiment in ordinary Python, independently of Blender entry points."""
+    config = default_config()
+    if experiment:
+        name = Path(experiment).stem
+        directory = Path(__file__).resolve().parent / "experiments"
+        if not name.replace("_", "").isalnum() or not (directory / f"{name}.py").is_file():
+            raise ValueError(f"Unknown experiment: {experiment}")
+        module = importlib.import_module(f"{__package__}.experiments.{name}")
+        config = module.configure(config)
+    if preview:
+        config = apply_preview(config)
+    config.validate()
     return config

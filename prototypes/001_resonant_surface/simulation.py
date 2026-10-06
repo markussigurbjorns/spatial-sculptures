@@ -4,6 +4,7 @@ The equations are artistic approximations, intentionally not CFD, FEM, or acoust
 Blender and OSC consume the same state without owning the simulated system.
 """
 
+from collections.abc import Sequence
 from copy import deepcopy
 from math import ceil, cos, floor, hypot, isfinite, sin, sqrt, tau
 
@@ -12,6 +13,7 @@ from spatial_sculptures.simulation.sensors import VirtualSensor
 from spatial_sculptures.simulation.waves import expanding_ripple, radial_wave
 
 from .config import PrototypeConfig
+from .sampling import FieldSampler
 
 
 def _drip_clock(time: float, interval: float) -> tuple[int, float]:
@@ -135,6 +137,13 @@ class ResonantField:
             for ring in range(rings)
             for j in range(segments)
         )
+        self._metric_sampler = self.prepare(self._metric_points)
+
+    def prepare(
+        self, points: Sequence[tuple[float, float]], *, use_numpy: bool | None = None
+    ) -> FieldSampler:
+        """Prepare fixed field samples; uses NumPy if available, otherwise cached Python math."""
+        return FieldSampler(self.config, points, use_numpy=use_numpy)
 
     def sample(self, x: float, y: float, time: float | None = None) -> float:
         """Sample displacement in metres at the current or explicitly supplied time."""
@@ -148,7 +157,7 @@ class ResonantField:
             raise ValueError("Simulation time must be finite")
         self.time = float(time)
         self._ages = impact_ages(self.time, self.config)
-        samples = tuple(self.sample(x, y) for x, y in self._metric_points)
+        samples = self._metric_sampler.sample(self.time)
         completed, phase = _drip_clock(self.time, self.config.drip["interval"])
         impact = (
             max(0.0, 1.0 - phase / self.config.drip["impact_duration"]) if completed >= 1 else 0.0
@@ -164,8 +173,8 @@ class ResonantField:
                 for i, source in enumerate(self.config.exciters, start=1)
             ),
             # Mean squared displacement is a visual energy PROXY in m², not joules.
-            total_energy=sum(value * value for value in samples) / len(samples),
-            max_displacement=max(abs(value) for value in samples),
+            total_energy=float(sum(value * value for value in samples) / len(samples)),
+            max_displacement=float(max(abs(value) for value in samples)),
             drop_impact=impact,
         )
         return self.state

@@ -48,10 +48,10 @@ mean-squared-displacement proxy in m², not physical energy in joules.
 | Location | Purpose |
 | --- | --- |
 | `src/spatial_sculptures/` | Reusable Blender helpers, Python field/state/sensor math, audio tools, and OSC transport |
-| `src/spatial_sculptures/transport/` | Central message paths and a small, Blender-independent OSC sender |
+| `src/spatial_sculptures/transport/` | Central message paths, OSC sender, and local latest-state exchange |
 | `prototypes/` | Complete sculpture ideas, each with its own configuration, geometry, experiments, assets, and outputs |
 | `studies/` | Isolated investigations into physical/acoustic phenomena that may inform several sculptures |
-| `tools/` | Small command-line launch, still-render, and mesh-export helpers |
+| `tools/` | Simulation/Blender launch, still-render, and mesh-export helpers |
 | `data/` | Local measurements, recordings, and FEM results |
 | `docs/` | Concepts, fabrication notes, and research references |
 
@@ -73,8 +73,33 @@ resonant-noise listening sketch.
 
 Install Blender separately and make `blender` available on PATH. The initial
 prototype targets Blender 4.x or newer with bundled Python 3.11+, and has been
-checked in Blender 4.5.9. It uses only Blender and Python's standard library;
-installing this Python package into Blender is unnecessary.
+checked in Blender 4.5.9. It works with Blender and Python's standard library;
+NumPy accelerates sampling when available, with a cached Python fallback.
+Installing this Python package into Blender is unnecessary.
+
+For a slower computer, start with the lightweight **live** view:
+
+```bash
+python tools/run_blender.py 001_resonant_surface --preview --live --osc
+```
+
+This starts a separate Python simulation process and a Blender viewer. Motion
+starts automatically; Space/timeline playback is unnecessary. Python owns elapsed
+wall-clock time and OSC, so slow drawing or a paused Blender timeline does not
+slow the simulation clock. Closing Blender stops its worker. Use `--no-osc` if
+you only want the visual preview. Start SuperCollider separately for sound.
+
+For listening without the Blender window:
+
+```bash
+python tools/run_simulation.py 001_resonant_surface --osc
+```
+
+Stop with Ctrl+C; add `--duration 20` for a limited run. See the
+[SuperCollider setup](prototypes/001_resonant_surface/supercollider/README.md)
+to start the receiver and listening sketch.
+
+Timeline mode remains available for scrubbing and deterministic renders:
 
 ```bash
 python tools/run_blender.py 001_resonant_surface
@@ -82,7 +107,7 @@ python tools/run_blender.py 001_resonant_surface --background
 python tools/run_blender.py 001_resonant_surface --experiment 002_close_frequencies
 ```
 
-The first command opens Blender; press Space in the timeline to play. The
+These commands use timeline mode; press Space in the timeline to play. The
 background command builds and exits. Set `BLENDER_BIN` to an executable name or
 path to select another installation:
 
@@ -115,8 +140,8 @@ python tools/render.py 001_resonant_surface prototypes/001_resonant_surface/rend
 python tools/run_blender.py 001_resonant_surface --background --save-blend prototypes/001_resonant_surface/blender/generated/baseline.blend
 ```
 
-Runtime frame handlers are Python session state. Reopening a saved `.blend` alone
-does not reinstall the simulation; rebuild with the entry script to animate it.
+Runtime frame handlers and live timers are Python session state. Reopening a
+saved `.blend` alone does not reinstall them; rebuild with the entry script.
 Saved scenes remain useful as geometry/presentation snapshots.
 
 ## Python simulation and optional OSC
@@ -137,13 +162,25 @@ print(field.sample(-0.20, -0.04))  # displacement in metres
 ```
 
 `step(time)` produces the same snapshot when repeated or scrubbed backwards.
-Blender's timeline currently supplies its clock, but another Python loop can do
-the same. Metric sampling is independent of Blender mesh resolution.
+In live mode, `run_simulation.py` supplies monotonic elapsed time at
+`RUNTIME["tick_rate"]` (baseline 60 Hz). Blender reads snapshots at up to
+`RUNTIME["display_rate"]` (30 Hz, capped at 15 for baseline preview). The loop
+skips missed deadlines rather than building a queue. This is a control-rate loop,
+not a hard real-time audio engine. SuperCollider's server generates audio.
 
-OSC is disabled by default in the prototype's `config.py`. Enable `OSC["enabled"]`
-to send snapshots to SuperCollider's language port (default 57120), capped at
-`send_rate` bundles per wall-clock second. The sender uses Python's standard
-library; neither `python-osc` nor an OSC server is required for a default build.
+The live launcher takes one configuration snapshot for both processes. A small
+atomic JSON file in a temporary directory holds only the latest `FieldState`;
+Blender can skip obsolete snapshots without acknowledging the producer. Its
+adapter reconstructs this analytic field at mesh positions using state time and
+exciter controls. No mesh vertices are sent over OSC or the local exchange.
+Metric sampling is independent of Blender mesh resolution. Timeline mode uses
+the same equations with Blender's frame clock for reproducible scrubbing/renders.
+
+OSC follows `OSC["enabled"]` in the prototype's `config.py`; `--osc` and `--no-osc`
+override it for one run. Snapshots go to SuperCollider's language port (default
+57120), capped at `send_rate` bundles per wall-clock second. Disabled OSC creates
+no socket. The sender uses Python's standard library; neither `python-osc` nor
+an OSC server is required to build the scene.
 Messages are control-rate state, not hydrophone audio streams.
 
 See [the SuperCollider setup](prototypes/001_resonant_surface/supercollider/README.md)
@@ -183,8 +220,22 @@ transport plugin framework is introduced.
 
 ## Ordinary Python development
 
+The first physical reference is the
+[dry modal plate study](studies/plates/001_modal_reference/README.md), with a
+[working research paper](docs/research/modal_reference/paper.md), verified
+references, analytical checks, Blender inspection and offline contact-pickup
+audio. It is a separate study with provisional assumptions; it does not predict
+the curved water-filled basin.
+
+```bash
+python tools/run_modal_study.py
+```
+
+Open `studies/plates/001_modal_reference/results/contact_pickups.wav` to hear the
+model-generated contact signals. The existing sculpture keeps its artistic field.
+
 Use Python 3.11+ for tooling and pure field/sensor experiments. Runtime
-dependencies are empty; development tools are optional.
+dependencies are empty; development tools and NumPy acceleration are optional.
 
 ```bash
 python -m venv .venv
@@ -196,6 +247,13 @@ pytest
 python -m compileall -q src prototypes tools tests
 ```
 
+For faster ordinary-Python batching, install `python -m pip install -e '.[fast]'`
+in your environment. Blender uses its own Python: NumPy is selected only if its
+interpreter already provides it. Both backends cache distances, attenuation and
+spatial phases; the Blender adapter writes mesh coordinates in one bulk operation.
+Rebuild after changing source positions, wavelengths, damping or other static
+field parameters. Frequencies and amplitudes remain per-frame controls.
+
 The numerical, state, transport, and launcher tests also run without pytest or package installation:
 
 ```bash
@@ -203,10 +261,11 @@ PYTHONPATH=src python -m unittest discover -s tests
 blender --background --factory-startup --python-exit-code 1 --python tests/validate_blender.py
 ```
 
-The Blender check builds twice, checks callback and object counts, scrubs frames
-backwards, and verifies droplet timing, sensor state, base coordinates, and OSC
-disabled without its optional consumers. Tests preserve representative samples
-from the original field equation. A localhost UDP test skips when the environment
+The Blender check verifies repeated timeline/live builds, callback cleanup across
+module reloads, backwards scrubbing, droplet timing, sensor state, base coordinates,
+and builds without NumPy or OSC. Tests compare both optimized sampling paths with
+the original equation, check independent-clock progress with an idle consumer,
+and check worker cleanup and exit status. A localhost UDP test skips when the environment
 forbids sockets; packet encoding and rate-limit tests still run. These checks are
 software validation. Parameter variations in `experiments/` are artistic and
 research investigations, not unit tests.
@@ -222,8 +281,8 @@ as `geometry` and `simulation`.
 
 Record experiment changes in small Python modules, and keep parameter sets
 independent. Document measured units, calibration, and provenance when physical
-data becomes available. Introduce NumPy/SciPy or a solver as an optional dependency
-only when an actual study calls for it.
+data becomes available. Introduce SciPy or a solver as an optional dependency
+when an actual study calls for it.
 
 ## Outputs and version control
 

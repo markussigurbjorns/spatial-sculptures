@@ -12,6 +12,8 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["ruff>=0.6", "pytest>=8"]
+fast = ["numpy>=1.24"]
+paper = ["numpy>=1.24", "matplotlib>=3.7"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -26,4 +28,3 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
-
