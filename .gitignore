@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+
+*.blend1
+*.blend2
+# Automatically saved build results; curated scenes elsewhere may be committed.
+prototypes/*/blender/generated/
+
+prototypes/*/renders/*
+!prototypes/*/renders/.gitkeep
+
+data/measurements/*
+!data/measurements/.gitkeep
+data/recordings/*
+!data/recordings/.gitkeep
+data/fem/*
+!data/fem/.gitkeep
+
