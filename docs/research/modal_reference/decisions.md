@@ -19,10 +19,19 @@ Recorded 6 October 2026. These are research choices, not fabrication specificati
 | Offline 48 kHz PCM with one normalization gain | Implemented listening output | Preserves relative channel levels; no calibrated SPL, pressure, radiation or stereo spatialization. |
 | Blender displacement ×2000 and time ×0.02 | Inspection choices | Explicit gain and slow motion expose fast, small vibration. WAV playback uses physical time; the slow-motion view is not synchronized to that WAV. |
 | Working technical manuscript in Markdown + BibTeX | Initial publication form | Paper, source code and computed figures evolve together. Authorship, venue and final formatting remain open. |
+| Configurable provisional physical settings | Clarified by the project owner | Profile, thickness, supports, mounting and water depth can be explored before final fabrication choices or measurements. |
+| Explicit solver capability validation | Implemented | Dry reference rejects requests it cannot model; storing a setting does not imply its physics is implemented. |
+| Eight named parameter experiments and configuration replay | Implemented | Compare thickness, impulse placement/area, damping, pickup position and harmonic drives without copying the solver. |
 
-Before a curved-basin model, decide material grade, measured thickness/profile,
-local support stiffness/contact area, exciter mounting/force calibration, and the
-frequency band of interest. Before water coupling, decide fill depth and the
-accuracy required for surface motion versus underwater pressure. Before physical
-validation, define repeatable recordings and sensor calibration. None of these
-later decisions blocks the dry analytical reference.
+Final fabrication specifications and measurements are not prerequisites for model
+development. Use documented provisional material, thickness/profile, support,
+mounting and fill values; vary them in reproducible experiments. The current
+reference accepts uniform rectangular geometry, ideal edge supports, rigid
+transverse patch forces and zero water depth. Other requests need a solver that
+represents those effects and are rejected here.
+
+The next solver milestone is the dry curved basin with local supports and mounting
+effects. Water coupling and pressure sensing follow. Before physical validation,
+define repeatable recordings and sensor calibration; measurements then constrain
+the provisional values. Choose an analysis bandwidth and an error criterion for
+each study rather than claiming that one retained mode count is sufficient.

@@ -1,6 +1,7 @@
 # Toward spatial audio through matter: a modal reference study for a resonant-surface sculpture
 
-**Working technical paper, version 0.1 — 6 October 2026**  
+**Working technical paper, version 0.2 — 6 October 2026**
+
 Project: Spatial Sculptures. Authorship and publication venue remain to be decided.  
 Status: computational reference study; no physical measurements or listener study.
 
@@ -15,7 +16,9 @@ first physical reference implemented alongside that prototype: a dry, homogeneou
 simply supported rectangular plate with a retained bank of analytical bending
 modes. Finite-area impulses and harmonic forces produce modal displacement and
 velocity; the same coordinates supply Blender inspection and offline contact-pickup
-listening signals. Tests check boundary conditions, modal normalization, material
+listening signals. Explicit parameter experiments and saved configurations permit
+repeatable comparisons without duplicating the solver. Tests check boundary
+conditions, modal normalization, material
 and dimension scaling, oscillator equations, and mechanical energy balance.
 Provisional parameters give a fundamental frequency of 14.279 Hz and 36 retained
 modes up to 514.026 Hz. Increasing the mode count changes retained impulse energy
@@ -241,6 +244,25 @@ for the three force-controlled excitation experiment. The figure command needs
 optional NumPy/Matplotlib (`pip install -e '.[paper]'`) and exports PNG and PDF.
 See the study README for SuperCollider playback and validation commands.
 
+### 5.1 Configurable experiments and capability checks
+
+Physical settings may be provisional and varied before a vessel is fabricated.
+Configuration separates structure/material, support and mounting requests,
+excitation, pickups, fluid requests, computation and inspection settings. The dry
+reference accepts uniform rectangular geometry, ideal edge supports and rigid
+transverse patch excitation. It rejects curved/imported profiles, local support
+contacts, thickness distributions, attached mass/compliant mounting and positive
+fill depth. A stored parameter is not evidence that its physics is represented.
+
+Eight explicit Python experiments vary thickness, impulse position/area, damping,
+pickup positions and prescribed harmonic drives. Each applies a short configuration
+function to fresh defaults. Exports include complete configuration snapshots,
+source/config hashes, SI response tables and dimensionless modal coupling weights.
+Both Python and Blender can replay a saved snapshot independently of later default
+changes. A comparison runner reports frequencies, reference mass, retained energy
+and sampled pickup peak/RMS before audio normalization. Details and reproduction
+commands are in the [parameter experiment study](parameter_experiments.md).
+
 ## 6. Computational checks and results
 
 Tests independently evaluate the known square-plate frequency parameter 2π²,
@@ -292,6 +314,30 @@ of that ideal energy. A bandwidth-specific error criterion, increasing mode coun
 and the limits of thin-plate theory must guide later use. More modes alone do not
 make an assumed support condition or material correct. The committed figure data
 and summary are generated outputs, not physical recordings.
+
+### 6.1 Parameter exploration
+
+The complete eight-case comparison uses 36 modes and four physical seconds per
+case. Changing uniform thickness from 5 mm to 3 or 7 mm gives fundamentals
+8.567108 and 19.989918 Hz respectively, consistent with linear thickness scaling
+in this plate formula. A centred impulse suppresses modes with either even index.
+A larger contact patch changes modal coupling while total impulse stays fixed.
+Higher assumed damping reduces ring-down energy, while shifted pickups change
+observations without changing modal motion or energy. The three-drive case receives
+external energy and must not be interpreted as an unforced decay experiment.
+
+![Computed parameter comparison](figures/parameter_comparison.png)
+
+*Figure 3. Frequencies, sampled contact-velocity peaks, retained energy and selected
+patch projections from the dry reference experiments. These are computed with
+provisional assumptions, not measured basin results.*
+
+The full table, assumptions and [recorded comparison](parameter_comparison.json)
+are documented in [the parameter study](parameter_experiments.md). Response peaks
+and RMS are sampled estimates on the reported grids. Optional listening files
+are individually normalized, so listening loudness cannot compare physical levels
+between cases. This experiment suite does not resolve the broadband truncation
+limitation or introduce local support, shell or fluid physics.
 
 ## 7. Limits and progression toward the sculpture
 

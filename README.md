@@ -234,6 +234,25 @@ python tools/run_modal_study.py
 Open `studies/plates/001_modal_reference/results/contact_pickups.wav` to hear the
 model-generated contact signals. The existing sculpture keeps its artistic field.
 
+The dry reference now supports named parameter experiments and exact configuration
+replay. Start with a short comparison:
+
+```bash
+python tools/run_modal_experiments.py --duration 0.5 --modes 4 --audio
+```
+
+Read `studies/plates/001_modal_reference/results/experiments/comparison.md` and
+listen to the per-case `contact_pickups.wav` files. The eight cases vary thickness,
+excitation location, patch width, damping, pickup placement and prescribed drives.
+They record physical-unit metrics and the full configuration; optional WAVs are
+individually normalized. See [the experiment guide](studies/plates/001_modal_reference/experiments/README.md)
+for saved-configuration replay in Python and Blender.
+
+Profile, supports, mounting and water depth have explicit configuration fields.
+This dry analytical backend rejects unsupported curved/imported profiles, local
+supports, nonuniform thickness, attached exciter mass/compliance and water loading.
+These need later solvers; provisional values can guide that work before fabrication.
+
 Use Python 3.11+ for tooling and pure field/sensor experiments. Runtime
 dependencies are empty; development tools and NumPy acceleration are optional.
 

@@ -13,6 +13,41 @@ from spatial_sculptures.simulation.modal import (
 
 from .config import StudyConfig
 
+MODEL_CAPABILITIES = {
+    "geometry": "flat rectangle; centred XY coordinates in metres",
+    "material": "homogeneous isotropic E, density and Poisson ratio",
+    "thickness": "uniform, in metres",
+    "supports": "continuous simply supported edges; no local support springs",
+    "mounting": "rigid uniform square patch, transverse force, no attached mass",
+    "fluid": "dry only; water depth must be zero",
+    "sensors": "ideal point contact velocity in m/s; not pressure",
+}
+
+
+def validate_model_support(config: StudyConfig) -> None:
+    """Reject physical requests this reference cannot represent; never silently ignore them."""
+    unsupported = []
+    if config.profile.kind != "flat_rectangle":
+        unsupported.append(f"profile.kind={config.profile.kind!r}")
+    if config.profile.rise_m != 0 or config.profile.mesh_path is not None:
+        unsupported.append("profile rise/imported mesh")
+    if config.thickness_map is not None:
+        unsupported.append("nonuniform thickness_map")
+    if config.supports.kind != "simply_supported_edges" or config.supports.contacts:
+        unsupported.append("local or alternative supports")
+    if not isfinite(config.water.depth_m) or config.water.depth_m < 0:
+        raise ValueError("Water depth must be finite and nonnegative")
+    if config.water.depth_m > 0:
+        unsupported.append(f"water.depth_m={config.water.depth_m:g}")
+    for index, event in enumerate((*config.impulses, *config.drives), 1):
+        mounting = event.mounting
+        if mounting.added_mass_kg != 0 or mounting.stiffness_n_per_m is not None:
+            unsupported.append(f"excitation {index}: attached mass/compliant mounting")
+        if tuple(mounting.force_direction) not in ((0, 0, 1), (0, 0, -1)):
+            unsupported.append(f"excitation {index}: non-transverse unit force_direction")
+    if unsupported:
+        raise ValueError("Dry analytical reference does not support: " + "; ".join(unsupported))
+
 
 class PlateSimulation:
     """Exact absolute-time responses; Blender and exported audio use the same mode bank."""
@@ -20,12 +55,23 @@ class PlateSimulation:
     def __init__(self, config: StudyConfig) -> None:
         self.config = deepcopy(config)
         config = self.config
+        validate_model_support(config)
         if not isinstance(config.modes_per_axis, int) or config.modes_per_axis < 1:
             raise ValueError("Mode count per axis must be a positive integer")
         if not isfinite(config.duration) or config.duration <= 0:
             raise ValueError("Duration must be finite and positive")
         if not isinstance(config.sample_rate, int) or config.sample_rate <= 0:
             raise ValueError("Sample rate must be a positive integer")
+        if not config.pickups or any(
+            len(point) != 2 or not all(isfinite(v) for v in point) for point in config.pickups
+        ):
+            raise ValueError("At least one finite XY contact pickup is required")
+        if not isinstance(config.display_fps, int) or config.display_fps <= 0:
+            raise ValueError("Display FPS must be a positive integer")
+        if not isfinite(config.visual_time_scale) or config.visual_time_scale <= 0:
+            raise ValueError("Visual time scale must be finite and positive")
+        if not isfinite(config.visual_gain) or config.visual_gain <= 0:
+            raise ValueError("Visual displacement gain must be finite and positive")
         for event in config.impulses:
             if not isfinite(event.time) or event.time < 0 or not isfinite(event.impulse_ns):
                 raise ValueError("Impulse time must be nonnegative and impulse finite")
@@ -47,6 +93,7 @@ class PlateSimulation:
                     (
                         event.time,
                         event.impulse_ns
+                        * event.mounting.force_direction[2]
                         * config.plate.patch_projection(m, n, event.x, event.y, event.patch_width),
                     )
                     for event in config.impulses
@@ -59,6 +106,7 @@ class PlateSimulation:
                         drive.frequency_hz,
                         drive.phase,
                         drive.force_n
+                        * drive.mounting.force_direction[2]
                         * config.plate.patch_projection(m, n, drive.x, drive.y, drive.patch_width),
                     )
                     for drive in config.drives

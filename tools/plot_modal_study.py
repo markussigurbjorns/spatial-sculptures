@@ -35,12 +35,7 @@ def main() -> None:
     )
     report = json.loads((args.results / "report.json").read_text(encoding="utf-8"))
     parameters = report["parameters"]
-    config.plate = type(config.plate)(**parameters["plate"])
-    config.modes_per_axis = parameters["modes_per_axis"]
-    config.damping_ratio = parameters["damping_ratio"]
-    config.impulses = tuple(config_module.Impulse(**v) for v in parameters["impulses"])
-    config.drives = tuple(config_module.Drive(**v) for v in parameters["drives"])
-    config.pickups = tuple(tuple(v) for v in parameters["pickups"])
+    config = config_module.config_from_dict(parameters)
     args.output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({"font.size": 10, "axes.spines.top": False, "axes.spines.right": False})
     x = np.linspace(-config.plate.length_x / 2, config.plate.length_x / 2, 81)

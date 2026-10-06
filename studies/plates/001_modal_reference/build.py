@@ -7,8 +7,10 @@ This is an inspection view; it does not synchronize playback of the offline WAV.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from array import array
+from dataclasses import asdict
 from pathlib import Path
 
 if not __package__:
@@ -36,20 +38,20 @@ def modal_reference_frame_change(scene, _depsgraph=None) -> None:
     scene["retained_energy_j"] = state.energy_joules
 
 
-def build(*, driven: bool = False):
+def build(*, driven: bool = False, experiment: str | None = None, config_path: Path | None = None):
     import bpy
 
     from spatial_sculptures.blender.camera import create_camera
     from spatial_sculptures.blender.materials import brushed_steel
     from spatial_sculptures.blender.utils import HANDLER_TAG, clear_scene
 
-    from .config import default_config
+    from .config import load_config
     from .simulation import PlateSimulation
 
     global _adapter
-    clear_scene((_HANDLER_NAME,))
-    config = default_config(driven=driven)
+    config = load_config(driven=driven, experiment=experiment, config_path=config_path)
     simulation = PlateSimulation(config)
+    clear_scene((_HANDLER_NAME,))
     plate = config.plate
     count = 32
     base = tuple(
@@ -91,6 +93,8 @@ def build(*, driven: bool = False):
     scene["model"] = "Dry reference plate; all edges simply supported; not the curved basin"
     scene["visual_displacement_gain"] = config.visual_gain
     scene["physical_seconds_per_visual_second"] = config.visual_time_scale
+    scene["experiment"] = experiment or ("saved configuration" if config_path else "default")
+    scene["physical_configuration_json"] = json.dumps(asdict(config), sort_keys=True)
     for screen in bpy.data.screens:
         for area in screen.areas:
             if area.type == "VIEW_3D":
@@ -113,8 +117,14 @@ def main() -> None:
     parser.add_argument("--driven", action="store_true")
     parser.add_argument("--frame", type=int, default=1)
     parser.add_argument("--render-output", type=Path)
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--experiment")
+    source.add_argument("--config", type=Path)
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else [])
-    build(driven=args.driven)
+    try:
+        build(driven=args.driven, experiment=args.experiment, config_path=args.config)
+    except (OSError, ValueError, TypeError) as error:
+        parser.error(str(error))
     bpy.context.scene.frame_set(args.frame)
     if args.render_output:
         path = args.render_output.resolve()

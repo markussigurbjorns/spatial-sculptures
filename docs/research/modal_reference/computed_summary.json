@@ -9,6 +9,19 @@
       "density": 8030.0,
       "poisson_ratio": 0.3
     },
+    "profile": {
+      "kind": "flat_rectangle",
+      "rise_m": 0.0,
+      "mesh_path": null
+    },
+    "thickness_map": null,
+    "supports": {
+      "kind": "simply_supported_edges",
+      "contacts": []
+    },
+    "water": {
+      "depth_m": 0.0
+    },
     "modes_per_axis": 6,
     "damping_ratio": 0.005,
     "impulses": [
@@ -17,7 +30,16 @@
         "x": -0.34,
         "y": 0.14,
         "impulse_ns": 0.03,
-        "patch_width": 0.05
+        "patch_width": 0.05,
+        "mounting": {
+          "force_direction": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "added_mass_kg": 0.0,
+          "stiffness_n_per_m": null
+        }
       }
     ],
     "drives": [],
@@ -37,6 +59,17 @@
     "visual_time_scale": 0.02,
     "visual_gain": 2000.0
   },
+  "model_capabilities": {
+    "geometry": "flat rectangle; centred XY coordinates in metres",
+    "material": "homogeneous isotropic E, density and Poisson ratio",
+    "thickness": "uniform, in metres",
+    "supports": "continuous simply supported edges; no local support springs",
+    "mounting": "rigid uniform square patch, transverse force, no attached mass",
+    "fluid": "dry only; water depth must be zero",
+    "sensors": "ideal point contact velocity in m/s; not pressure"
+  },
+  "experiment": null,
+  "plate_mass_kg": 67.06656,
   "mode_count": 36,
   "fundamental_frequency_hz": 14.278513162374741,
   "highest_retained_frequency_hz": 514.0264738454906,
@@ -44,18 +77,39 @@
   "final_retained_energy_j": 3.547756162224513e-07,
   "maximum_energy_increase_j": -1.9213976674436903e-13,
   "pickup_units": "m/s; virtual contact velocity, not hydrophone pressure",
+  "response_sampling_hz": 8224.5,
+  "pickup_statistics": [
+    {
+      "index": 1,
+      "position_m": [
+        -0.2,
+        -0.04
+      ],
+      "sampled_peak_velocity_m_per_s": 0.0049505827140981,
+      "sampled_rms_velocity_m_per_s": 0.000564144290923477
+    },
+    {
+      "index": 2,
+      "position_m": [
+        0.25,
+        -0.1
+      ],
+      "sampled_peak_velocity_m_per_s": 0.008553768112831494,
+      "sampled_rms_velocity_m_per_s": 0.0006165451368890627
+    }
+  ],
   "measurements": "none; material properties and damping are provisional",
   "provenance": {
     "python_version": "3.13.13",
     "sampling_backend": "numpy",
-    "config_sha256": "4eacb203a11f2e2afc4c1876fbff6069583ddcf6e4c63c15b67734a3d74dd1b4",
+    "config_sha256": "e59489a209c0b36ca3835fadb0d191c21b8f0726000d381cdd87993e5b2c1988",
     "source_sha256": {
       "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
       "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
       "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
-      "studies/plates/001_modal_reference/config.py": "35907aeb213920cd41afe30e079bcb37f9985fbd56acf7fda2b2ed0c56ac74e7",
-      "studies/plates/001_modal_reference/simulation.py": "afe21584dc8d7ba95a4eac8e1a71349a47e3200b930b6b68484326f548b1444c",
-      "tools/run_modal_study.py": "cb25a09aa6a7531e34304ae37d1cb28fb6537985307af78b444d6e349b2b11f2"
+      "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
+      "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
+      "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f"
     }
   },
   "audio_gain_per_m_per_s": 105.09737831434347,
