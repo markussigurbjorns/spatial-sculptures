@@ -144,6 +144,7 @@ def run_study(
                 name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
                 for name in (
                     "src/spatial_sculptures/simulation/modal.py",
+                    "src/spatial_sculptures/simulation/mode_bank.py",
                     "src/spatial_sculptures/simulation/plates.py",
                     "src/spatial_sculptures/audio/synthesis.py",
                     "studies/plates/001_modal_reference/config.py",

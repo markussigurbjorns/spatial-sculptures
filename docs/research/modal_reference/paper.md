@@ -5,6 +5,11 @@
 Project: Spatial Sculptures. Authorship and publication venue remain to be decided.  
 Status: computational reference study; no physical measurements or listener study.
 
+Implementation update: the analytical response engine is now shared with the
+[numerical dry-basin study](../dry_basin/paper.md). This paper's flat-plate scope
+and numerical results remain unchanged. The companion paper records the curved
+shell, local supports, housing masses and synchronized audio/video export.
+
 ## Abstract
 
 This project asks whether spatial perception can emerge from the vibration and

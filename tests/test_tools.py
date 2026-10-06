@@ -17,6 +17,22 @@ class ToolTests(unittest.TestCase):
     def test_package_and_prototype_imports_without_blender(self) -> None:
         import sys
 
+        numerical_modules = {
+            "spatial_sculptures.simulation.splines",
+            "spatial_sculptures.simulation.structures",
+            "spatial_sculptures.simulation.mode_cache",
+            "prototypes.001_resonant_surface.dry.config",
+            "prototypes.001_resonant_surface.dry.model",
+        }
+
+        def import_module(name):
+            try:
+                importlib.import_module(name)
+            except ModuleNotFoundError as error:
+                # Only the documented optional numerical backend requires NumPy.
+                if name not in numerical_modules or error.name != "numpy":
+                    raise
+
         for base in (REPOSITORY_ROOT / "src" / "spatial_sculptures", REPOSITORY_ROOT / "tools"):
             for path in base.rglob("*.py"):
                 root = (
@@ -27,12 +43,10 @@ class ToolTests(unittest.TestCase):
                 parts = list(path.relative_to(root).with_suffix("").parts)
                 if parts[-1] == "__init__":
                     parts.pop()
-                importlib.import_module(".".join(parts))
+                import_module(".".join(parts))
         prototype = REPOSITORY_ROOT / "prototypes" / "001_resonant_surface"
         for path in prototype.rglob("*.py"):
-            importlib.import_module(
-                ".".join(path.relative_to(REPOSITORY_ROOT).with_suffix("").parts)
-            )
+            import_module(".".join(path.relative_to(REPOSITORY_ROOT).with_suffix("").parts))
         self.assertNotIn("bpy", sys.modules)
 
     def test_paths_and_blender_argument_order(self) -> None:

@@ -47,7 +47,7 @@ def remove_frame_handlers(names: Iterable[str] = (), *, tagged: bool = False) ->
 
 
 def clear_scene(handler_names: Iterable[str] = ()) -> None:
-    """Clear scene objects and research callbacks so repeated builds remain clean.
+    """Clear scene objects, sequencer and research callbacks for clean repeated builds.
 
     Prototype callbacks should carry HANDLER_TAG or be supplied by name. Unrelated
     add-on callbacks are left alone. Remove orphaned meshes/materials from old builds.
@@ -56,9 +56,19 @@ def clear_scene(handler_names: Iterable[str] = ()) -> None:
 
     remove_frame_handlers(handler_names, tagged=True)
     remove_timers(tagged=True)
+    # A new sculpture scene must not retain a previous model's soundtrack.
+    if bpy.context.scene.sequence_editor:
+        bpy.context.scene.sequence_editor_clear()
     for obj in list(bpy.context.scene.objects):
         bpy.data.objects.remove(obj, do_unlink=True)
-    for collection in (bpy.data.meshes, bpy.data.materials, bpy.data.cameras, bpy.data.lights):
+    for collection in (
+        bpy.data.meshes,
+        bpy.data.curves,
+        bpy.data.materials,
+        bpy.data.cameras,
+        bpy.data.lights,
+        bpy.data.sounds,
+    ):
         for block in list(collection):
             if block.users == 0:
                 collection.remove(block)

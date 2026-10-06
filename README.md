@@ -69,7 +69,34 @@ Its `simulation.py` produces state independently of Blender. Its
 mesh. Its `supercollider/` directory holds an optional receiver and a small
 resonant-noise listening sketch.
 
-## Run the first prototype
+## Run the numerical dry basin
+
+The new [dry-basin model](prototypes/001_resonant_surface/dry/README.md) computes
+curved-shell modes with local spring supports and attached exciter masses. Python
+generates contact-velocity audio and vector displacement from the same response;
+Blender consumes precomputed frames. The modes are cached, so repeat playback
+does not repeat the structural solve.
+
+```bash
+python -m pip install -e '.[numerical]'  # optional NumPy backend
+python tools/run_dry_basin.py --preview --view
+python tools/run_dry_basin.py --preview --render
+```
+
+Press Space in Blender for synchronized playback. Rendering produces an MP4 with
+audio under `prototypes/001_resonant_surface/renders/dry/` and requires FFmpeg.
+Without `--view` or `--render`, the command exports audio/data without Blender.
+Use `--experiment 003_soft_supports` or `--config path/to/configuration.json` for
+reproducible variations. Preview reduces presentation cost, not structural physics.
+
+This model is **dry**: the two listening channels are normalized metal contact
+velocity, with no water pressure or acoustic radiation. Its physical clock is
+shared by audio and picture; video displacement is magnified and temporally
+averaged. Separate slowed inspection deliberately omits audio. The
+[dry-basin paper](docs/research/dry_basin/paper.md) records numerical plate
+verification, curved-shell refinement, assumptions and limitations.
+
+## Run the artistic water prototype
 
 Install Blender separately and make `blender` available on PATH. The initial
 prototype targets Blender 4.x or newer with bundled Python 3.11+, and has been
@@ -251,7 +278,10 @@ for saved-configuration replay in Python and Blender.
 Profile, supports, mounting and water depth have explicit configuration fields.
 This dry analytical backend rejects unsupported curved/imported profiles, local
 supports, nonuniform thickness, attached exciter mass/compliance and water loading.
-These need later solvers; provisional values can guide that work before fabrication.
+The separate dry-basin backend now handles its configurable curved graph, uniform
+thickness, local spring patches and rigid attached masses. Water coupling,
+nonuniform thickness and compliant actuator mounts remain future work. Provisional
+values can guide experiments before fabrication.
 
 Use Python 3.11+ for tooling and pure field/sensor experiments. Runtime
 dependencies are empty; development tools and NumPy acceleration are optional.

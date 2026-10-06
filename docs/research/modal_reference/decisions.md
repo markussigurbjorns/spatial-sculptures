@@ -30,8 +30,12 @@ reference accepts uniform rectangular geometry, ideal edge supports, rigid
 transverse patch forces and zero water depth. Other requests need a solver that
 represents those effects and are rejected here.
 
-The next solver milestone is the dry curved basin with local supports and mounting
-effects. Water coupling and pressure sensing follow. Before physical validation,
+The dry curved-basin milestone is now implemented separately in
+[`prototypes/001_resonant_surface/dry/`](../../../prototypes/001_resonant_surface/dry/README.md).
+It adds a numerical shell, local translational spring patches and rigid housing
+masses, verified first against this analytical plate. See its
+[paper and limitations](../dry_basin/paper.md). Water coupling and pressure sensing
+follow. Before physical validation,
 define repeatable recordings and sensor calibration; measurements then constrain
 the provisional values. Choose an analysis bandwidth and an error criterion for
 each study rather than claiming that one retained mode count is sufficient.

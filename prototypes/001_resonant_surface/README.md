@@ -29,6 +29,24 @@ specification or a prediction of its sound.
 
 ## Current simulation status
 
+There are now two runnable versions of this sculpture:
+
+| Version | What it models | Listening output |
+| --- | --- | --- |
+| Original `build.py` | Artistic waves on water and sculpture geometry | Optional SuperCollider resonant-noise sketch driven by control values |
+| [Numerical dry basin](dry/README.md) | Linear curved metal shell, local spring supports and housing masses | Model-derived contact-velocity WAV and synchronized Blender/MP4 |
+
+```bash
+python tools/run_dry_basin.py --preview --view
+python tools/run_dry_basin.py --preview --render
+```
+
+The numerical version has no water. Its visible pickups represent metal contact
+sensors rather than hydrophones. Profile, thickness, supports and mounting masses
+affect its eigenmodes; a shared modal response generates audio and motion. The
+[technical paper](../../docs/research/dry_basin/paper.md) documents this transition
+and its verification limits. The original version is preserved below.
+
 Version 1 is a geometric prototype and a visual wave/interference simulation.
 It is **not CFD, not FEM, and not a physically correct acoustic simulation**.
 Default builds produce no audio or active feedback. There is no measured pressure

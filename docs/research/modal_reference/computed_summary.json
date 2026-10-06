@@ -105,11 +105,12 @@
     "config_sha256": "e59489a209c0b36ca3835fadb0d191c21b8f0726000d381cdd87993e5b2c1988",
     "source_sha256": {
       "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+      "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
       "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
       "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
       "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-      "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-      "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f"
+      "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+      "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e"
     }
   },
   "audio_gain_per_m_per_s": 105.09737831434347,

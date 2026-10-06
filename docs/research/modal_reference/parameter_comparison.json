@@ -114,11 +114,12 @@
         "config_sha256": "e59489a209c0b36ca3835fadb0d191c21b8f0726000d381cdd87993e5b2c1988",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/001_baseline.py": "4ca3cbeacf5bd0bb5b543a90c8f64fd2fbadd09ea403ce0a7e2fef7931216817",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }
@@ -231,11 +232,12 @@
         "config_sha256": "7312bff7238dd1397d24a67dea07f3f11facb3096a751dc2d8c0492f2805bc7a",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/002_thin_3mm.py": "588601dbcd4a908522cf6ca0a994019ea0f5b1fd5764f5484ed951ec22aa19f7",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }
@@ -348,11 +350,12 @@
         "config_sha256": "d38a680ed1627f3850b1c978007529192e0e79663d9296183d556aae965f4cdb",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/003_thick_7mm.py": "34c369bc06ec0a99c576911f8dfcf7c97257f17e40c77bee23ca38c356ad2fb3",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }
@@ -465,11 +468,12 @@
         "config_sha256": "b9851eae2950ff8a324270e8f2d7599b4b492fd272badc626cb23010e5ffb093",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/004_center_excitation.py": "e5b59f882d714e5b68a24edc80497e4e092ed19255a4cedd059c737a38e96a25",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }
@@ -582,11 +586,12 @@
         "config_sha256": "fbe91efd785437681279e5176a68f7abdd28c9d8c96f053a385412c9798a2170",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/005_wide_contact.py": "4145fa668370ea48d6b9f93376deab0d355fb02843e3d6337323b4ae1c5d3093",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }
@@ -699,11 +704,12 @@
         "config_sha256": "1441f83681acbd90e067437841ef322b66eb5677c535a5fa48747d5bec82a6f8",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/006_more_damping.py": "ffdebd51ff2a7ffdb08a0400b4009a1407599e82b937cd098340736f30c5811d",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }
@@ -816,11 +822,12 @@
         "config_sha256": "433daa7b4f67163a4f42d5db3b2ed1cefbb64fba8cc14fe1714558070743b87c",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/007_shifted_pickups.py": "7b5293bc749403f4a5eb1988bc045f57d2511f037c8dbe76c1c3c79cb356e381",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }
@@ -988,11 +995,12 @@
         "config_sha256": "fe20756987f8f920a43dbce76dca2fb09d9e80a329bdf4df14613bb1edd714b7",
         "source_sha256": {
           "src/spatial_sculptures/simulation/modal.py": "f4bdced26789da09a6506a6c0ee8c737070a25af6f6f194752e12fd8f9394624",
+          "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
           "src/spatial_sculptures/simulation/plates.py": "e035fe1fb347c510058d4b425ea10e768350926b5f638e6215a438e3a70ab2f5",
           "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
           "studies/plates/001_modal_reference/config.py": "42b7a5d7f73e506134390804c92bf9afac813c492a1be7436ce218b88d03b761",
-          "studies/plates/001_modal_reference/simulation.py": "526c2e548451bcf2109ef7aa2e29fb6aba8790879e67851572d52d10512f3d3f",
-          "tools/run_modal_study.py": "12235a71dc132fd6dee5826855b244c2878b58b661528fbf77c2b64eb9eb9d5f",
+          "studies/plates/001_modal_reference/simulation.py": "3a5580b761b7177a490672875c319d1ee5b351a9fd2292b7f25ec1d1292ba0cb",
+          "tools/run_modal_study.py": "4ba035707534ad25262f657039ea91d1e8c1694c59b00bf6aa77c294afc84d9e",
           "studies/plates/001_modal_reference/experiments/008_three_drives.py": "cf147ee9a2098c97f90a00920f73d97b59be8ad100ebd9f3fc97d31b155df3d2",
           "studies/plates/001_modal_reference/experiments/__init__.py": "e6978e4cd10465cdc64e965624ace7346be2c7bcccdf49699069ed262fc9fe54"
         }

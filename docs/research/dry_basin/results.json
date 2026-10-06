@@ -1,0 +1,1463 @@
+{
+  "scope": "provisional dry shell, no physical measurements or fluid coupling",
+  "reports": {
+    "001_baseline": {
+      "model": "linear dry Kirchhoff-Love graph shell; compliant patch supports; rigid attached masses",
+      "parameters": {
+        "surface": {
+          "radius_x": 0.72,
+          "radius_y": 0.58,
+          "rise": 0.12,
+          "asymmetry": 0.006,
+          "center_z": 0.72,
+          "domain": "ellipse"
+        },
+        "material": {
+          "youngs_modulus": 193000000000.0,
+          "density": 8030.0,
+          "poisson_ratio": 0.3
+        },
+        "thickness": 0.005,
+        "supports": [
+          {
+            "patch": {
+              "x": -0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": -0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          }
+        ],
+        "exciters": [
+          {
+            "patch": {
+              "x": -0.34,
+              "y": 0.14,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 59.0,
+            "phase": 0.0,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.31,
+              "y": 0.13,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 61.3,
+            "phase": 1.7,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.02,
+              "y": -0.32,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 57.8,
+            "phase": 3.1,
+            "start": 0.0
+          }
+        ],
+        "impulses": [
+          {
+            "exciter": 0,
+            "time": 0.0,
+            "impulse_ns": 0.03
+          }
+        ],
+        "pickups": [
+          [
+            -0.2,
+            -0.04
+          ],
+          [
+            0.25,
+            -0.1
+          ]
+        ],
+        "elements": [
+          8,
+          8
+        ],
+        "gauss_order": 5,
+        "mode_count": 16,
+        "damping_ratio": 0.005,
+        "water_depth_m": 0.0,
+        "duration": 0.5,
+        "sample_rate": 48000,
+        "fps": 30,
+        "visual_gain": 1500.0,
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "resolution": [
+          480,
+          360
+        ],
+        "rings": 8,
+        "segments": 48
+      },
+      "requested_duration_s": 0.5,
+      "physical_duration_s": 0.5,
+      "visual_duration_s": 0.5,
+      "frame_count": 15,
+      "audio_samples": 24000,
+      "audio_gain_per_m_per_s": 1131.3720305291604,
+      "mode_frequencies_hz": [
+        4.297010537520432,
+        4.297379461305325,
+        5.3447433325322296,
+        14.527626983952523,
+        17.087021986464062,
+        22.410588940042267,
+        24.574147445482655,
+        41.06709144420101,
+        44.41722925886802,
+        55.14891651898679,
+        69.8507744174772,
+        77.10404367787011,
+        103.87297343371124,
+        110.80148332434243,
+        149.0631824337825,
+        150.1468319608748
+      ],
+      "modal_masses_kg": [
+        54.53114163970751,
+        54.808333679271364,
+        22.69898869368196,
+        7.917272972524143,
+        7.026549035082464,
+        7.219366699294271,
+        5.44050017607564,
+        8.066345131921329,
+        5.7952605386998295,
+        6.208818377311189,
+        4.940987950700985,
+        5.729468709127847,
+        5.060307826929319,
+        4.946990101867277,
+        4.426991090550078,
+        4.43263181682484
+      ],
+      "cache_key": "69fe01c5b7db430b3492d727482e1576f57838215c7a6717f804032a31baecc0",
+      "cache_path": "data/fem/001_resonant_surface/dry_modes_69fe01c5b7db430b3492.npz",
+      "cache_reused": false,
+      "diagnostics": {
+        "discarded_rigid_or_near_zero_modes": 0,
+        "maximum_relative_eigen_residual": 2.7888473762258244e-08,
+        "mass_condition_number_scaled": 786.8628030624875,
+        "degrees_of_freedom": 351,
+        "area_m2": 1.3572127998559065,
+        "shell_mass_kg": 54.49209391421465
+      },
+      "structural_provenance": {
+        "splines.py": "e6f35cb16fa9fffdbfe483fcf0ff12e8ffb2b0eb35a31ff950340101e4e8df15",
+        "structures.py": "a193270f4c1fcc6849170e1a8a6b2e288c13d3a220dc21fd8f77558f459bc419",
+        "mode_cache.py": "2083f58b24a1e391a5e64d00b267b57dfd6be64288fa307a35e2890c02adda49"
+      },
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
+        "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
+        "prototypes/001_resonant_surface/dry/config.py": "8ad35fcdbffecfe75d9b9057eee7b404ab2b64a1bd9ddb7cbf82a2ef927bd6fa",
+        "prototypes/001_resonant_surface/dry/model.py": "4fb7384ef921c9853c7044024964c527984891bdecdee93f9d7040f6879629e7",
+        "prototypes/001_resonant_surface/dry/build.py": "8a23e410ba77d8a59369b2efec8dc1af049daa78586f77998349c40df575df15",
+        "tools/run_dry_basin.py": "5b011be6c332345274ced9ab68533148ab70ff493878dca1ee13e33b34348929"
+      },
+      "initial_retained_energy_j": 2.3025438561063222e-05,
+      "final_retained_energy_j": 9.153799501937428e-06,
+      "pickup_peak_velocity_m_per_s": [
+        0.0007954942987047824,
+        0.0007648566421482883
+      ],
+      "pickup_units": "global vertical contact velocity m/s; not hydrophone pressure or radiated sound",
+      "presentation": {
+        "frame_count": 15,
+        "fps": 30,
+        "physical_seconds_per_visual_second": 1,
+        "visual_gain": 1500.0,
+        "audio_path": "/home/maggi/Documents/spatial-sculptures/prototypes/001_resonant_surface/renders/dry_experiments/001_baseline/contact_pickups.wav",
+        "exposure_fraction": 0.5,
+        "exposure_samples": 11,
+        "presentation": "exposure-averaged displacement, not full optical motion blur"
+      },
+      "measurements": "none; all supports/masses/damping and profile are provisional",
+      "validation": "plate verification and separate shell refinement; no specimen/pressure/radiation validation"
+    },
+    "002_flat_profile": {
+      "model": "linear dry Kirchhoff-Love graph shell; compliant patch supports; rigid attached masses",
+      "parameters": {
+        "surface": {
+          "radius_x": 0.72,
+          "radius_y": 0.58,
+          "rise": 0.0,
+          "asymmetry": 0.0,
+          "center_z": 0.72,
+          "domain": "ellipse"
+        },
+        "material": {
+          "youngs_modulus": 193000000000.0,
+          "density": 8030.0,
+          "poisson_ratio": 0.3
+        },
+        "thickness": 0.005,
+        "supports": [
+          {
+            "patch": {
+              "x": -0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": -0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          }
+        ],
+        "exciters": [
+          {
+            "patch": {
+              "x": -0.34,
+              "y": 0.14,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 59.0,
+            "phase": 0.0,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.31,
+              "y": 0.13,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 61.3,
+            "phase": 1.7,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.02,
+              "y": -0.32,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 57.8,
+            "phase": 3.1,
+            "start": 0.0
+          }
+        ],
+        "impulses": [
+          {
+            "exciter": 0,
+            "time": 0.0,
+            "impulse_ns": 0.03
+          }
+        ],
+        "pickups": [
+          [
+            -0.2,
+            -0.04
+          ],
+          [
+            0.25,
+            -0.1
+          ]
+        ],
+        "elements": [
+          8,
+          8
+        ],
+        "gauss_order": 5,
+        "mode_count": 16,
+        "damping_ratio": 0.005,
+        "water_depth_m": 0.0,
+        "duration": 0.5,
+        "sample_rate": 48000,
+        "fps": 30,
+        "visual_gain": 1500.0,
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "resolution": [
+          480,
+          360
+        ],
+        "rings": 8,
+        "segments": 48
+      },
+      "requested_duration_s": 0.5,
+      "physical_duration_s": 0.5,
+      "visual_duration_s": 0.5,
+      "frame_count": 15,
+      "audio_samples": 24000,
+      "audio_gain_per_m_per_s": 260.8464065263479,
+      "mode_frequencies_hz": [
+        4.370887480820654,
+        4.370894406872197,
+        5.462936312048846,
+        10.815616387446108,
+        15.54947703411842,
+        20.4257493113305,
+        23.80541393351412,
+        32.76226340079734,
+        37.380169413141495,
+        39.74687116662769,
+        55.48387908639651,
+        57.04865151943748,
+        65.71130179605892,
+        67.10674882489346,
+        71.42744198875526,
+        91.81195885188102
+      ],
+      "modal_masses_kg": [
+        53.02061832421453,
+        52.976877147100545,
+        21.817444523654636,
+        16.41138011519207,
+        7.599572423438295,
+        10.106170203140872,
+        5.691742050736549,
+        8.665764128580713,
+        11.451911840010121,
+        8.107325479115364,
+        6.890060060203932,
+        9.630059221280774,
+        4.568751663330641,
+        10.031755411958674,
+        7.117460166868879,
+        11.179182449828273
+      ],
+      "cache_key": "794a9f29e944f49eac3378d5bc9f2d00c0ce57b2ae2af740b1d5ce5cfad64cda",
+      "cache_path": "data/fem/001_resonant_surface/dry_modes_794a9f29e944f49eac33.npz",
+      "cache_reused": false,
+      "diagnostics": {
+        "discarded_rigid_or_near_zero_modes": 0,
+        "maximum_relative_eigen_residual": 3.441885493496444e-08,
+        "mass_condition_number_scaled": 784.0724573875566,
+        "degrees_of_freedom": 351,
+        "area_m2": 1.3119375357056282,
+        "shell_mass_kg": 52.67429205858098
+      },
+      "structural_provenance": {
+        "splines.py": "e6f35cb16fa9fffdbfe483fcf0ff12e8ffb2b0eb35a31ff950340101e4e8df15",
+        "structures.py": "a193270f4c1fcc6849170e1a8a6b2e288c13d3a220dc21fd8f77558f459bc419",
+        "mode_cache.py": "2083f58b24a1e391a5e64d00b267b57dfd6be64288fa307a35e2890c02adda49"
+      },
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
+        "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
+        "prototypes/001_resonant_surface/dry/config.py": "8ad35fcdbffecfe75d9b9057eee7b404ab2b64a1bd9ddb7cbf82a2ef927bd6fa",
+        "prototypes/001_resonant_surface/dry/model.py": "4fb7384ef921c9853c7044024964c527984891bdecdee93f9d7040f6879629e7",
+        "prototypes/001_resonant_surface/dry/build.py": "8a23e410ba77d8a59369b2efec8dc1af049daa78586f77998349c40df575df15",
+        "tools/run_dry_basin.py": "5b011be6c332345274ced9ab68533148ab70ff493878dca1ee13e33b34348929"
+      },
+      "initial_retained_energy_j": 7.921753842654136e-05,
+      "final_retained_energy_j": 2.0279524096745278e-05,
+      "pickup_peak_velocity_m_per_s": [
+        0.0030749126590104434,
+        0.003450306300880904
+      ],
+      "pickup_units": "global vertical contact velocity m/s; not hydrophone pressure or radiated sound",
+      "presentation": {
+        "frame_count": 15,
+        "fps": 30,
+        "physical_seconds_per_visual_second": 1,
+        "visual_gain": 1500.0,
+        "audio_path": "/home/maggi/Documents/spatial-sculptures/prototypes/001_resonant_surface/renders/dry_experiments/002_flat_profile/contact_pickups.wav",
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "presentation": "exposure-averaged displacement, not full optical motion blur"
+      },
+      "measurements": "none; all supports/masses/damping and profile are provisional",
+      "validation": "plate verification and separate shell refinement; no specimen/pressure/radiation validation"
+    },
+    "003_soft_supports": {
+      "model": "linear dry Kirchhoff-Love graph shell; compliant patch supports; rigid attached masses",
+      "parameters": {
+        "surface": {
+          "radius_x": 0.72,
+          "radius_y": 0.58,
+          "rise": 0.12,
+          "asymmetry": 0.006,
+          "center_z": 0.72,
+          "domain": "ellipse"
+        },
+        "material": {
+          "youngs_modulus": 193000000000.0,
+          "density": 8030.0,
+          "poisson_ratio": 0.3
+        },
+        "thickness": 0.005,
+        "supports": [
+          {
+            "patch": {
+              "x": -0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              2500.0,
+              2500.0,
+              75000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": -0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              2500.0,
+              2500.0,
+              75000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              2500.0,
+              2500.0,
+              75000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              2500.0,
+              2500.0,
+              75000.0
+            ]
+          }
+        ],
+        "exciters": [
+          {
+            "patch": {
+              "x": -0.34,
+              "y": 0.14,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 59.0,
+            "phase": 0.0,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.31,
+              "y": 0.13,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 61.3,
+            "phase": 1.7,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.02,
+              "y": -0.32,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 57.8,
+            "phase": 3.1,
+            "start": 0.0
+          }
+        ],
+        "impulses": [
+          {
+            "exciter": 0,
+            "time": 0.0,
+            "impulse_ns": 0.03
+          }
+        ],
+        "pickups": [
+          [
+            -0.2,
+            -0.04
+          ],
+          [
+            0.25,
+            -0.1
+          ]
+        ],
+        "elements": [
+          8,
+          8
+        ],
+        "gauss_order": 5,
+        "mode_count": 16,
+        "damping_ratio": 0.005,
+        "water_depth_m": 0.0,
+        "duration": 0.5,
+        "sample_rate": 48000,
+        "fps": 30,
+        "visual_gain": 1500.0,
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "resolution": [
+          480,
+          360
+        ],
+        "rings": 8,
+        "segments": 48
+      },
+      "requested_duration_s": 0.5,
+      "physical_duration_s": 0.5,
+      "visual_duration_s": 0.5,
+      "frame_count": 15,
+      "audio_samples": 24000,
+      "audio_gain_per_m_per_s": 1009.6283545323695,
+      "mode_frequencies_hz": [
+        2.1485928126859988,
+        2.148771591211934,
+        2.6724300402978725,
+        10.726503587808839,
+        11.350783078624685,
+        14.763145903753301,
+        17.097284806970443,
+        25.44772664129123,
+        39.22690851925691,
+        42.39104926961376,
+        67.60172403936426,
+        69.65210473999313,
+        103.4757462868232,
+        105.112870368378,
+        147.52344300359022,
+        147.72654263605426
+      ],
+      "modal_masses_kg": [
+        54.541640010979144,
+        54.80901804514717,
+        22.699701905388523,
+        19.072899324789685,
+        10.046935014847662,
+        9.851967930923314,
+        7.704021618915474,
+        9.546490666339238,
+        6.648781105035054,
+        6.737874955271222,
+        5.997300725236824,
+        6.06503935068387,
+        5.28905719455032,
+        5.327463886993895,
+        4.698336684293614,
+        4.699332662903281
+      ],
+      "cache_key": "ea802d2a2713b46431fe1bbfe83244e3ee638ee6c405dbcfdf0a8c37aadb9ba7",
+      "cache_path": "data/fem/001_resonant_surface/dry_modes_ea802d2a2713b46431fe.npz",
+      "cache_reused": false,
+      "diagnostics": {
+        "discarded_rigid_or_near_zero_modes": 0,
+        "maximum_relative_eigen_residual": 1.225913079754453e-06,
+        "mass_condition_number_scaled": 786.8628030624875,
+        "degrees_of_freedom": 351,
+        "area_m2": 1.3572127998559065,
+        "shell_mass_kg": 54.49209391421465
+      },
+      "structural_provenance": {
+        "splines.py": "e6f35cb16fa9fffdbfe483fcf0ff12e8ffb2b0eb35a31ff950340101e4e8df15",
+        "structures.py": "a193270f4c1fcc6849170e1a8a6b2e288c13d3a220dc21fd8f77558f459bc419",
+        "mode_cache.py": "2083f58b24a1e391a5e64d00b267b57dfd6be64288fa307a35e2890c02adda49"
+      },
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
+        "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
+        "prototypes/001_resonant_surface/dry/config.py": "8ad35fcdbffecfe75d9b9057eee7b404ab2b64a1bd9ddb7cbf82a2ef927bd6fa",
+        "prototypes/001_resonant_surface/dry/model.py": "4fb7384ef921c9853c7044024964c527984891bdecdee93f9d7040f6879629e7",
+        "prototypes/001_resonant_surface/dry/build.py": "8a23e410ba77d8a59369b2efec8dc1af049daa78586f77998349c40df575df15",
+        "tools/run_dry_basin.py": "5b011be6c332345274ced9ab68533148ab70ff493878dca1ee13e33b34348929"
+      },
+      "initial_retained_energy_j": 2.287948966963944e-05,
+      "final_retained_energy_j": 1.3330451930132265e-05,
+      "pickup_peak_velocity_m_per_s": [
+        0.0007919296001256133,
+        0.0008914171199330608
+      ],
+      "pickup_units": "global vertical contact velocity m/s; not hydrophone pressure or radiated sound",
+      "presentation": {
+        "frame_count": 15,
+        "fps": 30,
+        "physical_seconds_per_visual_second": 1,
+        "visual_gain": 1500.0,
+        "audio_path": "/home/maggi/Documents/spatial-sculptures/prototypes/001_resonant_surface/renders/dry_experiments/003_soft_supports/contact_pickups.wav",
+        "exposure_fraction": 0.5,
+        "exposure_samples": 10,
+        "presentation": "exposure-averaged displacement, not full optical motion blur"
+      },
+      "measurements": "none; all supports/masses/damping and profile are provisional",
+      "validation": "plate verification and separate shell refinement; no specimen/pressure/radiation validation"
+    },
+    "004_heavier_exciters": {
+      "model": "linear dry Kirchhoff-Love graph shell; compliant patch supports; rigid attached masses",
+      "parameters": {
+        "surface": {
+          "radius_x": 0.72,
+          "radius_y": 0.58,
+          "rise": 0.12,
+          "asymmetry": 0.006,
+          "center_z": 0.72,
+          "domain": "ellipse"
+        },
+        "material": {
+          "youngs_modulus": 193000000000.0,
+          "density": 8030.0,
+          "poisson_ratio": 0.3
+        },
+        "thickness": 0.005,
+        "supports": [
+          {
+            "patch": {
+              "x": -0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": -0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          }
+        ],
+        "exciters": [
+          {
+            "patch": {
+              "x": -0.34,
+              "y": 0.14,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.6,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 59.0,
+            "phase": 0.0,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.31,
+              "y": 0.13,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.6,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 61.3,
+            "phase": 1.7,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.02,
+              "y": -0.32,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.6,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 57.8,
+            "phase": 3.1,
+            "start": 0.0
+          }
+        ],
+        "impulses": [
+          {
+            "exciter": 0,
+            "time": 0.0,
+            "impulse_ns": 0.03
+          }
+        ],
+        "pickups": [
+          [
+            -0.2,
+            -0.04
+          ],
+          [
+            0.25,
+            -0.1
+          ]
+        ],
+        "elements": [
+          8,
+          8
+        ],
+        "gauss_order": 5,
+        "mode_count": 16,
+        "damping_ratio": 0.005,
+        "water_depth_m": 0.0,
+        "duration": 0.5,
+        "sample_rate": 48000,
+        "fps": 30,
+        "visual_gain": 1500.0,
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "resolution": [
+          480,
+          360
+        ],
+        "rings": 8,
+        "segments": 48
+      },
+      "requested_duration_s": 0.5,
+      "physical_duration_s": 0.5,
+      "visual_duration_s": 0.5,
+      "frame_count": 15,
+      "audio_samples": 24000,
+      "audio_gain_per_m_per_s": 1153.9804356938312,
+      "mode_frequencies_hz": [
+        4.241676130577394,
+        4.242045254138645,
+        5.307008083738723,
+        14.424372235142148,
+        16.97271111562562,
+        22.203399003964588,
+        24.42192522328792,
+        40.992030566069616,
+        44.381194935285954,
+        55.02584329580196,
+        69.78888225074488,
+        77.0586756910264,
+        103.85459424015707,
+        110.76431326676826,
+        149.0312934572922,
+        150.14463838176252
+      ],
+      "modal_masses_kg": [
+        55.92061636998313,
+        56.02767500313555,
+        23.009588612262757,
+        7.611683389476753,
+        6.661980049751451,
+        7.330572140077449,
+        5.567162523966866,
+        7.874984616799104,
+        5.637830527641714,
+        6.1945603008346914,
+        4.942364758290505,
+        5.747552311848159,
+        5.04208181589924,
+        4.938659446047355,
+        4.423349160149449,
+        4.425705101052015
+      ],
+      "cache_key": "8e119ba710cc610ec26737cb655457e75fcd04d7329cd14d72895ec0efffe85a",
+      "cache_path": "data/fem/001_resonant_surface/dry_modes_8e119ba710cc610ec267.npz",
+      "cache_reused": false,
+      "diagnostics": {
+        "discarded_rigid_or_near_zero_modes": 0,
+        "maximum_relative_eigen_residual": 2.1395685560222735e-08,
+        "mass_condition_number_scaled": 782.1599129647868,
+        "degrees_of_freedom": 351,
+        "area_m2": 1.3572127998559065,
+        "shell_mass_kg": 54.49209391421465
+      },
+      "structural_provenance": {
+        "splines.py": "e6f35cb16fa9fffdbfe483fcf0ff12e8ffb2b0eb35a31ff950340101e4e8df15",
+        "structures.py": "a193270f4c1fcc6849170e1a8a6b2e288c13d3a220dc21fd8f77558f459bc419",
+        "mode_cache.py": "2083f58b24a1e391a5e64d00b267b57dfd6be64288fa307a35e2890c02adda49"
+      },
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
+        "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
+        "prototypes/001_resonant_surface/dry/config.py": "8ad35fcdbffecfe75d9b9057eee7b404ab2b64a1bd9ddb7cbf82a2ef927bd6fa",
+        "prototypes/001_resonant_surface/dry/model.py": "4fb7384ef921c9853c7044024964c527984891bdecdee93f9d7040f6879629e7",
+        "prototypes/001_resonant_surface/dry/build.py": "8a23e410ba77d8a59369b2efec8dc1af049daa78586f77998349c40df575df15",
+        "tools/run_dry_basin.py": "5b011be6c332345274ced9ab68533148ab70ff493878dca1ee13e33b34348929"
+      },
+      "initial_retained_energy_j": 2.253143319547323e-05,
+      "final_retained_energy_j": 9.027067409812097e-06,
+      "pickup_peak_velocity_m_per_s": [
+        0.0007743073307239488,
+        0.0007799092360338629
+      ],
+      "pickup_units": "global vertical contact velocity m/s; not hydrophone pressure or radiated sound",
+      "presentation": {
+        "frame_count": 15,
+        "fps": 30,
+        "physical_seconds_per_visual_second": 1,
+        "visual_gain": 1500.0,
+        "audio_path": "/home/maggi/Documents/spatial-sculptures/prototypes/001_resonant_surface/renders/dry_experiments/004_heavier_exciters/contact_pickups.wav",
+        "exposure_fraction": 0.5,
+        "exposure_samples": 11,
+        "presentation": "exposure-averaged displacement, not full optical motion blur"
+      },
+      "measurements": "none; all supports/masses/damping and profile are provisional",
+      "validation": "plate verification and separate shell refinement; no specimen/pressure/radiation validation"
+    },
+    "005_thin_3mm": {
+      "model": "linear dry Kirchhoff-Love graph shell; compliant patch supports; rigid attached masses",
+      "parameters": {
+        "surface": {
+          "radius_x": 0.72,
+          "radius_y": 0.58,
+          "rise": 0.12,
+          "asymmetry": 0.006,
+          "center_z": 0.72,
+          "domain": "ellipse"
+        },
+        "material": {
+          "youngs_modulus": 193000000000.0,
+          "density": 8030.0,
+          "poisson_ratio": 0.3
+        },
+        "thickness": 0.003,
+        "supports": [
+          {
+            "patch": {
+              "x": -0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": -0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          }
+        ],
+        "exciters": [
+          {
+            "patch": {
+              "x": -0.34,
+              "y": 0.14,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 59.0,
+            "phase": 0.0,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.31,
+              "y": 0.13,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 61.3,
+            "phase": 1.7,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.02,
+              "y": -0.32,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.0,
+            "frequency_hz": 57.8,
+            "phase": 3.1,
+            "start": 0.0
+          }
+        ],
+        "impulses": [
+          {
+            "exciter": 0,
+            "time": 0.0,
+            "impulse_ns": 0.03
+          }
+        ],
+        "pickups": [
+          [
+            -0.2,
+            -0.04
+          ],
+          [
+            0.25,
+            -0.1
+          ]
+        ],
+        "elements": [
+          8,
+          8
+        ],
+        "gauss_order": 5,
+        "mode_count": 16,
+        "damping_ratio": 0.005,
+        "water_depth_m": 0.0,
+        "duration": 0.5,
+        "sample_rate": 48000,
+        "fps": 30,
+        "visual_gain": 1500.0,
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "resolution": [
+          480,
+          360
+        ],
+        "rings": 8,
+        "segments": 48
+      },
+      "requested_duration_s": 0.5,
+      "physical_duration_s": 0.5,
+      "visual_duration_s": 0.5,
+      "frame_count": 15,
+      "audio_samples": 24000,
+      "audio_gain_per_m_per_s": 679.1960825291163,
+      "mode_frequencies_hz": [
+        5.534340447444797,
+        5.53501455408163,
+        6.891346951830013,
+        9.204838172467982,
+        12.44971917456672,
+        18.376399639445125,
+        19.482501120625127,
+        36.15399911702157,
+        37.43742115714484,
+        54.19268032120656,
+        54.75176581746139,
+        63.40722631070513,
+        67.86926396824481,
+        85.41697941394884,
+        99.87887139665357,
+        103.28673635498697
+      ],
+      "modal_masses_kg": [
+        32.69755027073817,
+        32.90622930758216,
+        13.64530912360495,
+        4.579671044179138,
+        3.4623488848612824,
+        2.306738456795173,
+        3.042852770335646,
+        2.544421873537967,
+        2.9754437891934287,
+        1.268668930749893,
+        1.2315638047679902,
+        2.524260918664738,
+        2.2797004162624392,
+        2.534203297110613,
+        1.9974291206882617,
+        2.0879241453778086
+      ],
+      "cache_key": "300e72a798d18b58c5cc648b51f018cac02ea569c142064105ca277d00bb738f",
+      "cache_path": "data/fem/001_resonant_surface/dry_modes_300e72a798d18b58c5cc.npz",
+      "cache_reused": false,
+      "diagnostics": {
+        "discarded_rigid_or_near_zero_modes": 0,
+        "maximum_relative_eigen_residual": 2.1747047116998773e-08,
+        "mass_condition_number_scaled": 785.2801426983352,
+        "degrees_of_freedom": 351,
+        "area_m2": 1.3572127998559065,
+        "shell_mass_kg": 32.69525634852879
+      },
+      "structural_provenance": {
+        "splines.py": "e6f35cb16fa9fffdbfe483fcf0ff12e8ffb2b0eb35a31ff950340101e4e8df15",
+        "structures.py": "a193270f4c1fcc6849170e1a8a6b2e288c13d3a220dc21fd8f77558f459bc419",
+        "mode_cache.py": "2083f58b24a1e391a5e64d00b267b57dfd6be64288fa307a35e2890c02adda49"
+      },
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
+        "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
+        "prototypes/001_resonant_surface/dry/config.py": "8ad35fcdbffecfe75d9b9057eee7b404ab2b64a1bd9ddb7cbf82a2ef927bd6fa",
+        "prototypes/001_resonant_surface/dry/model.py": "4fb7384ef921c9853c7044024964c527984891bdecdee93f9d7040f6879629e7",
+        "prototypes/001_resonant_surface/dry/build.py": "8a23e410ba77d8a59369b2efec8dc1af049daa78586f77998349c40df575df15",
+        "tools/run_dry_basin.py": "5b011be6c332345274ced9ab68533148ab70ff493878dca1ee13e33b34348929"
+      },
+      "initial_retained_energy_j": 3.8062310779519885e-05,
+      "final_retained_energy_j": 1.4236590182453719e-05,
+      "pickup_peak_velocity_m_per_s": [
+        0.0013250959820743933,
+        0.0011108960287061352
+      ],
+      "pickup_units": "global vertical contact velocity m/s; not hydrophone pressure or radiated sound",
+      "presentation": {
+        "frame_count": 15,
+        "fps": 30,
+        "physical_seconds_per_visual_second": 1,
+        "visual_gain": 1500.0,
+        "audio_path": "/home/maggi/Documents/spatial-sculptures/prototypes/001_resonant_surface/renders/dry_experiments/005_thin_3mm/contact_pickups.wav",
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "presentation": "exposure-averaged displacement, not full optical motion blur"
+      },
+      "measurements": "none; all supports/masses/damping and profile are provisional",
+      "validation": "plate verification and separate shell refinement; no specimen/pressure/radiation validation"
+    },
+    "006_three_drives": {
+      "model": "linear dry Kirchhoff-Love graph shell; compliant patch supports; rigid attached masses",
+      "parameters": {
+        "surface": {
+          "radius_x": 0.72,
+          "radius_y": 0.58,
+          "rise": 0.12,
+          "asymmetry": 0.006,
+          "center_z": 0.72,
+          "domain": "ellipse"
+        },
+        "material": {
+          "youngs_modulus": 193000000000.0,
+          "density": 8030.0,
+          "poisson_ratio": 0.3
+        },
+        "thickness": 0.005,
+        "supports": [
+          {
+            "patch": {
+              "x": -0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": -0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": -0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          },
+          {
+            "patch": {
+              "x": 0.48,
+              "y": 0.32,
+              "width": 0.035
+            },
+            "stiffness": [
+              10000.0,
+              10000.0,
+              300000.0
+            ]
+          }
+        ],
+        "exciters": [
+          {
+            "patch": {
+              "x": -0.34,
+              "y": 0.14,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 1.0,
+            "frequency_hz": 59.0,
+            "phase": 0.0,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.31,
+              "y": 0.13,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.85,
+            "frequency_hz": 61.3,
+            "phase": 1.7,
+            "start": 0.0
+          },
+          {
+            "patch": {
+              "x": 0.02,
+              "y": -0.32,
+              "width": 0.05
+            },
+            "added_mass_kg": 0.12,
+            "direction": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "force_n": 0.95,
+            "frequency_hz": 57.8,
+            "phase": 3.1,
+            "start": 0.0
+          }
+        ],
+        "impulses": [],
+        "pickups": [
+          [
+            -0.2,
+            -0.04
+          ],
+          [
+            0.25,
+            -0.1
+          ]
+        ],
+        "elements": [
+          8,
+          8
+        ],
+        "gauss_order": 5,
+        "mode_count": 16,
+        "damping_ratio": 0.005,
+        "water_depth_m": 0.0,
+        "duration": 0.5,
+        "sample_rate": 48000,
+        "fps": 30,
+        "visual_gain": 1500.0,
+        "exposure_fraction": 0.5,
+        "exposure_samples": 8,
+        "resolution": [
+          480,
+          360
+        ],
+        "rings": 8,
+        "segments": 48
+      },
+      "requested_duration_s": 0.5,
+      "physical_duration_s": 0.5,
+      "visual_duration_s": 0.5,
+      "frame_count": 15,
+      "audio_samples": 24000,
+      "audio_gain_per_m_per_s": 5338.413280956977,
+      "mode_frequencies_hz": [
+        4.297010537520432,
+        4.297379461305325,
+        5.3447433325322296,
+        14.527626983952523,
+        17.087021986464062,
+        22.410588940042267,
+        24.574147445482655,
+        41.06709144420101,
+        44.41722925886802,
+        55.14891651898679,
+        69.8507744174772,
+        77.10404367787011,
+        103.87297343371124,
+        110.80148332434243,
+        149.0631824337825,
+        150.1468319608748
+      ],
+      "modal_masses_kg": [
+        54.53114163970751,
+        54.808333679271364,
+        22.69898869368196,
+        7.917272972524143,
+        7.026549035082464,
+        7.219366699294271,
+        5.44050017607564,
+        8.066345131921329,
+        5.7952605386998295,
+        6.208818377311189,
+        4.940987950700985,
+        5.729468709127847,
+        5.060307826929319,
+        4.946990101867277,
+        4.426991090550078,
+        4.43263181682484
+      ],
+      "cache_key": "69fe01c5b7db430b3492d727482e1576f57838215c7a6717f804032a31baecc0",
+      "cache_path": "data/fem/001_resonant_surface/dry_modes_69fe01c5b7db430b3492.npz",
+      "cache_reused": true,
+      "diagnostics": {
+        "discarded_rigid_or_near_zero_modes": 0,
+        "maximum_relative_eigen_residual": 2.7888473762258244e-08,
+        "mass_condition_number_scaled": 786.8628030624875,
+        "degrees_of_freedom": 351,
+        "area_m2": 1.3572127998559065,
+        "shell_mass_kg": 54.49209391421465
+      },
+      "structural_provenance": {
+        "splines.py": "e6f35cb16fa9fffdbfe483fcf0ff12e8ffb2b0eb35a31ff950340101e4e8df15",
+        "structures.py": "a193270f4c1fcc6849170e1a8a6b2e288c13d3a220dc21fd8f77558f459bc419",
+        "mode_cache.py": "2083f58b24a1e391a5e64d00b267b57dfd6be64288fa307a35e2890c02adda49"
+      },
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "68a110230d4a0f85002a9b13d756b6b3fc9ce9e189bb0471f2759db1ac90c5cf",
+        "src/spatial_sculptures/audio/synthesis.py": "8a3757b730ccae3dc872f696c3f796be6a077f476aef61396d1e098bbc574b53",
+        "prototypes/001_resonant_surface/dry/config.py": "8ad35fcdbffecfe75d9b9057eee7b404ab2b64a1bd9ddb7cbf82a2ef927bd6fa",
+        "prototypes/001_resonant_surface/dry/model.py": "4fb7384ef921c9853c7044024964c527984891bdecdee93f9d7040f6879629e7",
+        "prototypes/001_resonant_surface/dry/build.py": "8a23e410ba77d8a59369b2efec8dc1af049daa78586f77998349c40df575df15",
+        "tools/run_dry_basin.py": "5b011be6c332345274ced9ab68533148ab70ff493878dca1ee13e33b34348929"
+      },
+      "initial_retained_energy_j": 1.526033802348813e-40,
+      "final_retained_energy_j": 8.714120582709507e-07,
+      "pickup_peak_velocity_m_per_s": [
+        0.00016806092672979272,
+        0.00016858942023287185
+      ],
+      "pickup_units": "global vertical contact velocity m/s; not hydrophone pressure or radiated sound",
+      "presentation": {
+        "frame_count": 15,
+        "fps": 30,
+        "physical_seconds_per_visual_second": 1,
+        "visual_gain": 1500.0,
+        "audio_path": "/home/maggi/Documents/spatial-sculptures/prototypes/001_resonant_surface/renders/dry_experiments/006_three_drives/contact_pickups.wav",
+        "exposure_fraction": 0.5,
+        "exposure_samples": 11,
+        "presentation": "exposure-averaged displacement, not full optical motion blur"
+      },
+      "measurements": "none; all supports/masses/damping and profile are provisional",
+      "validation": "plate verification and separate shell refinement; no specimen/pressure/radiation validation"
+    }
+  }
+}
