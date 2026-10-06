@@ -30,9 +30,9 @@ if not __package__:
     __package__ = f"prototypes.{Path(__file__).resolve().parent.name}"
 
 
-def load_config(experiment: str | None = None) -> PrototypeConfig:
+def load_config(experiment: str | None = None, *, preview: bool = False) -> PrototypeConfig:
     """Start from independent defaults and optionally apply one local experiment."""
-    from .config import default_config
+    from .config import apply_preview, default_config
 
     config = default_config()
     if experiment:
@@ -42,6 +42,8 @@ def load_config(experiment: str | None = None) -> PrototypeConfig:
             raise ValueError(f"Unknown experiment: {experiment}")
         module = importlib.import_module(f"{__package__}.experiments.{name}")
         config = module.configure(config)
+    if preview:
+        config = apply_preview(config)
     config.validate()
     return config
 
@@ -88,6 +90,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--experiment", help="Experiment filename stem")
+    parser.add_argument("--preview", action="store_true", help="Use a lightweight solid preview")
     parser.add_argument("--frame", type=int, help="Frame to display/render after building")
     parser.add_argument("--render-output", type=Path, help="Render one PNG to this path")
     parser.add_argument(
@@ -95,7 +98,7 @@ def main() -> None:
     )
     arguments = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     args = parser.parse_args(arguments)
-    build(load_config(args.experiment))
+    build(load_config(args.experiment, preview=args.preview))
     if args.frame is not None:
         bpy.context.scene.frame_set(args.frame)
     if args.save_blend is not None:

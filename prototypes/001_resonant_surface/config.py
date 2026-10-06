@@ -99,10 +99,12 @@ RENDERING = {
     "camera_target": (0.0, 0.0, 0.75),
     "camera_lens": 48.0,
     "world_strength": 0.25,
+    "viewport_shading": "MATERIAL",
+    "playback_sync": "NONE",
 }
 
 OSC = {
-    "enabled": False,
+    "enabled": True,
     "host": "127.0.0.1",
     "port": 57120,
     "send_rate": 30,
@@ -165,3 +167,28 @@ def default_config() -> PrototypeConfig:
         rendering=deepcopy(RENDERING),
         osc=deepcopy(OSC),
     )
+
+
+def apply_preview(config: PrototypeConfig) -> PrototypeConfig:
+    """Use coarse geometry and solid shading for a lighter interactive preview.
+
+    Wave controls and sensor metric sampling remain identical. Reduce the timeline
+    rate only when 15 FPS can sample the configured carrier; the close-frequency
+    experiment needs its higher rate to avoid aliasing.
+    """
+    config.water.update(rings=12, segments=64)
+    config.basin.update(rings=12, segments=64)
+    config.rendering.update(
+        engine="BLENDER_WORKBENCH",
+        viewport_shading="SOLID",
+        playback_sync="FRAME_DROP",
+        samples=16,
+        resolution_percentage=50,
+    )
+    effective_frequency = max(
+        (abs(source["frequency"] * config.water["time_scale"]) for source in config.exciters),
+        default=0.0,
+    )
+    if effective_frequency < 15 / 2:
+        config.animation["fps"] = min(config.animation["fps"], 15)
+    return config

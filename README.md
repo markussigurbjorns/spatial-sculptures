@@ -90,6 +90,19 @@ path to select another installation:
 BLENDER_BIN=/path/to/blender python tools/run_blender.py 001_resonant_surface
 ```
 
+For a slower computer, start with the lightweight preview:
+
+```bash
+python tools/run_blender.py 001_resonant_surface --preview
+```
+
+This uses solid shading, 769 water vertices instead of 6,913, and 15 FPS for the
+baseline, with frame dropping to keep playback responsive. Its coarser geometry
+shows less surface detail. Wave controls and sensor sampling stay the same.
+High-frequency experiments retain the frame rate needed to sample their carrier;
+the 240 FPS close-frequency experiment is still heavier. The normal launch keeps
+the detailed materials and mesh.
+
 Launch paths are resolved relative to the repository, so an absolute invocation
 of `tools/run_blender.py` works from any working directory. Blender starts with
 factory settings for reproducibility. The launcher returns Blender's exit status

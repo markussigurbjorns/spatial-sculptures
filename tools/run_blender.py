@@ -26,6 +26,7 @@ def build_command(
     prototype: str,
     *,
     background: bool = False,
+    preview: bool = False,
     experiment: str | None = None,
     frame: int | None = None,
     render_output: Path | None = None,
@@ -38,6 +39,8 @@ def build_command(
         command.append("--background")
     command.extend(["--python-exit-code", "1", "--python", str(script)])
     arguments: list[str] = []
+    if preview:
+        arguments.append("--preview")
     if experiment:
         arguments.extend(["--experiment", experiment])
     if frame is not None:
@@ -65,6 +68,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("prototype", help="Directory name, for example 001_resonant_surface")
     parser.add_argument("--background", action="store_true", help="Build without opening a window")
+    parser.add_argument("--preview", action="store_true", help="Use a lightweight solid preview")
     parser.add_argument("--experiment", help="Experiment filename stem")
     parser.add_argument("--frame", type=int, help="Frame to select after building")
     parser.add_argument("--save-blend", type=Path, help="Explicit scene output path")
@@ -73,6 +77,7 @@ def main() -> int:
         return run(
             args.prototype,
             background=args.background,
+            preview=args.preview,
             experiment=args.experiment,
             frame=args.frame,
             save_blend=args.save_blend,

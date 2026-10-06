@@ -129,6 +129,19 @@ python tools/run_blender.py 001_resonant_surface --experiment 002_close_frequenc
 python tools/render.py 001_resonant_surface prototypes/001_resonant_surface/renders/drip.png --frame 105
 ```
 
+For a lightweight first look:
+
+```bash
+python tools/run_blender.py 001_resonant_surface --preview
+```
+
+Preview uses a 12-ring × 64-segment water mesh (769 vertices), a coarser basin,
+solid material colors, and Workbench rendering at half resolution. Baseline
+playback is 15 FPS with frame dropping. The sculpture's controls, wave equations,
+drip timing in seconds, and sensor sampling are preserved; surface detail is lower.
+Higher-frequency experiments keep their original FPS to avoid aliasing, so begin
+with the baseline preview if the close-frequency experiment is too demanding.
+
 The close-frequency experiment uses 59.00, 59.08, and 59.17 Hz with a common
 wavelength. It sets `time_scale=1`, a 60-second duration, and 240 FPS to sample the
 fast carrier while showing slow envelopes. Pairwise beat periods are about 12.5,

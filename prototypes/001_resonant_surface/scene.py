@@ -26,6 +26,7 @@ def configure_scene(config: PrototypeConfig) -> None:
     scene.unit_settings.scale_length = 1.0
     scene.render.fps = animation["fps"]
     scene.render.fps_base = 1.0
+    scene.sync_mode = rendering["playback_sync"]
     scene.frame_start = animation["frame_start"]
     scene.frame_end = scene.frame_start + round(animation["fps"] * animation["seconds"]) - 1
     scene.render.engine = rendering["engine"]
@@ -86,4 +87,6 @@ def setup_scene(materials: dict[str, Any], config: PrototypeConfig) -> None:
         for area in bpy.context.screen.areas:
             if area.type == "VIEW_3D":
                 area.spaces.active.region_3d.view_perspective = "CAMERA"
-                area.spaces.active.shading.type = "MATERIAL"
+                area.spaces.active.shading.type = rendering["viewport_shading"]
+                if rendering["viewport_shading"] == "SOLID":
+                    area.spaces.active.shading.color_type = "MATERIAL"
