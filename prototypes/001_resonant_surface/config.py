@@ -38,6 +38,9 @@ WATER = {
     "damping": 1.25,
     "irregularity": 0.00018,
     "edge_fade_power": 8.0,
+    # Independent, equal-area sampling for state metrics; not the Blender mesh.
+    "state_rings": 8,
+    "state_segments": 32,
 }
 
 EXCITERS = [
@@ -79,6 +82,7 @@ DRIP = {
     "ripple_wavelength": 0.075,
     "ripple_width": 0.055,
     "ripple_decay": 0.85,
+    "impact_duration": 0.12,
     "nozzle_z": 1.45,
     "droplet_radius": 0.008,
     "arm_radius": 0.009,
@@ -97,6 +101,13 @@ RENDERING = {
     "world_strength": 0.25,
 }
 
+OSC = {
+    "enabled": False,
+    "host": "127.0.0.1",
+    "port": 57120,
+    "send_rate": 30,
+}
+
 
 @dataclass
 class PrototypeConfig:
@@ -109,6 +120,7 @@ class PrototypeConfig:
     hydrophones: list[tuple[float, float]]
     drip: dict[str, Any]
     rendering: dict[str, Any]
+    osc: dict[str, Any]
 
     def validate(self) -> None:
         """Catch basic parameter errors before creating Blender objects."""
@@ -125,14 +137,20 @@ class PrototypeConfig:
             raise ValueError("Basin thickness and profile power must be positive")
         if self.water["damping"] < 0 or self.water["edge_fade_power"] <= 0:
             raise ValueError("Water damping must be >= 0 and edge fade power > 0")
+        if self.water["state_rings"] < 1 or self.water["state_segments"] < 3:
+            raise ValueError("State sampling needs at least one ring and three segments")
         if not 0 < self.drip["fall_time"] < self.drip["interval"]:
             raise ValueError("Drip fall time must be positive and shorter than its interval")
         if self.drip["nozzle_z"] <= self.water["z"]:
             raise ValueError("Drip nozzle must be above the water")
         if self.drip["wave_speed"] <= 0 or self.drip["ripple_lifetime"] <= 0:
             raise ValueError("Drip wave speed and ripple lifetime must be positive")
+        if not 0 < self.drip["impact_duration"] < self.drip["interval"]:
+            raise ValueError("Drop impact duration must be positive and shorter than its interval")
         if any(source["wavelength"] <= 0 for source in self.exciters):
             raise ValueError("Exciter wavelengths must be positive")
+        if not 1 <= self.osc["port"] <= 65535 or self.osc["send_rate"] <= 0:
+            raise ValueError("OSC port must be 1..65535 and send rate must be positive")
 
 
 def default_config() -> PrototypeConfig:
@@ -145,4 +163,5 @@ def default_config() -> PrototypeConfig:
         hydrophones=deepcopy(HYDROPHONES),
         drip=deepcopy(DRIP),
         rendering=deepcopy(RENDERING),
+        osc=deepcopy(OSC),
     )

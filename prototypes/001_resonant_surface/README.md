@@ -31,7 +31,58 @@ specification or a prediction of its sound.
 
 Version 1 is a geometric prototype and a visual wave/interference simulation.
 It is **not CFD, not FEM, and not a physically correct acoustic simulation**.
-There is no emitted audio, measured pressure, fluid volume, or active feedback.
+Default builds produce no audio or active feedback. There is no measured pressure
+or fluid volume. An optional SuperCollider listening sketch can be driven by
+control-rate simulated values.
+
+## Simulation and consumers
+
+```text
+                 Python simulation (ResonantField)
+                              │
+                          FieldState
+                              │
+                  ┌───────────┴───────────┐
+                  │                       │
+                  ▼                       ▼
+               Blender                   OSC
+            visualization                 │
+                                          ▼
+                                   SuperCollider
+                                          │
+                                     synthesis
+                                          │
+                                    spatial audio
+```
+
+`simulation.py` is ordinary Python: equations, exciter influence, droplet impulses,
+virtual hydrophone sampling, and state calculations. It imports neither `bpy` nor
+the Blender helpers. `visualization.py` contains the named Blender frame handler,
+mesh deformation, and visible droplet updates. Materials, camera, lights, and
+visible components remain presentation concerns.
+
+```python
+field = ResonantField(config)
+state = field.step(time)   # absolute seconds, not dt
+blender_adapter.update(state)
+osc_transport.send_state(state)
+value = field.sample(x, y)
+```
+
+`ResonantField` can run with no Blender installation or OSC server. The two
+hydrophones genuinely sample displacement at `config.hydrophones`; those values
+appear in `state.sensor_states` every step. `state.exciter_states` records the
+current relative amplitudes and configured frequencies.
+
+State metrics use a separate 8-ring × 32-segment equal-area sampling grid:
+`total_energy` is **mean squared displacement in m²**, an artistic activity proxy,
+not energy in joules. `max_displacement` is the sampled maximum absolute displacement
+in metres, not an exact global maximum. `drop_impact` is a 0..1 envelope that decays
+linearly for 0.12 s after each impact. No velocity, pressure conversion, dominant
+frequency estimator, or material-energy calculation is implemented yet.
+
+A future solver can expose comparable state and field sampling while consumers
+retain their responsibilities. This is a design goal, not a FEM abstraction layer.
 
 The procedural, slightly asymmetric metal vessel is approximately 1.4 m wide,
 with a 5 mm Solidify shell and a subtle beveled rim. A 48-ring, 144-segment water
@@ -66,7 +117,7 @@ water motion. Beat periods are also stretched by this factor.
 ## Configuration and experiments
 
 Edit [config.py](config.py) to change animation, basin, water, exciters,
-hydrophones, drip, or rendering. Values use metres, seconds, Hz, and radians.
+hydrophones, drip, rendering, or OSC. Values use metres, seconds, Hz, and radians.
 `default_config()` supplies independent deep copies of every section.
 
 From the repository root:
@@ -115,24 +166,50 @@ Rebuild after reopening a saved `.blend` to restore the Python animation handler
 | `build.py` | Import bootstrap, experiment selection, readable assembly, optional still render/save |
 | `config.py` | Sculpture-specific editable parameters |
 | `geometry.py` | Basin, water, exciters, hydrophones, supports, drip structure |
-| `simulation.py` | Combined displacement, drip clock, deterministic frame updates |
+| `simulation.py` | Blender-free combined field, drip clock, virtual hydrophones, and FieldState |
+| `visualization.py` | Blender adapter and named timeline callback; optional OSC output |
 | `feedback.py` | Virtual hydrophone sampling and opt-in processing proposals |
 | `scene.py` | Floor, camera, lights, world, timing, and render settings |
+| `supercollider/` | Receiver, small SynthDef, entry point, and future spatial routing |
 
 Reusable material/camera/primitive helpers and generic wave/sensor math live in
 `src/spatial_sculptures/`. Assets, curated Blender scenes, and render outputs stay
 alongside this prototype. No sculpture-specific geometry lives in the library.
 
+## Optional OSC and SuperCollider
+
+The reusable `src/spatial_sculptures/transport/` layer contains message paths and
+a small standard-library OSC sender. Set `OSC["enabled"] = True` in `config.py`,
+then load the [SuperCollider entry point](supercollider/main.scd). Match `host`
+and `port` to its language listener; default is `127.0.0.1:57120`. Audio-server
+port 57110 is a separate endpoint.
+
+OSC is disabled by default, creates no socket when disabled, and has no
+`python-osc` dependency. An enabled sender caps bundles at `send_rate` per
+wall-clock second. UDP does not acknowledge delivery; these snapshots and impact
+envelopes are not a reliable event log. Blender keeps working if a network error
+disables optional output.
+
+Each bundle carries hydrophone amplitudes, each exciter's amplitude/frequency,
+water activity/max displacement, drop impact, and simulation time. Indexes are
+one-based in configuration order. Position and feedback addresses are reserved
+for later. See the [SuperCollider README](supercollider/README.md) for the message
+table, receiver-only use, preview start/stop, and validation status.
+
 ## Feedback scaffold
 
 ```text
-water/metal field
+simulation
     ↓
 virtual hydrophone
     ↓
-processing
+OSC → SuperCollider
     ↓
-another exciter
+DSP / delay / filtering / frequency shifting
+    ↓
+OSC → virtual exciter
+    ↓
+simulation
 ```
 
 `sample_field(config, time)` reads visual displacement at the two hydrophone
@@ -141,6 +218,12 @@ control adjustments without mutating the scene or creating a loop. No default
 route is enabled. A future experiment needs a pressure/control mapping, delay,
 filtering, optional frequency shifting, and explicit gain limits before closing
 the loop. Individual route bounds do not guarantee closed-loop stability.
+
+Future `/feedback/exciter/N/amplitude` and `/feedback/exciter/N/frequency`
+messages will require an explicit Python receiver and control mapping. None is
+active yet. This mirrors real water/metal → hydrophone → SuperCollider → DSP →
+amplifier → contact exciter → metal/water. The goal is to retain useful DSP while
+replacing the virtual input with real hydrophone/audio-interface input later.
 
 ## Research questions
 
@@ -154,12 +237,13 @@ the loop. Individual route bounds do not guarantee closed-loop stability.
 ## Future progression
 
 ```text
-1. artistic Blender simulation
-2. simulated feedback system
-3. numerical/modal analysis
-4. FEM / coupled physical simulation
-5. physical prototype
-6. measurement and model correction
+1. artistic field simulation
+2. virtual sensor feedback
+3. SuperCollider integration
+4. better numerical/modal model
+5. FEM / coupled simulation
+6. physical sculpture
+7. measurement/model correction
 ```
 
 Each stage should revise the previous assumptions using evidence. Preserve useful

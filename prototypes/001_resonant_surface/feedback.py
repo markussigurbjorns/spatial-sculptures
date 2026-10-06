@@ -8,10 +8,9 @@ choose that mapping and introduce explicit delay, filtering and gain control.
 from dataclasses import dataclass
 
 from spatial_sculptures.simulation.feedback import bounded_gain
-from spatial_sculptures.simulation.sensors import VirtualSensor
 
 from .config import PrototypeConfig
-from .simulation import displacement
+from .simulation import ResonantField
 
 
 @dataclass(frozen=True)
@@ -24,21 +23,10 @@ class FeedbackRoute:
     limit: float = 0.1
 
 
-def virtual_hydrophones(config: PrototypeConfig) -> list[VirtualSensor]:
-    """Create virtual samples at the same XY positions as the visible hydrophones."""
-    return [
-        VirtualSensor(f"hydrophone_{i}", x, y)
-        for i, (x, y) in enumerate(config.hydrophones, start=1)
-    ]
-
-
 def sample_field(config: PrototypeConfig, time: float) -> dict[str, float]:
-    """Read the artistic field in metres; no feedback or scene mutation occurs."""
-
-    def field(x: float, y: float, sample_time: float) -> float:
-        return displacement(x, y, sample_time, config)
-
-    return {sensor.name: sensor.sample(field, time) for sensor in virtual_hydrophones(config)}
+    """Read the simulation's hydrophone state; no feedback or scene mutation occurs."""
+    state = ResonantField(config).step(time)
+    return {sensor.name: sensor.amplitude for sensor in state.sensor_states}
 
 
 def apply_feedback(samples: dict[str, float], routes: list[FeedbackRoute]) -> dict[int, float]:

@@ -49,10 +49,12 @@ def load_config(experiment: str | None = None) -> PrototypeConfig:
 def build(config: PrototypeConfig | None = None) -> Sculpture:
     """Rebuild the complete scene, returning its sculpture for interactive exploration."""
     from spatial_sculptures.blender.utils import clear_scene
+    from spatial_sculptures.transport.osc import OSCTransport
 
     from .geometry import create_sculpture
     from .scene import configure_scene, create_materials, setup_scene
-    from .simulation import FRAME_HANDLER_NAME, setup_simulation
+    from .simulation import ResonantField
+    from .visualization import FRAME_HANDLER_NAME, setup_visualization
 
     config = load_config() if config is None else config
     config.validate()
@@ -60,7 +62,9 @@ def build(config: PrototypeConfig | None = None) -> Sculpture:
     configure_scene(config)
     materials = create_materials()
     sculpture = create_sculpture(materials=materials, config=config)
-    setup_simulation(sculpture=sculpture, config=config)
+    field = ResonantField(config)
+    transport = OSCTransport(**config.osc)
+    setup_visualization(sculpture=sculpture, field=field, transport=transport)
     setup_scene(materials=materials, config=config)
     print_summary(sculpture, config)
     return sculpture

@@ -8,7 +8,9 @@ import math
 import runpy
 import sys
 import tempfile
+import warnings
 from pathlib import Path
+from unittest.mock import patch
 
 
 def main() -> None:
@@ -24,7 +26,13 @@ def main() -> None:
         pass
 
     bpy.app.handlers.frame_change_pre.append(unrelated_handler)
-    runpy.run_path(str(entry), run_name="__main__")
+    # Default builds must work even when no OSC package/server/socket is available.
+    with patch.dict(sys.modules, {"pythonosc": None}):
+        with patch(
+            "spatial_sculptures.transport.osc.socket.socket",
+            side_effect=AssertionError("Disabled OSC opened a socket"),
+        ):
+            runpy.run_path(str(entry), run_name="__main__")
     first_names = sorted(obj.name for obj in bpy.context.scene.objects)
     first_counts = (len(bpy.data.meshes), len(bpy.data.materials))
     # Re-execute the actual entry script rather than only calling a cached build function.
@@ -65,6 +73,21 @@ def main() -> None:
     base = water["base_coordinates"]
     assert all(abs(base[index] - 0.785) < 1e-6 for index in range(2, len(base), 3))
     assert max(abs(vertex[2] - 0.785) for vertex in forward) > 0.0001
+    visualization = importlib.import_module("prototypes.001_resonant_surface.visualization")
+    state = visualization._adapter.field.state
+    assert state is not None and state.time == 3.5
+    assert len(state.sensor_states) == 2
+    for sensor, (x, y) in zip(
+        state.sensor_states, visualization._adapter.field.config.hydrophones, strict=True
+    ):
+        assert sensor.amplitude == visualization._adapter.field.sample(x, y)
+    # Mesh deformation must still display the original field equation.
+    simulation = importlib.import_module("prototypes.001_resonant_surface.simulation")
+    config = visualization._adapter.field.config
+    for index in (0, 20, 1000, 5000, 6900):
+        x, y, z = visualization._adapter.sculpture.water_base[index]
+        expected = z + simulation.displacement(x, y, state.time, config)
+        assert abs(water.data.vertices[index].co.z - expected) < 1e-7
 
     for frame in (97, 193, 289, 385, 481, 577):
         scene.frame_set(frame)
@@ -82,10 +105,17 @@ def main() -> None:
     sculpture = prototype.build(prototype.load_config("002_close_frequencies"))
     assert scene.render.fps == 240 and scene.frame_end == 14400
     assert [obj["frequency_hz"] for obj in sculpture.exciters] == [59, 59.08, 59.17]
+    # Optional network failures disable the sender while presentation remains usable.
+    config = prototype.load_config()
+    config.osc["enabled"] = True
+    with patch("spatial_sculptures.transport.osc.socket.socket", side_effect=OSError("test UDP")):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            prototype.build(config)
+    assert any("OSC output disabled" in str(warning.message) for warning in caught)
+    assert not visualization._adapter.transport.enabled
     bpy.app.handlers.frame_change_pre.remove(unrelated_handler)
-    print(
-        "Blender integration passed: rebuilds, callbacks, scrubbing, dripping, export, experiments."
-    )
+    print("Blender integration passed: rebuilds, scrubbing, field state, optional OSC, export.")
 
 
 if __name__ == "__main__":

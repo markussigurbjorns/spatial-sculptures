@@ -1,16 +1,17 @@
-"""Artistic interference and drip animation; intentionally not CFD, FEM, or acoustics."""
+"""Ordinary-Python resonant field and state; no Blender or transport dependencies.
 
-from dataclasses import dataclass
-from math import ceil, floor, hypot, sin
-from typing import Any
+The equations are artistic approximations, intentionally not CFD, FEM, or acoustics.
+Blender and OSC consume the same state without owning the simulated system.
+"""
 
-from spatial_sculptures.blender.utils import HANDLER_TAG, remove_frame_handlers
+from copy import deepcopy
+from math import ceil, cos, floor, hypot, isfinite, sin, sqrt, tau
+
+from spatial_sculptures.simulation.fields import ExciterState, FieldState, SensorState
+from spatial_sculptures.simulation.sensors import VirtualSensor
 from spatial_sculptures.simulation.waves import expanding_ripple, radial_wave
 
 from .config import PrototypeConfig
-from .geometry import Sculpture
-
-FRAME_HANDLER_NAME = "resonant_surface_frame_change"
 
 
 def _drip_clock(time: float, interval: float) -> tuple[int, float]:
@@ -100,41 +101,71 @@ def droplet_state(time: float, config: PrototypeConfig) -> tuple[bool, float]:
     return visible, z
 
 
-@dataclass
-class SimulationState:
-    sculpture: Sculpture
-    config: PrototypeConfig
+def virtual_hydrophones(config: PrototypeConfig) -> tuple[VirtualSensor, ...]:
+    """Make genuine point samplers at the same positions as the visible hydrophones."""
+    return tuple(
+        VirtualSensor(f"hydrophone_{i}", x, y)
+        for i, (x, y) in enumerate(config.hydrophones, start=1)
+    )
 
 
-_state: SimulationState | None = None
+class ResonantField:
+    """A deterministic field that can be stepped and sampled without a visualizer.
 
+    step(time) sets ABSOLUTE simulation time in seconds, not a time increment.
+    Repeated times and backward steps reproduce identical states. Configuration is
+    copied so independent experiments/consumers cannot mutate each other's controls.
+    """
 
-def resonant_surface_frame_change(scene: Any, _depsgraph: Any = None) -> None:
-    """Named Blender callback, removable by name even after module/script reloads."""
-    if _state is None:
-        return
-    sculpture, config = _state.sculpture, _state.config
-    time = (scene.frame_current - config.animation["frame_start"]) / config.animation["fps"]
-    ages = impact_ages(time, config)
-    # Absolute deformation from base coordinates supports backwards scrubbing.
-    for vertex, (x, y, z) in zip(sculpture.water.data.vertices, sculpture.water_base, strict=True):
-        vertex.co = (x, y, z + displacement(x, y, time, config, ages))
-    sculpture.water.data.update()
-    visible, z = droplet_state(time, config)
-    sculpture.droplet.location.z = z
-    sculpture.droplet.hide_render = not visible
-    sculpture.droplet.hide_viewport = not visible
+    def __init__(self, config: PrototypeConfig):
+        config.validate()
+        self.config = deepcopy(config)
+        self.sensors = virtual_hydrophones(self.config)
+        self.time = 0.0
+        self._ages = impact_ages(self.time, self.config)
+        self.state: FieldState | None = None
+        water = self.config.water
+        rings, segments = water["state_rings"], water["state_segments"]
+        # Equal-area polar cells: these sample positions do not depend on Blender topology.
+        self._metric_points = tuple(
+            (
+                water["radius_x"] * sqrt((ring + 0.5) / rings) * cos(tau * j / segments),
+                water["radius_y"] * sqrt((ring + 0.5) / rings) * sin(tau * j / segments),
+            )
+            for ring in range(rings)
+            for j in range(segments)
+        )
 
+    def sample(self, x: float, y: float, time: float | None = None) -> float:
+        """Sample displacement in metres at the current or explicitly supplied time."""
+        time = self.time if time is None else time
+        ages = self._ages if time == self.time else impact_ages(time, self.config)
+        return displacement(x, y, time, self.config, ages)
 
-def setup_simulation(sculpture: Sculpture, config: PrototypeConfig) -> None:
-    """Replace the previous callback and initialize the water at the first frame."""
-    import bpy
-
-    global _state
-    remove_frame_handlers((FRAME_HANDLER_NAME,))
-    _state = SimulationState(sculpture, config)
-    setattr(resonant_surface_frame_change, HANDLER_TAG, True)
-    bpy.app.handlers.frame_change_pre.append(resonant_surface_frame_change)
-    # Blender recommends locking the interface when render-time handlers mutate meshes.
-    bpy.context.scene.render.use_lock_interface = True
-    bpy.context.scene.frame_set(config.animation["frame_start"])
+    def step(self, time: float) -> FieldState:
+        """Produce hydrophone samples, exciter controls, and small artistic state metrics."""
+        if not isfinite(time):
+            raise ValueError("Simulation time must be finite")
+        self.time = float(time)
+        self._ages = impact_ages(self.time, self.config)
+        samples = tuple(self.sample(x, y) for x, y in self._metric_points)
+        completed, phase = _drip_clock(self.time, self.config.drip["interval"])
+        impact = (
+            max(0.0, 1.0 - phase / self.config.drip["impact_duration"]) if completed >= 1 else 0.0
+        )
+        self.state = FieldState(
+            time=self.time,
+            sensor_states=tuple(
+                SensorState(sensor.name, sensor.sample(self.sample, self.time))
+                for sensor in self.sensors
+            ),
+            exciter_states=tuple(
+                ExciterState(f"exciter_{i}", source["amplitude"], source["frequency"])
+                for i, source in enumerate(self.config.exciters, start=1)
+            ),
+            # Mean squared displacement is a visual energy PROXY in m², not joules.
+            total_energy=sum(value * value for value in samples) / len(samples),
+            max_displacement=max(abs(value) for value in samples),
+            drop_impact=impact,
+        )
+        return self.state
