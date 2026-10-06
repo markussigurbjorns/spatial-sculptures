@@ -1,4 +1,4 @@
-# Computational validation — 6 October 2026
+# Computational validation — updated 7 October 2026
 
 These checks verify equations, software and export behavior. They do not validate
 a fabricated vessel, hydrophone pressure, radiation or spatial perception.
@@ -7,14 +7,21 @@ a fabricated vessel, hydrophone pressure, radiation or spatial perception.
 | --- | --- |
 | Ordinary Python compilation | Passed for source, prototypes, studies, tools and tests |
 | Ruff lint and formatting | Passed |
-| Unit suite with NumPy | 69 tests: 68 passed; UDP-delivery test skipped because sockets are forbidden |
-| Unit suite without NumPy | 69 tests: 55 passed; 13 optional NumPy tests and the UDP test skipped |
+| Unit suite with NumPy | 79 tests: 78 passed; UDP-delivery test skipped because sockets are forbidden |
+| Unit suite without NumPy | 79 tests: 55 passed; 23 optional NumPy tests and the UDP test skipped |
 | Imports without Blender | Core wave/state/sensor/modal modules import without `bpy`; NumPy-dependent structural modules are explicitly optional |
 | Numerical plate verification | First six frequencies within 0.1517%; finest-mesh shape MAC ≥0.999991 |
 | Free shell and membrane checks | Six rigid motions, mass orthogonality and analytical flat membrane energy passed |
 | Physical structural changes | Curvature changes eigenmodes; support stiffening raises frequencies; added mass lowers them |
 | Basin mesh comparison | 8 × 8 versus 10 × 10: max 0.3847% for first ten ordered frequencies, 2.118% for all sixteen |
 | Basin integration comparison | Gauss order 5 versus 7: max 0.001883% on baseline 8 × 8 mesh |
+| Independent curved reference | Separate disk-polynomial basis, polar quadrature and orthonormal tangent assembly; no production geometry/assembly/eigensolve imports |
+| Reference mathematics | Disk-polynomial orthogonality/derivatives and six free-curved-shell rigid modes passed |
+| Mode correspondence | Global matching checked against exhaustive assignment; signs/scales/permutations and degenerate-subspace rotations handled |
+| Frequency-only evidence | Default 8 × 8, 16 modes: verified prefix through reference mode 12, about 76.54 Hz |
+| Sampled contact-transfer evidence | Default supported cutoff 10 Hz under declared criteria; higher tested cutoffs fail |
+| Full impulse response | Common-time, unnormalized signals compared on all six paths; convergence is not established |
+| Accuracy gate | A saved unmet or unexamined band produces status 1; stale source hashes rejected |
 | Cache and replay | Mode normalization and arrays survive save/load; keys track structure/source; forcing/presentation changes reuse modes |
 | Audio/visual state | WAV samples match reconstructed physical contact velocity within PCM quantization; video times and energy match the same response |
 | Exposure and slow inspection | Exposure average checked against dense sampling; slowing picture leaves physical WAV duration unchanged |
@@ -31,6 +38,13 @@ condition number about 787. This measures the algebraic solve, not physical accu
 Higher retained modes and broadband impulse signals are not declared converged.
 Changed thickness/profile/support settings need their own refinement checks.
 
+The updated [convergence report](convergence.md) separates frequency-only evidence
+from contact-response criteria. The finite polynomial reference, preceding mesh
+and modal truncation are checked separately; a failed check cannot be bypassed by
+passing a higher cumulative band. Current sampled band support is 10 Hz, while
+unfiltered contact signals remain unconverged. This study is an independent
+numerical implementation of the same shell theory, not a published specimen table.
+
 Reproduce software checks:
 
 ```bash
@@ -42,9 +56,26 @@ blender --background --factory-startup --python-exit-code 1 --python tests/valid
 blender --background --factory-startup --python-exit-code 1 --python tests/validate_modal_blender.py
 blender --background --factory-startup --python-exit-code 1 --python tests/validate_blender.py
 python tools/run_dry_basin.py --preview --render
+python tools/validate_dry_basin.py
 ```
 
-Regenerate the curated paper data and figures from the repository root:
+Regenerate the independent comparison and its PNG/PDF figures:
+
+```bash
+python tools/validate_dry_basin.py --output docs/research/dry_basin/convergence.json
+python tools/plot_dry_convergence.py
+python tools/validate_dry_basin.py --check-report docs/research/dry_basin/convergence.json --require-band 10
+# Returns 1 for the current unmet 20 Hz band:
+python tools/validate_dry_basin.py --check-report docs/research/dry_basin/convergence.json --require-band 20
+```
+
+Saved-report checks verify source hashes before evaluating the accuracy gate and
+work without NumPy. An unexamined cutoff also returns 1. Smaller research plans
+can be selected with `--meshes`, `--degrees`, `--counts`, `--bands` and `--step-hz`;
+they do not inherit the default study's supported band. Paths are independent of
+the current working directory.
+
+Regenerate the original curated paper data and figures from the repository root:
 
 ```bash
 python tools/validate_structure.py --output docs/research/dry_basin/verification.json

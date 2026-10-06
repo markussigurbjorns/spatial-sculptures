@@ -96,6 +96,20 @@ averaged. Separate slowed inspection deliberately omits audio. The
 [dry-basin paper](docs/research/dry_basin/paper.md) records numerical plate
 verification, curved-shell refinement, assumptions and limitations.
 
+An [independent curved-shell study](studies/plates/002_curved_shell_reference/README.md)
+now compares the spline modes and unnormalized contact signals with a separate
+polynomial Ritz solver:
+
+```bash
+python tools/validate_dry_basin.py
+```
+
+The [recorded results](docs/research/dry_basin/convergence.md) distinguish frequency
+agreement from contact-signal convergence: current defaults meet all sampled
+contact-transfer criteria only through 10 Hz. The unfiltered listening WAV remains
+an experimental output, with no established audible-band accuracy. Further dry
+refinement comes before a trustworthy water-coupling model.
+
 ## Run the artistic water prototype
 
 Install Blender separately and make `blender` available on PATH. The initial

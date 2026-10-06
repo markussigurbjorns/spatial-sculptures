@@ -1,6 +1,6 @@
 # From a plate reference to a dry resonant basin: numerical modes and shared audiovisual state
 
-**Working technical paper, version 0.1 — 6 October 2026**
+**Working technical paper, version 0.2 — 7 October 2026**
 
 Project: Spatial Sculptures. Authorship and publication venue remain open.
 This is a computational study with provisional parameters, not a calibrated vessel
@@ -24,6 +24,12 @@ feed one modal response from which Python generates both contact-velocity audio
 and Blender displacement frames. A synchronized export shares physical time;
 magnification and exposure averaging remain explicit presentation choices. Water
 loading, pressure, acoustic radiation and closed feedback are outside this study.
+
+The expanded study adds an independently assembled polynomial Ritz reference and
+contact-signal convergence tests. The default model has frequency-only evidence
+through about 76.54 Hz, but meets all sampled contact-transfer criteria only through
+10 Hz. Unfiltered impulse audio remains unconverged; an accurate audible bandwidth
+is not yet established.
 
 ## 1. Purpose and relationship to the sculpture
 
@@ -259,6 +265,94 @@ do not establish tracked shape identity across changed structures.
 Figure 4. The baseline 0.5-second response in physical units before audio normalization,
 with energy of the sixteen retained modes. This is not a broadband convergence claim.
 
+### 5.4 Independent curved-shell cross-verification
+
+The [polynomial Ritz reference](../../../studies/plates/002_curved_shell_reference/README.md)
+implements the same configured elliptical graph with independent geometry evaluation,
+basis, integration and matrix assembly. Global real Zernike polynomials replace
+local splines; polar integration replaces clipped cells. Orthonormal tangent strains
+and direct variation of the reference normal replace metric-contracted production
+operators. Both solve the same stated Kirchhoff–Love physical model. This checks
+implementation and discretization independently; it does not check the adequacy of
+those shared physical assumptions against 3-D elasticity or a real specimen.
+
+The disk-polynomial basis is supported by
+[Greengard and Serkh (2018)](https://arxiv.org/abs/1811.02720). Our implementation
+evaluates Cartesian polynomial coefficients and derivatives. It does not implement
+their recurrence algorithm, and degree is capped at 20 to limit power-basis numerical
+stability concerns. Degrees 12, 16, 18 and 20 provide a reference refinement sequence.
+The production sequence uses 8, 10, 12 and 14 cells per axis. All configurations
+retain up to 64 modes for comparison, with subsets of 16, 32 and 48 modes.
+
+Correspondence maximizes the global area-weighted vector modal-assurance score,
+with one distinct candidate per reference mode. Nearly degenerate reference modes
+within 0.2% form a subspace. Weighted QR bases and singular values compare those
+subspaces; the minimum squared principal cosine tolerates sign, ordering and
+mixing of equivalent modes. Frequencies in each group are compared sorted.
+This replaces reliance on sorted mode indices alone.
+
+![Independent curved-mode correspondence](figures/independent_mode_comparison.png)
+
+Figure 5. Frequency and vector-subspace differences against the degree-20 Ritz
+reference. The default spline model passes the 1% frequency and 0.99 subspace
+criteria for a prefix through reference mode 12, approximately 76.54 Hz. Some higher
+default frequencies differ by approximately 3%. Shapes are substantially closer
+than these frequency differences might suggest.
+
+### 5.5 Contact-response convergence and usable bandwidth
+
+Frequency agreement is insufficient for a lightly damped contact signal. For force
+patch e and pickup p, the velocity/force transfer is
+
+$$H_{pe}(f)=i2\pi f\sum_j
+\frac{\phi_{j,z}(p)\,g_{je}}{M_j[\omega_j^2-(2\pi f)^2+
+ 2i\zeta_j\omega_j(2\pi f)]}.$$
+
+All six two-contact × three-exciter paths retain their physical scale and complex
+phase. For each cumulative cutoff B, relative L2 difference is evaluated on a
+0.05 Hz grid using the finer transfer as denominator. Frequencies with both signals
+silent produce zero error; a nonzero candidate with a silent reference is undefined
+and cannot pass. Signals are not separately normalized or phase-aligned.
+
+Declared criteria are: production frequency difference ≤1%, subspace score ≥0.99;
+reference refinement frequency difference ≤0.25%, score ≥0.995; independent contact
+transfer difference ≤10% on every path; and each reference, mesh or modal-truncation
+transfer refinement difference ≤5%. A modal cutoff must include all modes and
+degenerate groups intersecting the band. Every lower tested cumulative cutoff
+must also pass. These are research criteria, not specimen accuracy guarantees.
+
+![Contact transfer and refinement](figures/contact_transfer_convergence.png)
+
+Figure 6. The refined production model closely follows the finest Ritz transfer,
+but its preceding mesh and the preceding reference still limit a convergence claim.
+The default 8 × 8, 16-mode configuration supports only the tested cumulative band
+**up to 10 Hz** under these criteria. At the 15 Hz cutoff, the default model's worst
+path differs by about 36% in complex L2, despite small frequency differences.
+The finest spline-mesh change is about 5.89%, exceeding its 5% criterion. Above
+this range, reference refinement also exceeds its criterion. None of the tested
+mesh/mode configurations earns a larger supported band under all current checks.
+
+This result is stricter than the approximately 76.54 Hz frequency-only prefix.
+The two conclusions concern different observables. It does not establish useful
+audible-band contact accuracy. A supported transfer band would require appropriately
+limited forcing/output; the current default WAV remains an unfiltered impulse signal.
+
+![Unfiltered impulse comparison](figures/impulse_convergence.png)
+
+Figure 7. Common-time two-second unit-impulse contact signals at 4096 Hz, without
+listening normalization. The default sixteen-mode signals have a worst-path relative
+L2 difference of about 92.36% from the finite 64-mode Ritz reference. This is a
+difference between computed, truncated responses, not a measured physical error.
+Adding modes on a coarse mesh does not necessarily reduce it: additional inaccurate
+high-frequency phase and coupling can worsen agreement. The reference and retained
+bank are finite, so full-band impulse convergence is not claimed.
+
+Full data, criteria, matched groups and per-path failures are recorded in
+[convergence.json](convergence.json), with a [readable table](convergence.md).
+Validation success here means the tools correctly expose both passed and failed
+accuracy checks; it does not mean the current sculpture model is accurate across
+an audible bandwidth.
+
 ## 6. Limitations and next research steps
 
 Plate verification, rigid-motion checks and one shell refinement study cannot
@@ -274,8 +368,11 @@ patch response and pickup signals as well as frequencies. No measured damping,
 rim reinforcement, support rotation, exciter compliance, electrical impedance or
 nonlinear contact is present.
 
-The next research steps are independent curved-shell benchmarks with mode matching,
-then dry-vessel measurements to fit geometry, support stiffness and damping. Water
+The independent curved comparison and contact tests now identify the remaining
+refinement problem. Next, improve reference stability/local patch resolution and
+spatial refinement until a chosen audible contact band passes, and add a published
+curved-shell or external-solver comparison with matching physical assumptions.
+Dry-vessel measurements can then fit geometry, support stiffness and damping. Water
 coupling must subsequently represent fluid loading and pressure observations;
 simply adding a drawn water surface or a depth setting is insufficient. Later DSP
 feedback should consume actual simulated or recorded sensor signals. This preserves
@@ -295,6 +392,8 @@ ignored. Source hashes detect stale results when plotting.
 
 ```bash
 python tools/validate_structure.py
+python tools/validate_dry_basin.py --output docs/research/dry_basin/convergence.json
+python tools/plot_dry_convergence.py
 python tools/run_dry_basin.py --preview --render
 python tools/plot_dry_basin.py
 ```
@@ -319,6 +418,9 @@ were not evaluated in this environment.
 6. FFmpeg developers. *FFmpeg documentation*.
    [Official documentation](https://ffmpeg.org/ffmpeg.html).
 
-Online references checked 6 October 2026. BibTeX is in [references.bib](references.bib).
+7. Greengard, P., and Serkh, K. (2018). *Zernike Polynomials: Evaluation, Quadrature,
+   and Interpolation*. [arXiv:1811.02720](https://arxiv.org/abs/1811.02720).
+
+Online references checked 6–7 October 2026. BibTeX is in [references.bib](references.bib).
 The NGSolve derivations support the mathematical model, not an endorsement or
 validation of this implementation; NGSolve is not a runtime dependency.

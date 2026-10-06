@@ -21,6 +21,7 @@ class ToolTests(unittest.TestCase):
             "spatial_sculptures.simulation.splines",
             "spatial_sculptures.simulation.structures",
             "spatial_sculptures.simulation.mode_cache",
+            "spatial_sculptures.simulation.convergence",
             "prototypes.001_resonant_surface.dry.config",
             "prototypes.001_resonant_surface.dry.model",
         }

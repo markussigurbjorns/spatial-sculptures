@@ -115,6 +115,33 @@ motion. The small dense solver is intended for limited offline studies, not larg
 meshes or a converged broadband impulse sound.
 
 See the [technical paper](../../../docs/research/dry_basin/paper.md) for equations,
-references, computed figures and the validation record. The next physical task is
-independent curved-shell benchmarking and measurements of a dry vessel before
-adding water loading and pressure sensing.
+references, computed figures and the validation record. An independent curved
+reference and contact-response convergence runner are now available:
+
+```bash
+python tools/validate_dry_basin.py
+```
+
+The runner compares separately assembled disk-polynomial Ritz modes with spline
+meshes, matches nearly degenerate mode groups, varies retained modes and checks
+all six contact/exciter paths in SI units. It writes JSON and a readable table in
+`data/fem/001_resonant_surface/`. It is an offline numerical check; no Blender or
+audio server is needed. `--config` selects a saved physical configuration.
+
+The current default has frequency-only evidence through approximately **76.54 Hz**,
+but all contact-transfer criteria pass only up to the tested **10 Hz** cutoff.
+The unfiltered WAV is not certified by that band. The refined reference and mesh
+still fail stricter checks at higher cutoffs; simply adding more modes does not
+resolve this. Read [the result table](../../../docs/research/dry_basin/convergence.md)
+and [independent study](../../../studies/plates/002_curved_shell_reference/README.md).
+
+Gate a recorded result without repeating the numerical solve:
+
+```bash
+python tools/validate_dry_basin.py --check-report docs/research/dry_basin/convergence.json --require-band 20
+```
+
+This returns status 1 for the current unmet 20 Hz criterion. The next numerical
+task is to improve reference/local-patch resolution and mesh convergence for a
+chosen audible band. Dry-vessel measurements, water loading and pressure sensing
+remain subsequent work. Playback and render defaults are preserved.
