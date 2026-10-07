@@ -1,0 +1,180 @@
+{
+  "scope": "single-process peak RSS and assembly time only; excludes eigensolve and playback",
+  "measurement_date": "2026-10-07",
+  "method": "Fresh Linux Python processes, OPENBLAS_NUM_THREADS=1; one run per implementation; other checks ran concurrently, timings are indicative rather than controlled speed guarantees",
+  "python": "3.13.13",
+  "numpy": "2.2.6",
+  "parameters": {
+    "surface": {
+      "radius_x": 0.72,
+      "radius_y": 0.58,
+      "rise": 0.12,
+      "asymmetry": 0.006,
+      "center_z": 0.72,
+      "domain": "ellipse"
+    },
+    "material": {
+      "youngs_modulus": 193000000000.0,
+      "density": 8030.0,
+      "poisson_ratio": 0.3
+    },
+    "thickness": 0.005,
+    "supports": [
+      {
+        "patch": {
+          "x": -0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": -0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      }
+    ],
+    "exciters": [
+      {
+        "patch": {
+          "x": -0.34,
+          "y": 0.14,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 59.0,
+        "phase": 0.0,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.31,
+          "y": 0.13,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 61.3,
+        "phase": 1.7,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.02,
+          "y": -0.32,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 57.8,
+        "phase": 3.1,
+        "start": 0.0
+      }
+    ],
+    "impulses": [
+      {
+        "exciter": 0,
+        "time": 0.0,
+        "impulse_ns": 0.03
+      }
+    ],
+    "pickups": [
+      [
+        -0.2,
+        -0.04
+      ],
+      [
+        0.25,
+        -0.1
+      ]
+    ],
+    "elements": [
+      18,
+      18
+    ],
+    "gauss_order": 5,
+    "mode_count": 16,
+    "eigensolver": "numpy",
+    "patch_refinement": 0,
+    "damping_ratio": 0.005,
+    "water_depth_m": 0.0,
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "audio_stop_hz": null,
+    "fps": 30,
+    "visual_gain": 1500.0,
+    "exposure_fraction": 0.5,
+    "exposure_samples": 8,
+    "resolution": [
+      720,
+      540
+    ],
+    "rings": 16,
+    "segments": 64
+  },
+  "previous": {
+    "git_commit": "f18bb2fb1a70a32cfb0234d167de06e130b63944",
+    "source_sha256": "a193270f4c1fcc6849170e1a8a6b2e288c13d3a220dc21fd8f77558f459bc419",
+    "assembly_seconds": 12.970636653946713,
+    "process_peak_rss_kib": 1545520
+  },
+  "local_batches": {
+    "source_sha256": "11ef0ae2415a9bc4cfc3dc81770434b329bcb02ceecd631bdc7072f899d5fce6",
+    "assembly_seconds": 2.6025191800436005,
+    "process_peak_rss_kib": 85904
+  },
+  "degrees_of_freedom": 1179,
+  "area_m2": 1.3572046640278606,
+  "shell_mass_kg": 54.491767260718596
+}

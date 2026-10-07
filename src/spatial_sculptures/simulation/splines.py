@@ -5,11 +5,20 @@ from dataclasses import dataclass
 import numpy as np
 
 
-def open_knots(lower: float, upper: float, elements: int) -> np.ndarray:
-    """Open uniform cubic knot vector, with four copies of each endpoint."""
+def open_knots(lower: float, upper: float, elements: int, extra=()) -> np.ndarray:
+    """Open cubic knots; optional extra interior spans preserve simple knots and C2 continuity."""
     if not lower < upper or not isinstance(elements, int) or elements < 1:
         raise ValueError("Positive domain extent and element count are required")
-    edges = np.linspace(lower, upper, elements + 1)
+    extra = np.asarray(extra, dtype=float)
+    if (
+        extra.ndim != 1
+        or not np.all(np.isfinite(extra))
+        or np.any((extra <= lower) | (extra >= upper))
+    ):
+        raise ValueError("Extra knots must be finite and strictly inside the domain")
+    edges = np.unique(np.r_[np.linspace(lower, upper, elements + 1), extra])
+    # Avoid machine-sized spans when a contact coordinate coincides with a grid knot.
+    edges = edges[np.r_[True, np.diff(edges) > (upper - lower) * 1e-12]]
     return np.r_[np.repeat(lower, 4), edges[1:-1], np.repeat(upper, 4)]
 
 
@@ -45,9 +54,14 @@ class SplineSpace:
     active: np.ndarray
 
     @classmethod
-    def rectangle(cls, radius_x: float, radius_y: float, nx: int, ny: int):
-        kx, ky = open_knots(-radius_x, radius_x, nx), open_knots(-radius_y, radius_y, ny)
-        return cls(kx, ky, np.arange((nx + 3) * (ny + 3)))
+    def rectangle(
+        cls, radius_x: float, radius_y: float, nx: int, ny: int, *, extra_x=(), extra_y=()
+    ):
+        kx, ky = (
+            open_knots(-radius_x, radius_x, nx, extra_x),
+            open_knots(-radius_y, radius_y, ny, extra_y),
+        )
+        return cls(kx, ky, np.arange((len(kx) - 4) * (len(ky) - 4)))
 
     def evaluate(self, x, y) -> tuple[np.ndarray, ...]:
         """Return N, Nx, Ny, Nxx, Nyy and Nxy at paired XY coordinates."""

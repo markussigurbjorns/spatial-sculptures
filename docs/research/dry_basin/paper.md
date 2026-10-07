@@ -1,6 +1,6 @@
 # From a plate reference to a dry resonant basin: numerical modes and shared audiovisual state
 
-**Working technical paper, version 0.2 — 7 October 2026**
+**Working technical paper, version 0.3 — 7 October 2026**
 
 Project: Spatial Sculptures. Authorship and publication venue remain open.
 This is a computational study with provisional parameters, not a calibrated vessel
@@ -28,8 +28,12 @@ loading, pressure, acoustic radiation and closed feedback are outside this study
 The expanded study adds an independently assembled polynomial Ritz reference and
 contact-signal convergence tests. The default model has frequency-only evidence
 through about 76.54 Hz, but meets all sampled contact-transfer criteria only through
-10 Hz. Unfiltered impulse audio remains unconverged; an accurate audible bandwidth
-is not yet established.
+10 Hz. Further refinement with stable reference evaluation establishes a sampled
+contact-transfer band through 100 Hz for an 18 × 18 mesh and sixteen retained modes.
+Worst complex-transfer and identically filtered impulse differences are approximately
+2.4% and 2.1%, respectively. Listening uses a documented 80 Hz pass band / 100 Hz
+stop band. Unfiltered sixteen-mode impulses remain unconverged. These are numerical
+cross-verification results within shared assumptions, not physical vessel accuracy.
 
 ## 1. Purpose and relationship to the sculpture
 
@@ -276,13 +280,19 @@ operators. Both solve the same stated Kirchhoff–Love physical model. This chec
 implementation and discretization independently; it does not check the adequacy of
 those shared physical assumptions against 3-D elasticity or a real specimen.
 
-The disk-polynomial basis is supported by
-[Greengard and Serkh (2018)](https://arxiv.org/abs/1811.02720). Our implementation
-evaluates Cartesian polynomial coefficients and derivatives. It does not implement
-their recurrence algorithm, and degree is capped at 20 to limit power-basis numerical
-stability concerns. Degrees 12, 16, 18 and 20 provide a reference refinement sequence.
-The production sequence uses 8, 10, 12 and 14 cells per axis. All configurations
-retain up to 64 modes for comparison, with subsets of 16, 32 and 48 modes.
+The disk-polynomial basis and stable evaluation methods are described by
+[Greengard and Serkh (2018)](https://arxiv.org/abs/1811.02720). Version 0.2 evaluated
+explicit Cartesian coefficients with a degree-20 cap. The current evaluator uses
+a Jacobi three-term recurrence and its analytic derivatives, multiplied by a
+Cartesian complex monomial. This avoids polar singularities at the origin.
+Low-degree power-formula comparisons, orthogonality and analytic boundary
+values/derivatives through degree 48 check the implementation. Degree 48 is a
+resource cap, not an established reference accuracy limit.
+
+The baseline comparison retains degrees 12, 16, 18 and 20, with production meshes
+8, 10, 12 and 14 cells per axis. All configurations retain up to 64 modes for
+comparison, with subsets of 16, 32 and 48 modes. The further refinement below uses
+degrees 24/28/32/36 and meshes 14/18/22/26.
 
 Correspondence maximizes the global area-weighted vector modal-assurance score,
 with one distinct candidate per reference mode. Nearly degenerate reference modes
@@ -309,8 +319,12 @@ $$H_{pe}(f)=i2\pi f\sum_j
  2i\zeta_j\omega_j(2\pi f)]}.$$
 
 All six two-contact × three-exciter paths retain their physical scale and complex
-phase. For each cumulative cutoff B, relative L2 difference is evaluated on a
-0.05 Hz grid using the finer transfer as denominator. Frequencies with both signals
+phase. Version 0.2 used a uniform 0.05 Hz grid. Current comparisons add points
+around every reference/candidate resonance, with eight samples per estimated
+half-power half-width. Trapezoidal weights preserve integration measure on this
+nonuniform grid. Halving baseline spacing and doubling resonance density checks
+interpolation error. For each cumulative cutoff B, the finer transfer is the
+relative L2 denominator. Frequencies with both signals
 silent produce zero error; a nonzero candidate with a silent reference is undefined
 and cannot pass. Signals are not separately normalized or phase-aligned.
 
@@ -330,7 +344,8 @@ The default 8 × 8, 16-mode configuration supports only the tested cumulative ba
 path differs by about 36% in complex L2, despite small frequency differences.
 The finest spline-mesh change is about 5.89%, exceeding its 5% criterion. Above
 this range, reference refinement also exceeds its criterion. None of the tested
-mesh/mode configurations earns a larger supported band under all current checks.
+baseline mesh/mode configurations earns a larger supported band under its reference
+and refinement sequence.
 
 This result is stricter than the approximately 76.54 Hz frequency-only prefix.
 The two conclusions concern different observables. It does not establish useful
@@ -353,6 +368,83 @@ Validation success here means the tools correctly expose both passed and failed
 accuracy checks; it does not mean the current sculpture model is accurate across
 an audible bandwidth.
 
+### 5.6 Refined contact bandwidth and practical playback
+
+The [refinement report](contact_refinement.md) uses reference degrees 24, 28, 32
+and 36 and production meshes 14, 18, 22 and 26. It preserves the baseline geometry,
+material, mounting laws and damping. Existing tolerances remain unchanged. Extra
+checks require each candidate's next-mesh response to differ by at most 5%, and
+both increased quadrature order and denser frequency sampling to differ by at most
+1%. The final mesh pair is still checked independently of candidate selection.
+All lower tested cumulative cutoffs must pass. Transfer comparisons are also
+repeated over 20 Hz to each cutoff above 20 Hz, so sub-audible supported body
+motion cannot mask disagreement in the listening interval.
+
+The smallest passing tested playback bank uses **18 × 18 cells and sixteen modes**.
+The following are worst-path values at the 100 Hz cumulative cutoff; every one of
+the six pickup/force paths contributes separately to the maximum.
+
+| Observable/check | Relative L2 difference | Criterion |
+| --- | ---: | ---: |
+| 18 × 18, 16-mode transfer versus degree-36, 64-mode reference | 2.36% | ≤10% |
+| Reference degree 32 → 36 | 1.57% | ≤5% |
+| Reference 48 → 64 retained modes | 0.323% | ≤5% |
+| Candidate mesh 18 → 22, full banks | 1.93% | ≤5% |
+| Final mesh pair 22 → 26 | 2.45% | ≤5% |
+| Production 16 → 64 retained modes at 18 × 18 | 0.839% | ≤5% |
+| Production quadrature order 5 → 7, finest mesh | 0.0048% | ≤1% |
+| Reference quadrature refinement | <0.00001% | ≤1% |
+| Denser-grid interpolation check, selected bank | 0.0222% | ≤1% |
+| Identically filtered two-second unit-impulse signals versus reference | 2.14% | ≤10% |
+
+![Refined contact-response convergence](figures/refined/contact_transfer_convergence.png)
+
+Figure 8. Contact-transfer agreement and reference/mesh/truncation refinement for
+the expanded study. A cumulative band includes supported body modes below 20 Hz;
+the 100 Hz result is not a certification of the whole audible spectrum.
+
+![Filtered impulse convergence](figures/refined/filtered_impulse_convergence.png)
+
+Figure 9. Identically filtered, common-time impulses at every exciter, sampled at
+4096 Hz for the study. Raw SI amplitude and phase are retained. The chosen
+sixteen-mode bank's filtered difference is approximately 2.14%, while its unfiltered
+impulse difference remains approximately 85.2%. The two observables have deliberately
+different bandwidths; the filtered result cannot certify unfiltered playback.
+
+Listening uses a symmetric Kaiser-windowed sinc FIR: pass band through 80 Hz,
+transition to the stop band at 100 Hz. The empirical design follows
+[SciPy's Kaiser method documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.kaiserord.html)
+with a 90 dB design value and an 80 dB stop-band target; execution needs only
+NumPy. Independent filter tests check the frequency response, channel ratios,
+phase and absence of circular wrap. Linear FFT convolution compensates the FIR
+delay and uses physical continuation beyond the requested end. It is noncausal
+and can ring before an impact. Filtering is an observation operation; it does not
+alter mechanical damping, displacement or retained energy. The mechanical video
+keeps its exposure average and the common time origin. Output is 48 kHz stereo,
+with one shared listening normalization gain and recorded raw/filtered SI peaks.
+
+`--select-band 100` chooses the smallest tested DOF count and then the smallest
+retained bank passing both transfer and filtered-impulse criteria. A saved profile
+records the evidence digest. Export rejects stale sources or changes to structure,
+contacts, force directions, damping or output bandwidth that invalidate the claim.
+Ordinary configurations remain available for exploratory work without such a claim.
+
+Assembly now multiplies only local spline supports in bounded point batches;
+reference assembly also bounds quadrature batches. Dense K/M matrices and the
+NumPy eigensolver remain. An [assembly-only measurement](assembly_performance.json)
+on the same 18 × 18 structure reduced process peak RSS from about 1509 MiB to
+84 MiB. The indicative single-run assembly times were 13.0 and 2.6 seconds;
+concurrent checks ran during measurement, so these are not controlled speed
+bounds. Matching larger cached banks can provide a smaller playback subset without
+another solve. An optional [SciPy partial eigensolver](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigsh.html)
+is isolated to offline work; SciPy was unavailable here, so that branch's numerical
+runtime comparison is not claimed.
+
+Contact-edge/centre knot insertion is configurable independently of physical
+mounting laws. It refines tensor-product strips, and can add more DOFs than uniform
+refinement. The selected profile uses uniform refinement. Further patch-refinement
+studies must satisfy their own mesh and reference criteria.
+
 ## 6. Limitations and next research steps
 
 Plate verification, rigid-motion checks and one shell refinement study cannot
@@ -368,10 +460,10 @@ patch response and pickup signals as well as frequencies. No measured damping,
 rim reinforcement, support rotation, exciter compliance, electrical impedance or
 nonlinear contact is present.
 
-The independent curved comparison and contact tests now identify the remaining
-refinement problem. Next, improve reference stability/local patch resolution and
-spatial refinement until a chosen audible contact band passes, and add a published
-curved-shell or external-solver comparison with matching physical assumptions.
+The refined contact study establishes a limited 100 Hz numerical transfer band.
+Next, extend supported bandwidth and add a published curved-shell or external-solver
+comparison with matching physical assumptions. Support/patch sensitivity and
+thin-shell locking require further investigation across configurations.
 Dry-vessel measurements can then fit geometry, support stiffness and damping. Water
 coupling must subsequently represent fluid loading and pressure observations;
 simply adding a drawn water surface or a depth setting is insufficient. Later DSP
@@ -424,3 +516,9 @@ were not evaluated in this environment.
 Online references checked 6–7 October 2026. BibTeX is in [references.bib](references.bib).
 The NGSolve derivations support the mathematical model, not an endorsement or
 validation of this implementation; NGSolve is not a runtime dependency.
+
+7. Greengard, P., and Serkh, K. (2018). *Zernike Polynomials: Evaluation,
+   Quadrature, and Interpolation*. [arXiv:1811.02720](https://arxiv.org/abs/1811.02720).
+8. SciPy developers. *Kaiser window FIR design and partial symmetric eigenproblems*.
+   [kaiserord](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.kaiserord.html),
+   [eigsh](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigsh.html).

@@ -13,6 +13,8 @@ try:
         compare_modes,
         contact_transfer,
         relative_response_error,
+        resonance_grid,
+        trapezoid_weights,
     )
 except ImportError:
     np = None
@@ -84,6 +86,92 @@ class ConvergenceTests(unittest.TestCase):
         np.testing.assert_allclose((plus - minus) / (2 * h), dx, atol=1e-7)
         np.testing.assert_allclose((plus - 2 * v + minus) / h**2, dxx, atol=1e-4)
 
+    def test_high_degree_reference_boundary_and_origin(self):
+        ritz = importlib.import_module("studies.plates.002_curved_shell_reference.ritz")
+        basis = ritz.disk_polynomials(48)
+        values, dx, dy, dxx, dyy, dxy = ritz.evaluate(basis, [0, 0.72], [0, 0], 0.72, 0.58)
+        for result in (values, dx, dy, dxx, dyy, dxy):
+            self.assertTrue(np.all(np.isfinite(result)))
+        for column, (n, m, imaginary) in enumerate(basis.indices):
+            scale = np.sqrt((n + 1) * (1 if m == 0 else 2))
+            self.assertAlmostEqual(values[1, column], 0 if imaginary else scale, places=10)
+            self.assertAlmostEqual(
+                dx[1, column],
+                0 if imaginary else scale * (n * (n + 2) - m * m) / (2 * 0.72),
+                places=7,
+            )
+
+    def test_recurrence_matches_independent_low_degree_power_formula(self):
+        from math import factorial
+
+        ritz = importlib.import_module("studies.plates.002_curved_shell_reference.ritz")
+        basis = ritz.disk_polynomials(12)
+        theta = np.linspace(0.1, 5.9, 35)
+        radius = np.linspace(0.01, 0.99, 35)
+        actual = ritz.evaluate(
+            basis, radius * np.cos(theta), radius * np.sin(theta), 1, 1, orders=((0, 0),)
+        )[0]
+        for i, (n, m, imaginary) in enumerate(basis.indices):
+            radial = sum(
+                (-1) ** s
+                * factorial(n - s)
+                / (factorial(s) * factorial((n + m) // 2 - s) * factorial((n - m) // 2 - s))
+                * radius ** (n - 2 * s)
+                for s in range((n - m) // 2 + 1)
+            )
+            angle = np.sin(m * theta) if imaginary else np.cos(m * theta)
+            expected = radial * angle * np.sqrt((n + 1) * (1 if m == 0 else 2))
+            np.testing.assert_allclose(actual[:, i], expected, atol=2e-11)
+
+    def test_weighted_error_is_independent_of_sample_density(self):
+        for grid in (np.linspace(0, 1, 15), np.r_[0, 0.001, 0.01, 0.1, 0.8, 1]):
+            w = trapezoid_weights(grid)
+            self.assertAlmostEqual(float(w.sum()), 1)
+            self.assertAlmostEqual(float(w @ grid), 0.5)
+            self.assertAlmostEqual(
+                float(relative_response_error(np.ones_like(grid), np.ones_like(grid) * 1j, w)),
+                np.sqrt(2),
+            )
+        with self.assertRaises(ValueError):
+            trapezoid_weights([0, 1, 1])
+
+    def test_resonance_sampling_converges_for_narrow_peak(self):
+        frequencies, damping = [4.3, 44.4], 0.005
+        errors = []
+        for density in (4, 8, 16):
+            grid = resonance_grid(
+                [frequencies, np.array(frequencies) * 1.001],
+                damping,
+                100,
+                0.05,
+                samples_per_half_width=density,
+            )
+            self.assertTrue(np.all(np.diff(grid) > 0))
+            for f in frequencies:
+                self.assertTrue(np.any(grid == f))
+            a = contact_transfer(frequencies, [1, 1], [[1, 0.3]], [[1, 0.7]], damping, grid)
+            b = contact_transfer(
+                np.array(frequencies) * 1.001, [1, 1], [[1, 0.3]], [[1, 0.7]], damping, grid
+            )
+            errors.append(float(relative_response_error(a, b, trapezoid_weights(grid))[0, 0]))
+        self.assertLess(abs(errors[-1] - errors[-2]), 2e-5)
+
+    def test_reference_cache_reuses_and_tracks_degree(self):
+        import tempfile
+        from pathlib import Path
+
+        ritz = importlib.import_module("studies.plates.002_curved_shell_reference.ritz")
+        config = importlib.import_module("prototypes.001_resonant_surface.dry.config").load_config()
+        with tempfile.TemporaryDirectory() as folder:
+            one, path, reused = ritz.get_modes(asdict(config), 6, 8, Path(folder))
+            two, other, reused_again = ritz.get_modes(asdict(config), 6, 8, Path(folder))
+            self.assertFalse(reused)
+            self.assertTrue(reused_again)
+            self.assertEqual(path, other)
+            np.testing.assert_array_equal(one.coefficients, two.coefficients)
+            _, changed, _ = ritz.get_modes(asdict(config), 7, 8, Path(folder))
+            self.assertNotEqual(path, changed)
+
     def test_independent_free_curved_shell_has_six_rigid_modes(self):
         ritz = importlib.import_module("studies.plates.002_curved_shell_reference.ritz")
         config = importlib.import_module("prototypes.001_resonant_surface.dry.config").load_config()
@@ -104,12 +192,21 @@ class ConvergenceTests(unittest.TestCase):
             meshes=(4, 6),
             degrees=(6, 8),
             counts=(8, 16),
-            bands=(5.0, 10.0),
+            bands=(5.0, 10.0, 30.0),
             signal_duration=0.05,
         )
         json.dumps(result, allow_nan=False)
         self.assertEqual(result["parameters"]["water_depth_m"], 0)
         self.assertEqual(result["sampling"]["normalization"], "none; raw SI velocity per N s")
+        for row in result["meshes"]:
+            for case in row["retained_counts"]:
+                band = case["bands"][-1]
+                self.assertEqual(band["audible_interval_hz"], [20, 30])
+                if any(
+                    v["maximum_relative_L2"] is None or v["maximum_relative_L2"] > v["tolerance"]
+                    for v in band["audible_interval_checks"].values()
+                ):
+                    self.assertFalse(band["individual_band_checks_passed"])
         with self.assertRaises(ValueError):
             run_validation(config, meshes=(4, 4), degrees=(6, 8), counts=(8, 16), bands=(5.0, 10.0))
 

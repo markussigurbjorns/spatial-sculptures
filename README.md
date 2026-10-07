@@ -79,12 +79,12 @@ does not repeat the structural solve.
 
 ```bash
 python -m pip install -e '.[numerical]'  # optional NumPy backend
-python tools/run_dry_basin.py --preview --view
-python tools/run_dry_basin.py --preview --render
+python tools/run_dry_basin.py --profile contact_100hz --preview --view
+python tools/run_dry_basin.py --profile contact_100hz --preview --render
 ```
 
 Press Space in Blender for synchronized playback. Rendering produces an MP4 with
-audio under `prototypes/001_resonant_surface/renders/dry/` and requires FFmpeg.
+audio under `prototypes/001_resonant_surface/renders/contact_100hz/` and requires FFmpeg.
 Without `--view` or `--render`, the command exports audio/data without Blender.
 Use `--experiment 003_soft_supports` or `--config path/to/configuration.json` for
 reproducible variations. Preview reduces presentation cost, not structural physics.
@@ -104,11 +104,28 @@ polynomial Ritz solver:
 python tools/validate_dry_basin.py
 ```
 
-The [recorded results](docs/research/dry_basin/convergence.md) distinguish frequency
-agreement from contact-signal convergence: current defaults meet all sampled
-contact-transfer criteria only through 10 Hz. The unfiltered listening WAV remains
-an experimental output, with no established audible-band accuracy. Further dry
-refinement comes before a trustworthy water-coupling model.
+The [refined contact study](docs/research/dry_basin/contact_refinement.md) supports
+the sampled transfer band through **100 Hz** for the saved 18 × 18, 16-mode profile.
+Its worst complex contact-transfer difference is about 2.4%, and its identically
+filtered impulse difference about 2.1%, against the refined numerical reference.
+Pickup audio passes through 80 Hz, transitions to a stop band at 100 Hz, and shares
+the mechanical model's clock. This remains dry metal velocity with provisional
+physical assumptions. It is not measured vessel sound or a full audible-spectrum model.
+The profile checks its evidence before export; physical/contact/damping edits require
+new verification. The [paper](docs/research/dry_basin/paper.md) explains the scope.
+
+The original 8 × 8 exploratory configuration remains available by omitting
+`--profile`. Its [contact evidence](docs/research/dry_basin/convergence.md) supports
+only 10 Hz and its default WAV is unfiltered. Numerical assembly uses bounded
+local batches; playback reuses cached modes, including subsets of larger study
+banks. NumPy is sufficient. Optional `.[solver]` adds a SciPy partial eigensolver
+for offline work; Blender never needs SciPy.
+
+To reproduce refinement and select a passing profile:
+
+```bash
+python tools/validate_dry_basin.py --refine-contacts --select-band 100 --profile-output data/fem/001_resonant_surface/contact_100hz.json
+```
 
 ## Run the artistic water prototype
 

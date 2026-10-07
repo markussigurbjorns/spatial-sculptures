@@ -19,10 +19,10 @@ python -m pip install -e '.[numerical]'
 python tools/run_dry_basin.py --preview
 
 # Open a lightweight Blender scene; press Space to play picture and audio.
-python tools/run_dry_basin.py --preview --view
+python tools/run_dry_basin.py --profile contact_100hz --preview --view
 
 # Render a two-second movie with audio; requires Blender and FFmpeg.
-python tools/run_dry_basin.py --preview --render
+python tools/run_dry_basin.py --profile contact_100hz --preview --render
 ```
 
 Outputs default to `../renders/dry/`: `dry_basin.mp4` when rendered,
@@ -32,12 +32,54 @@ resolves source paths relative to itself and returns subprocess failures.
 Use a different `--output` directory to retain each run; an existing movie is only
 replaced by a successful render, so changing parameters without rendering leaves
 that older movie in place.
+Named profiles instead default to `../renders/<profile>/`; the checked profile's
+movie is `../renders/contact_100hz/dry_basin.mp4`.
 
 The first run solves the eigenproblem. Later runs reuse matching modes in
 `data/fem/001_resonant_surface/`. Structural settings and solver source are hashed;
 changing forces, duration, damping, pickups or display settings does not require
 another solve. `--rebuild` forces one. Cached mode arrays use NumPy archives without
-pickle. Cache files, generated audio and renders are ignored by Git.
+pickle. A smaller playback bank can reuse the leading modes of a matching larger
+research bank. Cache files, generated audio and renders are ignored by Git.
+
+## Checked 100 Hz contact profile
+
+[contact_100hz.json](profiles/contact_100hz.json) uses an 18 × 18 spline grid and
+16 retained modes. The [refinement study](../../../docs/research/dry_basin/contact_refinement.md)
+checks all three force patches × two pickups, source identity, mode correspondence,
+reference/mesh/truncation refinement, integration order and resonance sampling.
+Under its declared criteria, sampled complex response passes through 100 Hz.
+Worst transfer and filtered-impulse differences are approximately 2.4% and 2.1%
+against the finite reference. No specimen, pressure or acoustic-radiation accuracy
+is asserted by this numerical comparison.
+
+The profile filters pickup velocity with an offline symmetric FIR: pass band to
+80 Hz, transition to 100 Hz, and an 80 dB stop-band design target. All channels use
+the same filter and listening gain. Linear convolution removes filter delay and
+uses physical continuation after the requested end; it does not wrap the end to
+the start. Noncausal filtering can ring before an impact. The visual mechanical
+state and its existing exposure average are unchanged; the audio filter is an
+observation/presentation operation. WAV and picture retain the same time origin.
+Filter details and raw/filtered SI peaks are saved in `report.json`.
+
+The runner verifies the profile's evidence hash, solver source, structural settings,
+pickups, directions, damping and output bandwidth before exporting. Duration and
+presentation settings may change. For exploratory edits, use an ordinary JSON
+configuration containing the `parameters` object, and regenerate evidence when
+you want a supported-band claim.
+
+Reproduce the study and choose the smallest passing bank:
+
+```bash
+python tools/validate_dry_basin.py --refine-contacts --select-band 100 --profile-output data/fem/001_resonant_surface/contact_100hz.json
+python tools/run_dry_basin.py --config data/fem/001_resonant_surface/contact_100hz.json --preview --view
+```
+
+The initial solve is offline; repeated playback reads cached modes. Assembly uses
+bounded local-support batches. Optional `eigensolver="scipy"` uses a partial sparse
+eigensolve (`python -m pip install -e '.[solver]'`), while K/M remain dense. NumPy
+alone supports the checked profile. The SciPy branch was unavailable for runtime
+comparison on this machine.
 
 ## Configurable assumptions
 
@@ -58,6 +100,10 @@ housing mass, unit global force direction and prescribed harmonic force. Rigid
 housing inertia and loading couple through the surface-area mean of each patch.
 These are not models of glue compliance, actuator impedance or electrical drive.
 All these dimensions and assumptions affect the computed structure.
+`patch_refinement=1` inserts contact edges and centres as simple spline knots;
+larger levels subdivide the patches. Tensor-product knots refine entire strips,
+so this option can cost more than uniform refinement and needs its own convergence
+study. The checked profile uses uniform refinement (`patch_refinement=0`).
 
 The default is a 0.03 N·s impulse at the first mounting patch, followed by ring-down.
 All three housing masses are present; sustained forces are zero. Damping is an
@@ -130,7 +176,7 @@ audio server is needed. `--config` selects a saved physical configuration.
 
 The current default has frequency-only evidence through approximately **76.54 Hz**,
 but all contact-transfer criteria pass only up to the tested **10 Hz** cutoff.
-The unfiltered WAV is not certified by that band. The refined reference and mesh
+The unfiltered WAV is not certified by that band. The baseline reference and mesh
 still fail stricter checks at higher cutoffs; simply adding more modes does not
 resolve this. Read [the result table](../../../docs/research/dry_basin/convergence.md)
 and [independent study](../../../studies/plates/002_curved_shell_reference/README.md).
@@ -141,7 +187,6 @@ Gate a recorded result without repeating the numerical solve:
 python tools/validate_dry_basin.py --check-report docs/research/dry_basin/convergence.json --require-band 20
 ```
 
-This returns status 1 for the current unmet 20 Hz criterion. The next numerical
-task is to improve reference/local-patch resolution and mesh convergence for a
-chosen audible band. Dry-vessel measurements, water loading and pressure sensing
-remain subsequent work. Playback and render defaults are preserved.
+This returns status 1 for the baseline's unmet 20 Hz criterion. The refined saved
+profile passes through 100 Hz. Higher bandwidth, external shell benchmarks,
+dry-vessel measurements, water loading and pressure sensing remain subsequent work.

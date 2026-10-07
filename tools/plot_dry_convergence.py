@@ -122,6 +122,34 @@ def main():
         ax.legend()
         ax.grid(alpha=0.2)
     save(fig, "impulse_convergence")
+
+    if all("filtered_impulse" in c for row in report["meshes"] for c in row["retained_counts"]):
+        fig, axes = plt.subplots(1, 2, figsize=(10, 4), layout="constrained")
+        for row in report["meshes"]:
+            cases = row["retained_counts"]
+            for ax, key in zip(
+                axes, ("vs_independent_reference", "vs_full_modal_bank"), strict=True
+            ):
+                ax.plot(
+                    [c["count"] for c in cases],
+                    [100 * c["filtered_impulse"][key]["maximum_relative_L2"] for c in cases],
+                    "o-",
+                    ms=3,
+                    label=f"{row['elements_per_axis']} × {row['elements_per_axis']}",
+                )
+        axes[0].axhline(10, color="grey", linestyle="--")
+        axes[1].axhline(5, color="grey", linestyle="--")
+        filtering = report["sampling"]["filtered_impulse"]
+        axes[0].set_title(
+            "Filtered impulses versus reference\n"
+            f"pass {filtering['passband_hz']:g} / stop {filtering['stopband_hz']:g} Hz"
+        )
+        axes[1].set_title("Filtered truncation versus full bank")
+        for ax in axes:
+            ax.set(xlabel="Retained mode count", ylabel="Worst contact/path relative signal L2 (%)")
+            ax.legend()
+            ax.grid(alpha=0.2)
+        save(fig, "filtered_impulse_convergence")
     (args.output / "convergence_provenance.json").write_text(
         json.dumps(
             {

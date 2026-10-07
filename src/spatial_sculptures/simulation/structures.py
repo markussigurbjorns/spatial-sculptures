@@ -101,7 +101,7 @@ class AttachedMass:
             raise ValueError("Attached mass must be finite and nonnegative")
 
 
-def quadrature(surface: GraphSurface, nx: int, ny: int, order: int):
+def quadrature(surface: GraphSurface, nx: int, ny: int, order: int, *, spans_x=None, spans_y=None):
     """Cell-wise Gauss integration; ellipse intervals are clipped analytically.
 
     Split X at ellipse/grid intersections rather than classifying whole cells or
@@ -110,8 +110,12 @@ def quadrature(surface: GraphSurface, nx: int, ny: int, order: int):
     if min(nx, ny) < 1 or order < 4:
         raise ValueError("Positive cell counts and Gauss order >= 4 are required")
     nodes, weights = np.polynomial.legendre.leggauss(order)
-    xedges = np.linspace(-surface.radius_x, surface.radius_x, nx + 1)
-    yedges = np.linspace(-surface.radius_y, surface.radius_y, ny + 1)
+    xedges = (
+        np.linspace(-surface.radius_x, surface.radius_x, nx + 1) if spans_x is None else spans_x
+    )
+    yedges = (
+        np.linspace(-surface.radius_y, surface.radius_y, ny + 1) if spans_y is None else spans_y
+    )
     if surface.domain == "ellipse":
         cuts = surface.radius_x * np.sqrt(np.maximum(0, 1 - (yedges / surface.radius_y) ** 2))
         xedges = np.unique(np.r_[xedges, cuts, -cuts])
@@ -181,44 +185,29 @@ class ShellSystem:
     shell_mass_kg: float
 
 
-def assemble_shell(
-    surface: GraphSurface,
-    material: Material,
-    thickness: float,
-    *,
-    elements: tuple[int, int] = (6, 6),
-    gauss_order: int = 5,
-    supports: tuple[Support, ...] = (),
-    attached_masses: tuple[AttachedMass, ...] = (),
-    simply_supported_plate: bool = False,
-) -> ShellSystem:
-    """Assemble consistent K/M from membrane and bending energy, in SI units."""
-    if not isfinite(thickness) or thickness <= 0:
-        raise ValueError("Uniform thickness must be finite and positive")
-    if len(elements) != 2 or any(not isinstance(v, int) or v < 1 for v in elements):
-        raise ValueError("Two positive integer element counts are required")
-    if simply_supported_plate and (
-        surface.domain != "rectangle" or surface.rise or surface.asymmetry
-    ):
-        raise ValueError("The plate boundary check requires a flat rectangle")
-    if simply_supported_plate and (supports or attached_masses):
-        raise ValueError("Plate reference boundary check excludes local supports/attached masses")
-    space = SplineSpace.rectangle(surface.radius_x, surface.radius_y, *elements)
-    x, y, measure = quadrature(surface, *elements, gauss_order)
+def contact_knots(patches, axis: str, level: int):
+    """Insert contact edges and subdivisions; tensor-product refinement adds full strips.
+
+    The patch force/spring/mass laws remain unchanged. This is span refinement,
+    not a change to mounting compliance or an adaptive unstructured mesh.
+    """
+    if not isinstance(level, int) or isinstance(level, bool) or not 0 <= level <= 3:
+        raise ValueError("Contact refinement level must be an integer from 0 to 3")
+    if not level:
+        return ()
+    return tuple(
+        getattr(patch, axis) + offset * patch.width
+        for patch in patches
+        for offset in np.linspace(-0.5, 0.5, 2**level + 1)
+    )
+
+
+def _shell_matrices(surface, material, thickness, space, components, x, y, measure):
+    """Integrate one compact local batch; temporary storage scales with local support."""
     _, zx, zy, zxx, zyy, zxy = surface.geometry(x, y)
     jacobian = np.sqrt(1 + zx**2 + zy**2)
-    measure *= jacobian
-    values = space.evaluate(x, y)[0]
-    diagonal = np.sum(measure[:, None] * values**2, axis=0)
-    if simply_supported_plate:
-        ix, iy = np.unravel_index(space.active, (elements[0] + 3, elements[1] + 3))
-        keep = (ix > 0) & (ix < elements[0] + 2) & (iy > 0) & (iy < elements[1] + 2)
-    else:
-        keep = diagonal > diagonal.max() * 1e-12
-    space.active = space.active[keep]
     n, dx, dy, dxx, dyy, dxy = space.evaluate(x, y)
     count, points = len(space.active), len(x)
-    components = (2,) if simply_supported_plate else (0, 1, 2)
     # Inverse graph metric and unit normal.
     determinant = jacobian**2
     gxx, gyy, gxy = (1 + zy**2) / determinant, (1 + zx**2) / determinant, -zx * zy / determinant
@@ -257,7 +246,78 @@ def assemble_shell(
 
     stiffness = thickness * energy_matrix(strain) + thickness**3 / 12 * energy_matrix(bending)
     scalar_mass = n.T @ ((measure * material.density * thickness)[:, None] * n)
-    mass = np.kron(np.eye(len(components)), scalar_mass)
+    return stiffness, np.kron(np.eye(len(components)), scalar_mass)
+
+
+def assemble_shell(
+    surface: GraphSurface,
+    material: Material,
+    thickness: float,
+    *,
+    elements: tuple[int, int] = (6, 6),
+    gauss_order: int = 5,
+    supports: tuple[Support, ...] = (),
+    attached_masses: tuple[AttachedMass, ...] = (),
+    patch_refinement: int = 0,
+    simply_supported_plate: bool = False,
+) -> ShellSystem:
+    """Assemble consistent K/M from membrane and bending energy, in SI units."""
+    if not isfinite(thickness) or thickness <= 0:
+        raise ValueError("Uniform thickness must be finite and positive")
+    if len(elements) != 2 or any(not isinstance(v, int) or v < 1 for v in elements):
+        raise ValueError("Two positive integer element counts are required")
+    if simply_supported_plate and (
+        surface.domain != "rectangle" or surface.rise or surface.asymmetry
+    ):
+        raise ValueError("The plate boundary check requires a flat rectangle")
+    if simply_supported_plate and (supports or attached_masses):
+        raise ValueError("Plate reference boundary check excludes local supports/attached masses")
+    patches = [s.patch for s in supports] + [a.patch for a in attached_masses]
+    extra_x, extra_y = (
+        contact_knots(patches, "x", patch_refinement),
+        contact_knots(patches, "y", patch_refinement),
+    )
+    space = SplineSpace.rectangle(
+        surface.radius_x, surface.radius_y, *elements, extra_x=extra_x, extra_y=extra_y
+    )
+    x, y, measure = quadrature(
+        surface,
+        *elements,
+        gauss_order,
+        spans_x=np.unique(space.knots_x),
+        spans_y=np.unique(space.knots_y),
+    )
+    _, zx, zy, *_ = surface.geometry(x, y)
+    measure *= np.sqrt(1 + zx**2 + zy**2)
+    # Identify cut-domain basis functions without allocating the full quadrature x basis tensor.
+    diagonal = np.zeros(len(space.active))
+    for start in range(0, len(x), 256):
+        part = slice(start, start + 256)
+        values = space.evaluate(x[part], y[part])[0]
+        diagonal += np.sum(measure[part, None] * values**2, axis=0)
+    if simply_supported_plate:
+        ix, iy = np.unravel_index(space.active, (elements[0] + 3, elements[1] + 3))
+        keep = (ix > 0) & (ix < elements[0] + 2) & (iy > 0) & (iy < elements[1] + 2)
+    else:
+        keep = diagonal > diagonal.max() * 1e-12
+    space.active = space.active[keep]
+    count = len(space.active)
+    components = (2,) if simply_supported_plate else (0, 1, 2)
+    stiffness = np.zeros((len(components) * count,) * 2)
+    mass = np.zeros_like(stiffness)
+    # Cubic splines have compact support. Multiply only the basis functions touching
+    # each batch, instead of multiplying global mostly-zero strain operators.
+    for start in range(0, len(x), 32):
+        part = slice(start, start + 32)
+        values = space.evaluate(x[part], y[part])[0]
+        local = np.flatnonzero(np.any(values != 0, axis=0))
+        subset = SplineSpace(space.knots_x, space.knots_y, space.active[local])
+        k, m = _shell_matrices(
+            surface, material, thickness, subset, components, x[part], y[part], measure[part]
+        )
+        indices = np.concatenate([block * count + local for block in range(len(components))])
+        stiffness[np.ix_(indices, indices)] += k
+        mass[np.ix_(indices, indices)] += m
     for support in supports:
         mean = patch_average(space, surface, support.patch)
         for block, component in enumerate(components):
@@ -279,7 +339,7 @@ def assemble_shell(
     )
 
 
-def solve_modes(system: ShellSystem, mode_count: int):
+def solve_modes(system: ShellSystem, mode_count: int, *, backend: str = "numpy"):
     """Mass-whiten the generalized symmetric eigenproblem; return mass-normalized vectors.
 
     Modes below 0.01 Hz are excluded and counted (free-body motion is not rendered
@@ -287,13 +347,42 @@ def solve_modes(system: ShellSystem, mode_count: int):
     """
     if not isinstance(mode_count, int) or mode_count < 1:
         raise ValueError("Positive integer retained mode count required")
+    if backend not in ("numpy", "scipy"):
+        raise ValueError("Eigen backend must be numpy or scipy")
     scale = 1 / np.sqrt(np.diag(system.mass))
     mass = scale[:, None] * system.mass * scale[None, :]
     stiffness = scale[:, None] * system.stiffness * scale[None, :]
-    factor = np.linalg.cholesky(mass)
-    left = np.linalg.solve(factor, stiffness)
-    whitened = np.linalg.solve(factor, left.T).T
-    eigenvalues, vectors = np.linalg.eigh((whitened + whitened.T) / 2)
+    factor = np.linalg.cholesky(mass)  # Fail on an indefinite/singular mass in either backend.
+    if backend == "scipy":
+        try:
+            import scipy
+            from scipy.sparse import csc_matrix
+            from scipy.sparse.linalg import eigsh
+        except ImportError as error:
+            raise ImportError("Sparse solves require the optional .[solver] extra") from error
+        if mode_count + 7 >= len(mass):
+            raise ValueError("Sparse solve requires room for six rigid modes; use numpy here")
+        # Shift just below zero: retain the low supported modes and any rigid modes.
+        # K/M are assembled locally into dense matrices; only the eigensolve is sparse.
+        eigenvalues, vectors = eigsh(
+            csc_matrix(stiffness),
+            k=mode_count + 6,
+            M=csc_matrix(mass),
+            sigma=-1.0,
+            which="LM",
+            tol=1e-10,
+            v0=np.random.default_rng(5).standard_normal(len(mass)),
+        )
+        order = np.argsort(eigenvalues)
+        eigenvalues, vectors = eigenvalues[order], vectors[:, order]
+        mass_condition = None  # Do not add an all-spectrum SVD to a partial solve.
+        version = scipy.__version__
+    else:
+        left = np.linalg.solve(factor, stiffness)
+        whitened = np.linalg.solve(factor, left.T).T
+        eigenvalues, vectors = np.linalg.eigh((whitened + whitened.T) / 2)
+        mass_condition = float(np.linalg.cond(mass))
+        version = np.__version__
     if eigenvalues[0] < -max(1e-3, abs(eigenvalues[-1]) * 1e-9):
         raise ValueError("Negative structural eigenvalue; inspect formulation/conditioning")
     positive = eigenvalues > (2 * np.pi * 0.01) ** 2
@@ -301,7 +390,9 @@ def solve_modes(system: ShellSystem, mode_count: int):
     if np.count_nonzero(positive) < mode_count:
         raise ValueError("Requested more positive modes than the discrete structure provides")
     eigenvalues, vectors = eigenvalues[positive][:mode_count], vectors[:, positive][:, :mode_count]
-    coefficients = scale[:, None] * np.linalg.solve(factor.T, vectors)
+    coefficients = scale[:, None] * (
+        vectors if backend == "scipy" else np.linalg.solve(factor.T, vectors)
+    )
     residual = system.stiffness @ coefficients - (system.mass @ coefficients) * eigenvalues
     denominator = np.linalg.norm(system.stiffness @ coefficients, axis=0)
     relative_residual = np.linalg.norm(residual, axis=0) / np.maximum(denominator, 1e-15)
@@ -311,7 +402,10 @@ def solve_modes(system: ShellSystem, mode_count: int):
         {
             "discarded_rigid_or_near_zero_modes": discarded,
             "maximum_relative_eigen_residual": float(relative_residual.max()),
-            "mass_condition_number_scaled": float(np.linalg.cond(mass)),
+            "mass_condition_number_scaled": mass_condition,
+            "eigen_backend": backend,
+            "eigen_backend_version": version,
+            "assembly": "bounded local-support batches; dense K/M",
             "degrees_of_freedom": len(system.mass),
             "area_m2": system.area,
             "shell_mass_kg": system.shell_mass_kg,

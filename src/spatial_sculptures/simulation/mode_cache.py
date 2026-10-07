@@ -41,9 +41,11 @@ class CachedModes:
         return np.einsum("b,cbm,c->m", mean, self.coefficients, direction)
 
 
-def modes_from_system(system: ShellSystem, mode_count: int, metadata: dict) -> CachedModes:
+def modes_from_system(
+    system: ShellSystem, mode_count: int, metadata: dict, *, backend: str = "numpy"
+) -> CachedModes:
     """Normalize mode shapes and masses together; retain numerical diagnostics."""
-    frequencies, coefficients, diagnostics = solve_modes(system, mode_count)
+    frequencies, coefficients, diagnostics = solve_modes(system, mode_count, backend=backend)
     vector = np.zeros((3, len(system.space.active), mode_count))
     for block, component in enumerate(system.components):
         vector[component] = coefficients[

@@ -7,59 +7,110 @@ give an independently assembled linear Kirchhoff-Love reference. It is numerical
 cross-verification, not an analytical exact solution or measured-vessel validation.
 """
 
+import hashlib
+import json
 from dataclasses import dataclass
-from math import comb, factorial, pi
+from math import pi
+from pathlib import Path
 
 import numpy as np
-from numpy.polynomial import polynomial as poly
+
+
+@dataclass(frozen=True)
+class DiskBasis:
+    """Real Zernike indices; evaluation uses Jacobi recurrences, never power sums."""
+
+    degree: int
+    indices: tuple[tuple[int, int, bool], ...]
+
+    def __len__(self):
+        return len(self.indices)
 
 
 def disk_polynomials(degree: int):
-    """Normalized real Zernike polynomials expressed in Cartesian X/Y coefficients."""
-    if not isinstance(degree, int) or not 3 <= degree <= 20:
-        raise ValueError("Reference polynomial degree must lie between 3 and 20")
-    coefficients = []
-    for n in range(degree + 1):
-        for m in range(n % 2, n + 1, 2):
-            for imaginary in (False,) if m == 0 else (False, True):
-                terms = np.zeros((degree + 1, degree + 1))
-                for s in range((n - m) // 2 + 1):
-                    radial = (
-                        (-1) ** s
-                        * factorial(n - s)
-                        / (factorial(s) * factorial((n + m) // 2 - s) * factorial((n - m) // 2 - s))
-                    )
-                    power = (n - m) // 2 - s
-                    for k in range(m + 1):
-                        phase = (1j**k).imag if imaginary else (1j**k).real
-                        for j in range(power + 1):
-                            terms[m - k + 2 * (power - j), k + 2 * j] += (
-                                radial * comb(m, k) * phase * comb(power, j)
-                            )
-                terms *= np.sqrt((n + 1) * (1 if m == 0 else 2))
-                coefficients.append(terms)
-    return np.asarray(coefficients)
+    """Unit mean-square real disk basis, ordered as the original reference.
+
+    Degree 48 is a resource limit, not an accuracy claim. Higher degrees still
+    require quadrature, residual and response convergence checks.
+    """
+    if not isinstance(degree, int) or isinstance(degree, bool) or not 3 <= degree <= 48:
+        raise ValueError("Reference polynomial degree must lie between 3 and 48")
+    return DiskBasis(
+        degree,
+        tuple(
+            (n, m, imaginary)
+            for n in range(degree + 1)
+            for m in range(n % 2, n + 1, 2)
+            for imaginary in ((False,) if m == 0 else (False, True))
+        ),
+    )
+
+
+def jacobi_jets(maximum: int, m: int, s):
+    """P_j^(0,m)(s) and two s derivatives via a differentiated three-term recurrence.
+
+    Z_n^m = (X+iY)^m P_((n-m)/2)^(0,m)(2*(X²+Y²)-1).
+    This Cartesian product avoids polar-coordinate singularities at the origin.
+    See Greengard & Serkh, arXiv:1811.02720, Jacobi/Zernike recurrences.
+    """
+    zero, one = np.zeros_like(s), np.ones_like(s)
+    jets = [(one, zero, zero)]
+    if maximum:
+        jets.append((((m + 2) * s - m) / 2, one * (m + 2) / 2, zero))
+    for j in range(1, maximum):
+        a = 2 * (j + 1) * (j + m + 1) * (2 * j + m)
+        slope = (2 * j + m + 1) * (2 * j + m) * (2 * j + m + 2)
+        b = slope * s - (2 * j + m + 1) * m * m
+        c = 2 * j * (j + m) * (2 * j + m + 2)
+        p, dp, ddp = jets[-1]
+        previous, dprevious, ddprevious = jets[-2]
+        jets.append(
+            (
+                (b * p - c * previous) / a,
+                (b * dp + slope * p - c * dprevious) / a,
+                (b * ddp + 2 * slope * dp - c * ddprevious) / a,
+            )
+        )
+    return jets
 
 
 def evaluate(
-    coefficients,
+    basis,
     x,
     y,
     radius_x,
     radius_y,
     orders=((0, 0), (1, 0), (0, 1), (2, 0), (0, 2), (1, 1)),
 ):
-    """Independent polynomial values and derivatives in physical Cartesian coordinates."""
-    result = []
-    for nx, ny in orders:
-        rows = []
-        for coefficient in coefficients:
-            derivative = poly.polyder(poly.polyder(coefficient, nx, axis=0), ny, axis=1)
-            rows.append(
-                poly.polyval2d(x / radius_x, y / radius_y, derivative) / radius_x**nx / radius_y**ny
-            )
-        result.append(np.array(rows).T)
-    return result
+    """Stable values and analytic first/second physical XY derivatives, including at r=0."""
+    allowed = ((0, 0), (1, 0), (0, 1), (2, 0), (0, 2), (1, 1))
+    if any(order not in allowed for order in orders):
+        raise ValueError("Only values and derivatives through second order are supported")
+    x, y = np.broadcast_arrays(np.atleast_1d(x), np.atleast_1d(y))
+    xx, yy = x.ravel() / radius_x, y.ravel() / radius_y
+    z, s = xx + 1j * yy, 2 * (xx * xx + yy * yy) - 1
+    radial = {m: jacobi_jets((basis.degree - m) // 2, m, s) for m in range(basis.degree + 1)}
+    rows = {order: [] for order in orders}
+    for n, m, imaginary in basis.indices:
+        p, dp, ddp = radial[m][(n - m) // 2]
+        angular = z**m
+        first = m * z ** (m - 1) if m else np.zeros_like(z)
+        second = m * (m - 1) * z ** (m - 2) if m > 1 else np.zeros_like(z)
+        jets = {
+            (0, 0): angular * p,
+            (1, 0): first * p + angular * dp * 4 * xx,
+            (0, 1): 1j * first * p + angular * dp * 4 * yy,
+            (2, 0): second * p + 8 * xx * first * dp + angular * (16 * xx**2 * ddp + 4 * dp),
+            (0, 2): -second * p + 8j * yy * first * dp + angular * (16 * yy**2 * ddp + 4 * dp),
+            (1, 1): 1j * second * p
+            + 4 * (yy + 1j * xx) * first * dp
+            + 16 * xx * yy * angular * ddp,
+        }
+        scale = np.sqrt((n + 1) * (1 if m == 0 else 2))
+        for order in orders:
+            value = jets[order].imag if imaginary else jets[order].real
+            rows[order].append(scale * value / radius_x ** order[0] / radius_y ** order[1])
+    return [np.asarray(rows[order]).T for order in orders]
 
 
 def geometry(parameters, x, y):
@@ -92,8 +143,8 @@ def disk_quadrature(surface, radial_order: int, angular_points: int):
     return x, y, measure
 
 
-def patch_mean(coefficients, surface, patch):
-    nodes, weights = np.polynomial.legendre.leggauss(12)
+def patch_mean(basis, surface, patch):
+    nodes, weights = np.polynomial.legendre.leggauss(max(12, (basis.degree + 3) // 2))
     half = patch["width"] / 2
     x, y = np.meshgrid(patch["x"] + half * nodes, patch["y"] + half * nodes, indexing="ij")
     if np.max((x / surface["radius_x"]) ** 2 + (y / surface["radius_y"]) ** 2) > 1:
@@ -101,7 +152,7 @@ def patch_mean(coefficients, surface, patch):
     zx, zy = geometry(surface, x.ravel(), y.ravel())[1:3]
     measure = np.outer(weights, weights).ravel() * np.sqrt(1 + zx * zx + zy * zy)
     values = evaluate(
-        coefficients,
+        basis,
         x.ravel(),
         y.ravel(),
         surface["radius_x"],
@@ -114,7 +165,7 @@ def patch_mean(coefficients, surface, patch):
 @dataclass
 class RitzModes:
     parameters: dict
-    basis: np.ndarray
+    basis: DiskBasis
     coefficients: np.ndarray  # component x polynomial x mode; mass normalized.
     frequencies: np.ndarray
     diagnostics: dict
@@ -136,21 +187,9 @@ class RitzModes:
         return np.einsum("b,cbm,c->m", mean, self.coefficients, direction)
 
 
-def solve(
-    parameters: dict,
-    degree: int = 12,
-    mode_count: int = 32,
-    radial_order: int | None = None,
-    angular_points: int | None = None,
-) -> RitzModes:
-    """Assemble independently in local orthonormal coordinates and solve with unit modal mass."""
+def _reference_matrices(parameters, basis, x, y, measure):
+    """Independent orthonormal energy on a bounded quadrature batch."""
     surface = parameters["surface"]
-    if surface["domain"] != "ellipse" or parameters["water_depth_m"] != 0:
-        raise ValueError("Reference supports only dry elliptical graph shells")
-    radial_order = radial_order or degree + 5
-    angular_points = angular_points or 4 * degree + 12
-    basis = disk_polynomials(degree)
-    x, y, measure = disk_quadrature(surface, radial_order, angular_points)
     n, dx, dy, dxx, dyy, dxy = evaluate(basis, x, y, surface["radius_x"], surface["radius_y"])
     _, zx, zy, zxx, zyy, zxy = geometry(surface, x, y)
     jacobian = np.sqrt(1 + zx * zx + zy * zy)
@@ -204,6 +243,33 @@ def solve(
 
     stiffness = h * integrate(strain) + h**3 / 12 * integrate(bending)
     scalar_mass = n.T @ (n * (measure * material["density"] * h)[:, None])
+    return stiffness, scalar_mass, float(measure.sum())
+
+
+def solve(
+    parameters: dict,
+    degree: int = 12,
+    mode_count: int = 32,
+    radial_order: int | None = None,
+    angular_points: int | None = None,
+) -> RitzModes:
+    """Assemble independently in local orthonormal coordinates and solve with unit modal mass."""
+    surface = parameters["surface"]
+    if surface["domain"] != "ellipse" or parameters["water_depth_m"] != 0:
+        raise ValueError("Reference supports only dry elliptical graph shells")
+    radial_order = radial_order or degree + 5
+    angular_points = angular_points or 4 * degree + 12
+    basis = disk_polynomials(degree)
+    x, y, measure = disk_quadrature(surface, radial_order, angular_points)
+    count = len(basis)
+    stiffness, scalar_mass = np.zeros((3 * count,) * 2), np.zeros((count, count))
+    area = 0.0
+    for start in range(0, len(x), 256):
+        part = slice(start, start + 256)
+        k, m, a = _reference_matrices(parameters, basis, x[part], y[part], measure[part])
+        stiffness += k
+        scalar_mass += m
+        area += a
     mass = np.kron(np.eye(3), scalar_mass)
     for support in parameters["supports"]:
         mean = patch_mean(basis, surface, support["patch"])
@@ -233,11 +299,13 @@ def solve(
         np.sqrt(values) / (2 * pi),
         {
             "degree": degree,
+            "basis_evaluation": "Jacobi recurrence with analytic Cartesian derivatives",
+            "assembly": "quadrature batches of at most 256 points",
             "radial_order": radial_order,
             "angular_points": angular_points,
             "degrees_of_freedom": 3 * count,
-            "area_m2": float(measure.sum()),
-            "mass_condition_number": float(np.linalg.cond(mass)),
+            "area_m2": area,
+            "mass_condition_number": float(np.linalg.cond(mass[:count, :count])),
             "discarded_rigid_modes": int(np.count_nonzero(~keep)),
             "maximum_relative_eigen_residual": float(
                 np.max(
@@ -247,3 +315,59 @@ def solve(
             ),
         },
     )
+
+
+def get_modes(
+    parameters, degree, mode_count, directory: Path, *, radial_order=None, angular_points=None
+):
+    """Cache independent reference solves with full configuration and source identity."""
+    identity = {
+        "parameters": parameters,
+        "degree": degree,
+        "mode_count": mode_count,
+        "radial_order": radial_order,
+        "angular_points": angular_points,
+        "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    }
+    key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+    path = directory / f"ritz_modes_{key[:20]}.npz"
+    if path.is_file():
+        with np.load(path, allow_pickle=False) as archive:
+            metadata = json.loads(str(archive["metadata"]))
+            if metadata.get("cache_key") != key or metadata.get("schema") != 1:
+                raise ValueError("Independent reference cache identity mismatch")
+            coefficients, frequencies = (
+                archive["coefficients"].copy(),
+                archive["frequencies"].copy(),
+            )
+        if (
+            coefficients.shape != (3, len(disk_polynomials(degree)), mode_count)
+            or frequencies.shape != (mode_count,)
+            or not np.all(np.isfinite(coefficients))
+            or not np.all(np.isfinite(frequencies))
+            or np.any(frequencies <= 0)
+            or np.any(np.diff(frequencies) < 0)
+        ):
+            raise ValueError("Invalid independent reference archive")
+        return (
+            RitzModes(
+                parameters,
+                disk_polynomials(degree),
+                coefficients,
+                frequencies,
+                metadata["diagnostics"],
+            ),
+            path,
+            True,
+        )
+    modes = solve(parameters, degree, mode_count, radial_order, angular_points)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(
+        path,
+        coefficients=modes.coefficients,
+        frequencies=modes.frequencies,
+        metadata=json.dumps(
+            {"schema": 1, "cache_key": key, "diagnostics": modes.diagnostics, "identity": identity}
+        ),
+    )
+    return modes, path, False

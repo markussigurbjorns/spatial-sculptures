@@ -102,6 +102,72 @@ class DryBasinTests(unittest.TestCase):
             two = self.model.DryBasinSimulation(replay, modes).step(0.127)
             self.assertEqual(one, two)
 
+    def test_larger_cached_bank_serves_smaller_playback_bank(self):
+        from copy import deepcopy
+
+        config = deepcopy(self.config)
+        config.mode_count = 8
+        with patch.object(
+            self.model, "assemble_shell", side_effect=AssertionError("Repeated structural solve")
+        ):
+            modes, path, reused = self.model.get_modes(config, Path(self.folder.name))
+        self.assertTrue(reused)
+        self.assertNotEqual(path, self.path)
+        np.testing.assert_array_equal(modes.frequencies, self.modes.frequencies[:8])
+        np.testing.assert_array_equal(modes.coefficients, self.modes.coefficients[:, :, :8])
+        np.testing.assert_array_equal(modes.masses, self.modes.masses[:8])
+        self.assertEqual(modes.metadata["derived_from_cache_key"], self.modes.metadata["cache_key"])
+
+    def test_filtered_export_preserves_duration_and_physical_scale(self):
+        from copy import deepcopy
+
+        from spatial_sculptures.audio.filtering import filter_zero_phase, lowpass_kernel
+
+        config = deepcopy(self.config)
+        config.audio_stop_hz = 100
+        with tempfile.TemporaryDirectory() as folder:
+            with patch.object(self.model, "get_modes", return_value=(self.modes, self.path, True)):
+                report, _, _ = self.tool.export_run(config, Path(folder), preview=True)
+            kernel = lowpass_kernel(config.sample_rate, 100)
+            count = round(config.duration * config.sample_rate)
+            times = np.arange(count + len(kernel) // 2) / config.sample_rate
+            simulation = self.model.DryBasinSimulation(config, self.modes)
+            expected = filter_zero_phase(
+                simulation.pickup_velocities(simulation.trace(times)[1]),
+                kernel,
+                output_samples=count,
+            )
+            with wave.open(str(Path(folder) / "contact_pickups.wav"), "rb") as wav:
+                self.assertEqual(wav.getnframes(), count)
+                pcm = np.frombuffer(wav.readframes(count), dtype="<i2").reshape(-1, 2)
+            np.testing.assert_array_equal(
+                pcm, np.rint(expected.T * report["audio_gain_per_m_per_s"] * 32767)
+            )
+            self.assertEqual(report["audio_filter"]["passband_hz"], 80)
+            self.assertEqual(report["audio_filter"]["stopband_hz"], 100)
+
+    def test_verified_profile_allows_timing_changes_and_rejects_physical_changes(self):
+        from copy import deepcopy
+
+        path = self.tool.ROOT / "prototypes/001_resonant_surface/dry/profiles/contact_100hz.json"
+        config = self.config_module.load_config(path)
+        self.assertEqual(
+            self.tool.verify_profile(config, path)["verified_sampled_transfer_band_hz"], 100
+        )
+        config.duration = 3
+        self.tool.verify_profile(config, path)
+        for change in (
+            {"thickness": 0.004},
+            {"damping_ratio": 0.01},
+            {"audio_stop_hz": None},
+            {"audio_stop_hz": 150},
+        ):
+            changed = deepcopy(config)
+            for key, value in change.items():
+                setattr(changed, key, value)
+            with self.assertRaises(ValueError):
+                self.tool.verify_profile(changed, path)
+
     def test_invalid_settings_fail_before_cache_written(self):
         from copy import deepcopy
         from dataclasses import replace

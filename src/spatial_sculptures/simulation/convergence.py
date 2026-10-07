@@ -160,15 +160,71 @@ def contact_transfer(frequencies_hz, masses, pickup_weights, force_weights, damp
     return np.einsum("pm,em,mf->pef", pickups, forces, 1j * omega[None, :] / denominator)
 
 
-def relative_response_error(reference, candidate):
-    """Relative complex L2 error per contact/exciter path, with explicit silent-path handling."""
+def relative_response_error(reference, candidate, weights=None):
+    """Relative complex L2 per path; integration weights support nonuniform frequency grids."""
     reference, candidate = np.asarray(reference), np.asarray(candidate)
     if reference.shape != candidate.shape or reference.ndim < 1 or not reference.shape[-1]:
         raise ValueError("Matching sampled response arrays required")
     if not np.all(np.isfinite(reference)) or not np.all(np.isfinite(candidate)):
         raise ValueError("Finite response arrays required")
-    denominator = np.linalg.norm(reference, axis=-1)
-    numerator = np.linalg.norm(candidate - reference, axis=-1)
+    if weights is None:
+        weights = np.ones(reference.shape[-1])
+    weights = np.asarray(weights, dtype=float)
+    if (
+        weights.shape != (reference.shape[-1],)
+        or not np.all(np.isfinite(weights))
+        or np.any(weights < 0)
+        or not np.any(weights > 0)
+    ):
+        raise ValueError("Finite nonnegative integration weights with positive measure required")
+    denominator = np.sqrt(np.sum(weights * np.abs(reference) ** 2, axis=-1))
+    numerator = np.sqrt(np.sum(weights * np.abs(candidate - reference) ** 2, axis=-1))
     return np.divide(
         numerator, denominator, out=np.where(numerator == 0, 0.0, np.inf), where=denominator > 0
     )
+
+
+def resonance_grid(frequency_banks, damping, maximum_hz, base_step_hz, *, samples_per_half_width=8):
+    """Common frequency grid with extra samples around every candidate/reference resonance.
+
+    The estimated half-power half-width of a lightly damped mode is zeta*f.
+    Points are added within ±8 half-widths. All comparisons must use integration
+    weights so extra samples do not give a resonance arbitrary extra importance.
+    """
+    if (
+        not 0 < damping < 1
+        or not np.isfinite(maximum_hz)
+        or maximum_hz <= 0
+        or not np.isfinite(base_step_hz)
+        or base_step_hz <= 0
+        or not isinstance(samples_per_half_width, int)
+        or samples_per_half_width < 2
+    ):
+        raise ValueError("Positive finite bandwidth/spacing and damped resonances required")
+    points = [np.linspace(0, maximum_hz, int(np.ceil(maximum_hz / base_step_hz)) + 1)]
+    for bank in frequency_banks:
+        bank = np.asarray(bank)
+        if not np.all(np.isfinite(bank)) or np.any(bank <= 0):
+            raise ValueError("Resonance frequencies must be finite and positive")
+        for f in bank[bank <= maximum_hz / (1 - min(0.99, 8 * damping))]:
+            offsets = (
+                np.arange(-8 * samples_per_half_width, 8 * samples_per_half_width + 1)
+                / samples_per_half_width
+            )
+            points.append(f * (1 + damping * offsets))
+    points = np.unique(np.concatenate(points))
+    return points[(points >= 0) & (points <= maximum_hz)]
+
+
+def trapezoid_weights(samples):
+    """Positive trapezoidal integration weights on a strictly increasing sample grid."""
+    samples = np.asarray(samples, dtype=float)
+    if (
+        samples.ndim != 1
+        or len(samples) < 2
+        or not np.all(np.isfinite(samples))
+        or np.any(np.diff(samples) <= 0)
+    ):
+        raise ValueError("At least two finite increasing samples required")
+    spacing = np.diff(samples)
+    return np.r_[spacing[0] / 2, (spacing[:-1] + spacing[1:]) / 2, spacing[-1] / 2]

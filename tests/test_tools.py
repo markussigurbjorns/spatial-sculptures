@@ -14,6 +14,52 @@ from tools.run_blender import REPOSITORY_ROOT, build_command, prototype_script, 
 
 
 class ToolTests(unittest.TestCase):
+    def test_profile_selection_rejects_unverified_signals(self):
+        from copy import deepcopy
+
+        from tools.validate_dry_basin import select_profile
+
+        def case(count, transfer_pass, signal_error):
+            return {
+                "count": count,
+                "bands": [{"band_hz": 100, "passed": transfer_pass}],
+                "filtered_impulse": {
+                    "stopband_hz": 100,
+                    "vs_independent_reference": {"maximum_relative_L2": signal_error},
+                    "vs_full_modal_bank": {"maximum_relative_L2": 0.01},
+                },
+            }
+
+        report = {
+            "parameters": {},
+            "evaluated_bands_hz": [100],
+            "policy": {
+                "independent_transfer_relative_L2": 0.1,
+                "truncation_transfer_relative_L2": 0.05,
+            },
+            "meshes": [
+                {
+                    "elements_per_axis": 18,
+                    "diagnostics": {"degrees_of_freedom": 1179},
+                    "retained_counts": [
+                        case(16, True, 0.2),
+                        case(32, True, 0.02),
+                        case(48, True, 0.01),
+                    ],
+                }
+            ],
+        }
+        parameters, selection = select_profile(report, 100)
+        self.assertEqual(parameters["mode_count"], 32)
+        self.assertEqual(selection["audio_passband_hz"], 80)
+        with self.assertRaises(ValueError):
+            select_profile(report, 80)
+        changed = deepcopy(report)
+        for c in changed["meshes"][0]["retained_counts"]:
+            c["bands"][0]["passed"] = False
+        with self.assertRaises(ValueError):
+            select_profile(changed, 100)
+
     def test_package_and_prototype_imports_without_blender(self) -> None:
         import sys
 
@@ -22,6 +68,7 @@ class ToolTests(unittest.TestCase):
             "spatial_sculptures.simulation.structures",
             "spatial_sculptures.simulation.mode_cache",
             "spatial_sculptures.simulation.convergence",
+            "spatial_sculptures.audio.filtering",
             "prototypes.001_resonant_surface.dry.config",
             "prototypes.001_resonant_surface.dry.model",
         }

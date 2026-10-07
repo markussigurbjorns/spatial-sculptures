@@ -49,6 +49,33 @@ class StructureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             patch_average(space, surface, Patch(0.99, 0.8, 0.1))
 
+    def test_contact_span_refinement_preserves_rigid_motion(self):
+        surface = GraphSurface(0.72, 0.58, 0.12, 0.006)
+        supports = (Support(Patch(0.2, 0.1, 0.05), (0, 0, 0)),)
+        system = assemble_shell(
+            surface, Material(), 0.005, elements=(3, 3), supports=supports, patch_refinement=1
+        )
+        for expected in (0.175, 0.2, 0.225):
+            self.assertTrue(np.any(np.isclose(system.space.knots_x, expected)))
+        _, _, diagnostics = solve_modes(system, 8)
+        self.assertEqual(diagnostics["discarded_rigid_or_near_zero_modes"], 6)
+        self.assertLess(diagnostics["maximum_relative_eigen_residual"], 1e-6)
+
+    def test_sparse_backend_requires_optional_dependency_or_matches_dense(self):
+        surface = GraphSurface(0.72, 0.58, domain="rectangle")
+        system = assemble_shell(
+            surface, Material(), 0.005, elements=(5, 5), simply_supported_plate=True
+        )
+        if importlib.util.find_spec("scipy") is None:
+            with self.assertRaisesRegex(ImportError, "optional"):
+                solve_modes(system, 6, backend="scipy")
+            return
+        dense, c, _ = solve_modes(system, 6)
+        sparse, v, diagnostics = solve_modes(system, 6, backend="scipy")
+        np.testing.assert_allclose(sparse, dense, rtol=1e-8)
+        np.testing.assert_allclose(v.T @ system.mass @ v, np.eye(6), atol=1e-8)
+        self.assertLess(diagnostics["maximum_relative_eigen_residual"], 1e-6)
+
     def test_numerical_plate_convergence_and_shapes(self):
         from tools.validate_structure import validate_plate
 

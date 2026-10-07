@@ -48,10 +48,15 @@ class DryBasinConfig:
     elements: tuple[int, int] = (8, 8)
     gauss_order: int = 5
     mode_count: int = 16
+    eigensolver: str = "numpy"  # Optional "scipy" partial sparse solve; playback needs only NumPy.
+    patch_refinement: int = 0  # 1 inserts mounting/support edges and centres into the spline grid.
     damping_ratio: float = 0.005  # Assumed diagonal modal damping; not fitted support damping.
     water_depth_m: float = 0.0  # Positive depth is rejected until fluid coupling exists.
     duration: float = 2.0
     sample_rate: int = 48000
+    audio_stop_hz: float | None = (
+        None  # Optional offline output filter; pass band ends at 0.8*this.
+    )
     fps: int = 30
     visual_gain: float = 1500.0  # Geometry only; audio/data remain in physical SI units.
     exposure_fraction: float = 0.5  # Average displacement over this fraction of a frame.

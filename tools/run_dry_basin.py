@@ -43,7 +43,9 @@ def radial_mesh(surface, rings: int, segments: int):
     return vertices, faces
 
 
-def export_run(config, output: Path, *, preview=False, inspection_speed=1.0, rebuild=False):
+def export_run(
+    config, output: Path, *, preview=False, inspection_speed=1.0, rebuild=False, verification=None
+):
     """Sample one modal response for audio and all visual frames; Blender receives arrays only."""
     import numpy as np
 
@@ -75,9 +77,18 @@ def export_run(config, output: Path, *, preview=False, inspection_speed=1.0, reb
     configuration = output / "configuration.json"
     configuration.write_text(json.dumps(asdict(config), indent=2, allow_nan=False))
     sample_count = max(1, round(config.duration * config.sample_rate))
-    audio_times = np.arange(sample_count) / config.sample_rate
+    kernel, guard = None, 0
+    if config.audio_stop_hz is not None:
+        from spatial_sculptures.audio.filtering import filter_zero_phase, lowpass_kernel
+
+        kernel = lowpass_kernel(config.sample_rate, config.audio_stop_hz)
+        guard = len(kernel) // 2
+    audio_times = np.arange(sample_count + guard) / config.sample_rate
     _, velocities = simulation.trace(audio_times)
     channels = simulation.pickup_velocities(velocities)
+    raw_peaks = np.max(np.abs(channels[:, :sample_count]), axis=1)
+    if kernel is not None:
+        channels = filter_zero_phase(channels, kernel, output_samples=sample_count)
     audio_path = output / "contact_pickups.wav"
     gain = write_pickup_wav(audio_path, channels, config.sample_rate)
     frame_times = np.arange(frame_count) * inspection_speed / config.fps
@@ -177,6 +188,20 @@ def export_run(config, output: Path, *, preview=False, inspection_speed=1.0, reb
         "initial_retained_energy_j": simulation.step(0).energy_joules,
         "final_retained_energy_j": simulation.step(config.duration).energy_joules,
         "pickup_peak_velocity_m_per_s": np.max(np.abs(channels), axis=1).tolist(),
+        "unfiltered_pickup_peak_velocity_m_per_s": raw_peaks.tolist(),
+        "audio_filter": {
+            "type": "offline zero-phase Kaiser FIR" if kernel is not None else "none",
+            "passband_hz": 0.8 * config.audio_stop_hz if kernel is not None else None,
+            "stopband_hz": config.audio_stop_hz,
+            "stopband_target_db": 80 if kernel is not None else None,
+            "taps": len(kernel) if kernel is not None else 0,
+            "delay_compensation_samples": guard,
+            "end_continuation_samples": guard,
+            "mechanical_state": (
+                "unchanged; observation filter only; no inferred acoustic calibration"
+            ),
+            "timing": "common time origin; noncausal offline filtering may precede impacts",
+        },
         "pickup_units": (
             "global vertical contact velocity m/s; not hydrophone pressure or radiated sound"
         ),
@@ -186,9 +211,49 @@ def export_run(config, output: Path, *, preview=False, inspection_speed=1.0, reb
             "plate verification and separate shell refinement; "
             "no specimen/pressure/radiation validation"
         ),
+        "contact_band_verification": verification,
     }
     (output / "report.json").write_text(json.dumps(report, indent=2, allow_nan=False))
     return report, bundle, configuration
+
+
+def verify_profile(config, path: Path):
+    """Check saved band evidence against source, structure, contacts, damping and output filter."""
+    payload = json.loads(path.read_text())
+    evidence = payload.get("verification")
+    if evidence is None:
+        return None  # Ordinary configurations make no verified-band claim.
+    from tools.validate_dry_basin import check_provenance, select_profile
+
+    report_path = ROOT / evidence["report_path"]
+    if hashlib.sha256(report_path.read_bytes()).hexdigest() != evidence["report_sha256"]:
+        raise ValueError("Profile verification report changed; regenerate the selected profile")
+    report = json.loads(report_path.read_text())
+    check_provenance(report)
+    parameters, _ = select_profile(report, evidence["verified_sampled_transfer_band_hz"])
+    module = importlib.import_module("prototypes.001_resonant_surface.dry.config")
+    model = importlib.import_module("prototypes.001_resonant_surface.dry.model")
+    expected = module.from_dict(parameters)
+    if (
+        model.structural_parameters(config) != model.structural_parameters(expected)
+        or config.pickups != expected.pickups
+        or config.damping_ratio != expected.damping_ratio
+        or tuple(e.direction for e in config.exciters)
+        != tuple(e.direction for e in expected.exciters)
+    ):
+        raise ValueError(
+            "Profile structure, contacts or damping changed; revalidate this configuration"
+        )
+    band = evidence["verified_sampled_transfer_band_hz"]
+    if (
+        config.audio_stop_hz is None
+        or config.audio_stop_hz > band
+        or any(e.force_n and e.frequency_hz > band for e in config.exciters)
+    ):
+        raise ValueError(
+            "Verified profile needs an output stop band and drives within its checked band"
+        )
+    return evidence
 
 
 def blender_command(bundle: Path, configuration: Path, output: Path, *, render=False):
@@ -259,9 +324,17 @@ def main() -> int:
     source = parser.add_mutually_exclusive_group()
     source.add_argument("--config", type=Path)
     source.add_argument("--experiment")
+    source.add_argument(
+        "--profile", help="Saved profile name under the dry prototype's profiles/ directory"
+    )
     parser.add_argument("--duration", type=float)
     parser.add_argument(
-        "--output", type=Path, default=ROOT / "prototypes/001_resonant_surface/renders/dry"
+        "--audio-stop-hz",
+        type=float,
+        help="Offline pickup low-pass; pass band to 0.8*this, stop band at this frequency",
+    )
+    parser.add_argument(
+        "--output", type=Path, help="Output directory; defaults to renders/<profile> or renders/dry"
     )
     parser.add_argument(
         "--preview", action="store_true", help="Reduce visual mesh and image resolution only"
@@ -287,16 +360,30 @@ def main() -> int:
         )
     try:
         module = importlib.import_module("prototypes.001_resonant_surface.dry.config")
-        config = module.load_config(args.config, args.experiment)
+        config_path = args.config
+        if args.profile:
+            if Path(args.profile).name != args.profile:
+                parser.error("--profile takes a name; use --config for an arbitrary JSON path")
+            config_path = (
+                ROOT / "prototypes/001_resonant_surface/dry/profiles" / f"{args.profile}.json"
+            )
+        config = module.load_config(config_path, args.experiment)
         if args.duration is not None:
             config.duration = args.duration
-        output = args.output.resolve()
+        if args.audio_stop_hz is not None:
+            config.audio_stop_hz = args.audio_stop_hz
+        verification = verify_profile(config, config_path) if config_path is not None else None
+        output = (
+            args.output
+            or ROOT / "prototypes/001_resonant_surface/renders" / (args.profile or "dry")
+        ).resolve()
         report, bundle, configuration = export_run(
             config,
             output,
             preview=args.preview,
             inspection_speed=args.inspection_speed,
             rebuild=args.rebuild,
+            verification=verification,
         )
         print(
             f"{'Reused' if report['cache_reused'] else 'Solved'} "
@@ -316,9 +403,9 @@ def main() -> int:
             if result.returncode:
                 return result.returncode
             print(f"Synchronized movie: {output / 'dry_basin.mp4'}")
-    except ImportError:
+    except ImportError as error:
         parser.error(
-            "Dry structural simulation requires NumPy: python -m pip install -e '.[numerical]'"
+            f"Numerical dependency unavailable ({error}); install .[numerical] or .[solver]"
         )
     except (OSError, ValueError, TypeError, KeyError) as error:
         parser.error(str(error))
