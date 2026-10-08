@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "report_sha256": "02817144a71ca7aa1f51709bf4a3022aa41a389432161e2349b15731b1018f3c",
+  "summary_sha256": "e1f3209aa3d067aec2f621595ecf50a1db025f113fc66b841a6fe7a39e16b64f",
+  "modal_artifacts_sha256": {
+    "depth_1_modes.npz": "8d469d198a9015f67f238b90c6ede158856b8c6e43ee4c66c2057d9cc22aa37e",
+    "depth_2_modes.npz": "60c44212303e0f475155cf7ee51d15f33695955f8b45cb64e7861472a986823c",
+    "depth_3_modes.npz": "58bd5da802d2f7ae8d302340989092f48c56dc7bb2feccfb7fd1303ce4df0c74",
+    "depth_4_modes.npz": "6ab100d345afd5e78fc735079f4ee2fdb996bd65e3cc999ab0c9ba8c89e48f26"
+  },
+  "figures_sha256": {
+    "water_loading.png": "faaec0f1e838b198d8eb209b08af2980e05242efbc6832f31e2f394e88dad0dc",
+    "water_loading.pdf": "7bd910766ed6d783a66de033e2e615152b011673460a94a5d77a26e7969d15e0"
+  },
+  "plot_source_sha256": "58014ff5b1f6e99b0499f894b1489aa2d8fcad3348b5840d7ca9e0c89252b7c5",
+  "matplotlib_version": "3.10.9",
+  "presentation": "Sorted frequency ranks; no mode tracking across depths or fitted gains."
+}

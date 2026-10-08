@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "date": "2026-10-08",
+  "status": "passed",
+  "ordinary_compilation": "passed",
+  "ruff_lint": "passed",
+  "ruff_format": "passed",
+  "unit_tests_numerical": {
+    "total": 123,
+    "passed": 122,
+    "skipped": 1,
+    "skip_reason": "sandbox UDP socket restriction"
+  },
+  "unit_tests_without_numerical_dependencies": {
+    "total": 123,
+    "passed": 62,
+    "skipped": 61
+  },
+  "stdlib_water_math": "imports and samples without NumPy, NGSolve or bpy",
+  "source_and_curated_artifact_hashes": "passed",
+  "existing_dry_200hz_evidence": "passed",
+  "external_flat_cell": "passed; maximum added-mass difference 0.0724021%",
+  "wet_basin_contact_accuracy": "not established; no hydrophone pressure or water-loaded export enabled",
+  "report_sha256": "c5341b2acab9a0624559b37d86e0aae6bbf50db3aa6fb6c26064355bc014dfcd"
+}
