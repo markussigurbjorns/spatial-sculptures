@@ -137,6 +137,13 @@ See the [results and plots](docs/research/dry_basin/external_results.md).
 It uses an optional `.[external]` environment; simulation and Blender playback do
 not require it. Numerical agreement does not calibrate a fabricated vessel.
 
+The first [water-loading study](prototypes/001_resonant_surface/water_loading/README.md)
+now adds configurable shallow-column water inertia to that dry structure. It checks
+water volume, zero-depth recovery, integration and a separate finite-depth fluid
+reference before reporting provisional loaded metal modes. See its
+[research note and plots](docs/research/water_loading/study.md). It does not yet
+produce hydrophone pressure or a certified wet audio/visual simulation.
+
 The original 8 × 8 exploratory configuration remains available by omitting
 `--profile`. Its [contact evidence](docs/research/dry_basin/convergence.md) supports
 only 10 Hz and its default WAV is unfiltered. Numerical assembly uses bounded

@@ -52,6 +52,11 @@ The newer saved dry profile passes numerical contact-response criteria through
 alternative checked under the earlier broader-band criteria.
 Omitting `--profile` retains the original exploratory dry configuration.
 
+A separate [water-loading study](water_loading/README.md) now computes provisional
+metal mode changes from configurable water depth and density. It has analytical
+and optional NGSolve reference checks, but no hydrophone pressure or validated
+wet audio/render export. The dry playback commands above retain their dry model.
+
 Version 1 is a geometric prototype and a visual wave/interference simulation.
 It is **not CFD, not FEM, and not a physically correct acoustic simulation**.
 Default builds produce no audio or active feedback. There is no measured pressure

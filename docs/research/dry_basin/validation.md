@@ -7,8 +7,8 @@ a fabricated vessel, hydrophone pressure, radiation or spatial perception.
 | --- | --- |
 | Ordinary Python compilation | Passed for source, prototypes, studies, tools and tests |
 | Ruff lint and formatting | Passed |
-| Unit suite with NumPy/SciPy/NGSolve | 111 tests: 110 passed; sandbox UDP socket test skipped |
-| Unit suite without NumPy | 111 tests: 62 passed; 49 optional numerical/runtime tests skipped |
+| Unit suite with NumPy/SciPy/NGSolve | 123 tests: 122 passed; sandbox UDP socket test skipped |
+| Unit suite without NumPy | 123 tests: 62 passed; 61 optional numerical/runtime tests skipped |
 | Imports without Blender | Core wave/state/sensor/modal modules import without `bpy`; NumPy-dependent structural modules are explicitly optional |
 | Numerical plate verification | First six frequencies within 0.1517%; finest-mesh shape MAC ≥0.999991 |
 | Free shell and membrane checks | Six rigid motions, mass orthogonality and analytical flat membrane energy passed |
@@ -54,10 +54,11 @@ a fabricated vessel, hydrophone pressure, radiation or spatial perception.
 | Dry Blender adapter | Vector coordinates, common time origin, audio strip, scrubbing, module reload, callback cleanup and silent slow inspection passed in Blender 4.5.9 |
 | Existing Blender consumers | Original water prototype and analytical plate integrations passed |
 | Actual MP4 export | 60 H.264 frames at 30 FPS; stereo 48 kHz AAC; both streams exactly 2.000 s |
-| Unsupported request | Positive water depth and invalid damping/direction rejected before creating caches |
+| Unsupported dry request | Positive water depth and invalid damping/direction rejected before creating dry caches; water loading has a separate study entry point |
 | Working-directory independence | Saved configuration launched successfully from `/tmp`, including output path with spaces |
 | Audibility / hardware playback / SuperCollider server | Not evaluated; audio-device and server runtime validation unavailable here |
-| External shell solve / measured vessel / fluid coupling | External NGSolve study passed for the configured dry 20–200 Hz case; physical calibration deferred, water coupling absent |
+| External shell solve / measured vessel / fluid coupling | External NGSolve study passed for the configured dry 20–200 Hz case; separate provisional column-loading study added, physical calibration deferred, basin pressure/free-surface solve absent |
+| Water-loading study | Zero-depth recovery, analytical volume/inertia, nonnegative loading and integration checks pass; independent flat-fluid added masses within 0.073%; no certified wet contact band |
 
 The baseline discrete eigenproblem residual was below 3 × 10⁻⁸, with scaled mass
 condition number about 787. This measures the algebraic solve, not physical accuracy.

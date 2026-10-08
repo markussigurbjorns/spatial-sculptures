@@ -657,6 +657,12 @@ virtual and physical sound.
 
 ## 7. Reproducibility
 
+A separate [water-loading research note](../water_loading/study.md) now starts
+the next stage with configurable column inertia and an independent finite-depth
+fluid-cell reference. It reports provisional loaded modes, without hydrophone
+pressure or a certified wet contact-response band. Its results do not change the
+scope of the dry numerical certificate established here.
+
 Implementation: [dry prototype](../../../prototypes/001_resonant_surface/dry/README.md),
 [shell assembly](../../../src/spatial_sculptures/simulation/structures.py),
 [shared response](../../../src/spatial_sculptures/simulation/mode_bank.py).

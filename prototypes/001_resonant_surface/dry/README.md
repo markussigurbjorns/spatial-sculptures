@@ -250,3 +250,8 @@ compares modes and all six complex contact paths. It now passes the configured
 20–200 Hz study: worst interval response difference 5.39%, largest matched frequency
 difference 0.084%. See the [external results](../../../docs/research/dry_basin/external_results.md).
 Physical calibration is deferred; no basin is needed for this software check.
+
+The next stage has started in a separate [water-loading study](../water_loading/README.md).
+It adds provisional water inertia and checks volume, dry recovery and an independent
+flat-fluid reference. Its water settings do not enable fluid pressure or extend
+this dry profile's 200 Hz certificate to wet configurations.
