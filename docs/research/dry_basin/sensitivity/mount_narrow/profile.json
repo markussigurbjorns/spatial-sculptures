@@ -1,0 +1,172 @@
+{
+  "parameters": {
+    "surface": {
+      "radius_x": 0.72,
+      "radius_y": 0.58,
+      "rise": 0.12,
+      "asymmetry": 0.006,
+      "center_z": 0.72,
+      "domain": "ellipse"
+    },
+    "material": {
+      "youngs_modulus": 193000000000.0,
+      "density": 8030.0,
+      "poisson_ratio": 0.3
+    },
+    "thickness": 0.005,
+    "supports": [
+      {
+        "patch": {
+          "x": -0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": -0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      }
+    ],
+    "exciters": [
+      {
+        "patch": {
+          "x": -0.34,
+          "y": 0.14,
+          "width": 0.025
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 59.0,
+        "phase": 0.0,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.31,
+          "y": 0.13,
+          "width": 0.025
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 61.3,
+        "phase": 1.7,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.02,
+          "y": -0.32,
+          "width": 0.025
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 57.8,
+        "phase": 3.1,
+        "start": 0.0
+      }
+    ],
+    "impulses": [
+      {
+        "exciter": 0,
+        "time": 0.0,
+        "impulse_ns": 0.03
+      }
+    ],
+    "pickups": [
+      [
+        -0.2,
+        -0.04
+      ],
+      [
+        0.25,
+        -0.1
+      ]
+    ],
+    "elements": [
+      18,
+      18
+    ],
+    "gauss_order": 5,
+    "mode_count": 128,
+    "eigensolver": "numpy",
+    "patch_refinement": 0,
+    "damping_ratio": 0.005,
+    "water_depth_m": 0.0,
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "audio_stop_hz": 200.0,
+    "fps": 30,
+    "visual_gain": 1500.0,
+    "exposure_fraction": 0.5,
+    "exposure_samples": 8,
+    "resolution": [
+      720,
+      540
+    ],
+    "rings": 16,
+    "segments": 64
+  },
+  "verification": {
+    "elements_per_axis": 18,
+    "mode_count": 128,
+    "verified_sampled_transfer_band_hz": 200.0,
+    "audio_passband_hz": 160.0,
+    "audio_stopband_hz": 200.0,
+    "filtered_impulse_maximum_relative_L2": 0.01699727264024853,
+    "selection": "smallest tested DOF count, then smallest passing retained bank",
+    "report_path": "docs/research/dry_basin/sensitivity/mount_narrow/convergence.json",
+    "report_sha256": "55e2e528057eb74f63714321f13cbcf411ebdbae41e51463e49bc28127485535"
+  }
+}

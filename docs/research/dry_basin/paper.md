@@ -1,6 +1,6 @@
 # From a plate reference to a dry resonant basin: numerical modes and shared audiovisual state
 
-**Working technical paper, version 0.3 — 7 October 2026**
+**Working technical paper, version 0.6 — 8 October 2026**
 
 Project: Spatial Sculptures. Authorship and publication venue remain open.
 This is a computational study with provisional parameters, not a calibrated vessel
@@ -34,6 +34,20 @@ Worst complex-transfer and identically filtered impulse differences are approxim
 2.4% and 2.1%, respectively. Listening uses a documented 80 Hz pass band / 100 Hz
 stop band. Unfiltered sixteen-mode impulses remain unconverged. These are numerical
 cross-verification results within shared assumptions, not physical vessel accuracy.
+
+A further study checks smaller listening intervals independently and increases
+the full response banks to 512 modes. An 18 × 18 mesh with 128 playback modes passes
+the declared criteria through 200 Hz, with a worst interval transfer difference of
+5.38% and filtered-impulse difference of 1.70%. Listening passes through 160 Hz and
+reaches its stop band at 200 Hz. The smaller interval checks expose errors that
+the earlier cumulative integral can hide. Support/mount sensitivity and an SI
+mobility exchange prepare external and physical validation. An independently
+assembled NGSolve HHJ/Regge shell now passes an analytical plate prerequisite,
+mesh/rim/quadrature/truncation/grid refinement, and the configured dry basin's
+20–200 Hz comparison. The worst interval complex mobility difference is 5.39%,
+the largest matched frequency difference is 0.084%, and the minimum subspace MAC
+is 0.9999975. These results compare numerical models of shared provisional
+assumptions; no measured vessel calibration is claimed.
 
 ## 1. Purpose and relationship to the sculpture
 
@@ -437,13 +451,180 @@ on the same 18 × 18 structure reduced process peak RSS from about 1509 MiB to
 concurrent checks ran during measurement, so these are not controlled speed
 bounds. Matching larger cached banks can provide a smaller playback subset without
 another solve. An optional [SciPy partial eigensolver](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigsh.html)
-is isolated to offline work; SciPy was unavailable here, so that branch's numerical
-runtime comparison is not claimed.
+is isolated to offline work. A six-mode plate unit check now compares this branch
+with NumPy, checking frequencies, mass orthogonality and residuals. The full
+checked 200 Hz production profile still uses NumPy; a full-profile SciPy refinement
+study is not claimed.
 
 Contact-edge/centre knot insertion is configurable independently of physical
 mounting laws. It refines tensor-product strips, and can add more DOFs than uniform
 refinement. The selected profile uses uniform refinement. Further patch-refinement
 studies must satisfy their own mesh and reference criteria.
+
+### 5.7 Separate interval checks through 200 Hz
+
+The [bandwidth study](contact_bandwidth.md) keeps the provisional physics unchanged,
+using meshes 18/22/26 and Ritz degrees 24/28/32/36. Full banks contain 512 modes;
+reference truncation compares 384 with 512. Higher modes can contribute to contact
+mobility away from their resonances even when their frequencies exceed the listening
+band. The transfer and filtered-impulse tests therefore use the full retained banks.
+Shape correspondence covers every reference mode in the tested band and the next
+complete near-degenerate cluster. Matching unused high-mode shapes is omitted for
+offline cost, without omitting their dynamic contributions.
+
+The earlier style of cumulative 0–200 and 20–200 Hz integrals accepts a 32-mode
+candidate because strong low resonances dominate the denominator. Checking
+20–40, 40–80, 80–160 and 160–200 Hz separately exposes substantial omitted-mode
+differences in the upper intervals. Each interval must pass the existing reference,
+mesh, truncation and independent-response tolerances; quadrature and frequency-grid
+refinement retain their 1% criteria. No tolerance is relaxed.
+
+The selected bank is **18 × 18 cells, 128 modes**. The following are worst-path
+percent differences against the finite degree-36, 512-mode reference or corresponding
+refinement bank. These remain relative integrated differences, not pointwise bounds.
+
+| Interval (Hz) | Independent response | Reference degree refinement | Reference truncation | Candidate truncation |
+| --- | ---: | ---: | ---: | ---: |
+| 20–40 | 2.244% | 1.600% | 0.0013% | 0.0170% |
+| 40–80 | 2.388% | 1.516% | 0.0200% | 0.3264% |
+| 80–160 | 2.566% | 1.216% | 0.1569% | 1.5269% |
+| 160–200 | 5.380% | 3.103% | 0.4639% | 4.5367% |
+
+The worst candidate/final-mesh interval differences are approximately 2.14%/2.62%.
+All interval quadrature and grid tests pass 1%. Identically filtered two-second
+impulses, evaluated at 48 kHz, differ by at most 1.70% from the reference and 0.076%
+from the full production bank. The unfiltered impulse difference remains about
+69.2%; the filtered result does not certify full-band playback. The listening FIR
+passes through 160 Hz and reaches its stop band at 200 Hz. Its noncausality,
+continuation, common clock and shared normalization remain as in Section 5.6.
+
+![Separate interval convergence](figures/bandwidth/interval_convergence.png)
+
+Figure 10. Smaller intervals reveal upper-band contributions hidden by the
+cumulative integral. Both independent-response and modal-truncation gates must pass.
+
+Audio export now projects modal velocities in bounded time chunks; impulse studies
+share a unit modal response across all force paths. Both operations use the existing
+analytic modal equations. They change temporary storage and repeated work rather
+than dynamics. Blender still receives cached, precomputed displacement frames.
+An [audio-projection measurement](audio_projection_performance.json) on the selected
+128-mode, two-second, 48 kHz case reduced process peak RSS from about 239 MiB to
+51 MiB. The raw velocity peaks and summed squared samples agree in both processes.
+This excludes structural solving, filtering and Blender; other numerical work ran
+concurrently, and single-run times are not speed guarantees.
+
+### 5.8 Support/mount sensitivity and physical validation preparation
+
+The [sensitivity study](sensitivity/comparison.md) varies support stiffness by
+0.5/2 and exciter patch width by 0.5/1.5, one family at a time. Material, thickness,
+contact locations, total forces, rigid housing masses and assumed damping remain
+fixed. Every variant receives its own reference, mesh, truncation, quadrature,
+sampling and impulse checks. A passing profile is saved only when that variant
+passes; the baseline's band claim is not inherited. Reported sensitivity differences
+compare raw SI mobility with the baseline and are changes of assumptions, not
+numerical errors or measured uncertainty estimates. Width changes do not implement
+glue compliance or electrical actuator dynamics.
+
+All four tested variants select an 18 × 18, 128-mode playback bank through 200 Hz.
+Halving/doubling support stiffness moves the first frequency from 4.297 Hz to
+3.039/6.076 Hz. The worst-path cumulative 20–200 Hz complex mobility changes are
+104.88%/161.88% relative to the baseline; these are changes caused by assumptions,
+not failed numerical comparisons. Narrowing/widening the rigid mounting footprint
+gives 0.08%/0.13% changes under the same cumulative metric. That integral does not
+bound local frequency differences, and the footprint law excludes glue compliance.
+The results motivate measuring support conditions rather than treating them as
+known specimen properties.
+
+The [exchange tool](external_validation.md) exports all six complex velocity/force
+paths and a solver-neutral physical request. Imported data must retain SI units,
+harmonic convention, path coverage, the requested frequency grid and source/file
+identity. Comparison applies no fitted gain, phase alignment or interpolation.
+Source labels distinguish model predictions, synthetic fixtures, independently
+supplied solver results and measurements. Self/synthetic tool validation checks
+the exchange contracts; the independent shell results in Section 5.9 supply
+separate numerical evidence. No specimen result is supplied.
+
+A [measurement plan](measurement_plan.md) and blank specimen record establish how
+geometry, supports, mounting, sensor calibration and applied force should be recorded.
+The plan follows primary
+[mechanical-mobility guidance](https://www.bksv.com/doc/br0458.pdf) and
+[experimental modal-analysis guidance](https://www.ni.com/en/shop/labview/modal-analysis-in-labview.html).
+The external-solver plan links the separate
+[NGSolve mixed shell formulation](https://docu.ngsolve.org/ngs24/SaS/linear_KL_RM_shell_HHJ_TDNNS.html).
+Neither these references nor a source label establishes agreement with our vessel.
+
+### 5.9 Independent NGSolve results
+
+A separate [NGSolve study](../../../studies/plates/003_external_shell/README.md)
+now implements a mixed HHJ Kirchhoff–Love shell with Regge membrane interpolation,
+following the external solver's documented formulation. Plain physical parameters
+cross its boundary; production geometry, spline/Ritz basis, quadrature, assembly,
+mode cache and response equations are not imported by the external model. The
+runner uses production code only to prepare the request and compare predictions.
+
+Netgen triangulates the XY domain with conforming support/exciter patch boundaries.
+Quadratic spline arcs and second-order geometry approximate the ellipse; a
+degree-six lift represents the cubic graph composed with the quadratic XY map.
+Mechanical displacement is cubic, with quadratic moment/Regge spaces.
+Discontinuous bending stresses are eliminated locally; massless facet rotations
+and all displacement inertia remain in the eigenproblem. No artificial rotary
+mass, shear energy or changed spring/patch law is introduced.
+
+The runner first requires the six simply supported plate frequencies to match
+the analytical formula within 0.5%. It then tests external mesh, modal truncation,
+rim, quadrature and frequency-grid refinement; compares mode frequencies and
+weighted XYZ shapes; and compares all six raw complex contact paths through 200 Hz
+using the same smaller listening intervals. Declared tolerances and completed
+failures are preserved in machine-readable reports. An unresolved external
+reference cannot pass merely because its sampled response resembles our model.
+
+Executed on 8 October 2026 with NGSolve 6.2.2608, SciPy 1.18.1 and NumPy 2.2.6,
+the complete study **passes**. The plate's six frequencies have maximum relative
+difference `2.63e-9`, below the declared 0.5% prerequisite tolerance. Basin mesh
+lengths 0.12/0.085/0.06 m with 32/48/64 rim arcs give 15,303/18,981/28,107 mixed
+DOFs. The worst path/interval response differences for successive meshes are
+0.6352% and 0.1386%, below 5%. Separate rim, increased quadrature, 384 → 512 mode
+truncation and frequency-grid checks give 0.0500%, 0.00000218%, 0.7549% and 0.1365%,
+respectively. Rim/quadrature/grid limits remain 1%; truncation remains 5%.
+External frequency and shape refinement gates also pass.
+
+Comparing the 128-mode production bank with the 512-mode external bank gives
+these worst complex relative L2 differences among the six contact paths:
+
+| Interval (Hz) | Worst path difference | Declared limit |
+| --- | ---: | ---: |
+| 20–200 | 5.1642% | 10% |
+| 20–40 | 5.1689% | 10% |
+| 40–80 | 5.3863% | 10% |
+| 80–160 | 2.6431% | 10% |
+| 160–200 | 4.2938% | 10% |
+
+Nineteen reference modes are compared, including the next complete cluster above
+the band. The largest matched frequency difference is 0.0840% and minimum
+subspace MAC is 0.9999975, within the declared 1% and 0.99 criteria. Frequencies
+and shapes alone would not establish contact-response convergence; the interval
+checks preserve raw complex SI velocity/force, including amplitude and phase.
+
+![Independent and production contact mobility magnitude](external/contact_magnitude.png)
+
+The six panels compare unnormalized mobility; dashed curves are production and
+solid curves are NGSolve. [Phase plots](external/contact_phase.png) and
+[independent refinement plots](external/refinement.png) accompany the result.
+
+Two corrections preceded this pass. The initial plate runtime exposed a boundary
+label error that constrained only one edge; rim labels now use Netgen's outside
+domain classification. An ensuing straight-polygon basin trial failed mesh
+response refinement (21.57% and 5.48%) and separate rim refinement (1.38%). It was
+not promoted despite passing the production comparison. Its
+[historical failure report](external/linear_rim_report.json) is retained. Curved
+geometry improves boundary accuracy and passes without relaxing any tolerance.
+
+The [completed results](external_results.md), [full report](external/report.json)
+and [provenance](external/provenance.json) retain raw complex curves, five modal
+banks, parameters and source/data hashes. This is external numerical
+cross-validation for one provisional dry shell and finite response band, not
+physical calibration or an error bound across all geometries. Physical calibration
+remains deferred; no specimen measurement is implied.
 
 ## 6. Limitations and next research steps
 
@@ -454,16 +635,18 @@ document that issue and a treatment for quadratic NURBS shells
 ([2023 preprint](https://arxiv.org/abs/2311.00101)); our cubic spline implementation
 does not implement that treatment or claim universal freedom from locking.
 
-The retained sixteen-mode impulse response is a restricted low-frequency model,
+The retained playback impulse response is a restricted-frequency model,
 not a converged full-band sound. A larger mode count requires convergence of
 patch response and pickup signals as well as frequencies. No measured damping,
 rim reinforcement, support rotation, exciter compliance, electrical impedance or
 nonlinear contact is present.
 
-The refined contact study establishes a limited 100 Hz numerical transfer band.
-Next, extend supported bandwidth and add a published curved-shell or external-solver
-comparison with matching physical assumptions. Support/patch sensitivity and
-thin-shell locking require further investigation across configurations.
+The latest contact study establishes a limited 200 Hz numerical transfer band with
+separate interval checks, now supported by an independent NGSolve comparison with
+matching physical assumptions. Dry-vessel measurements remain a later step;
+physical calibration is deferred. The sensitivity study
+does not establish robustness across arbitrary geometry or thickness; thin-shell
+locking still requires investigation across configurations.
 Dry-vessel measurements can then fit geometry, support stiffness and damping. Water
 coupling must subsequently represent fluid loading and pressure observations;
 simply adding a drawn water surface or a depth setting is insufficient. Later DSP
@@ -513,12 +696,16 @@ were not evaluated in this environment.
 7. Greengard, P., and Serkh, K. (2018). *Zernike Polynomials: Evaluation, Quadrature,
    and Interpolation*. [arXiv:1811.02720](https://arxiv.org/abs/1811.02720).
 
-Online references checked 6–7 October 2026. BibTeX is in [references.bib](references.bib).
-The NGSolve derivations support the mathematical model, not an endorsement or
-validation of this implementation; NGSolve is not a runtime dependency.
-
-7. Greengard, P., and Serkh, K. (2018). *Zernike Polynomials: Evaluation,
-   Quadrature, and Interpolation*. [arXiv:1811.02720](https://arxiv.org/abs/1811.02720).
 8. SciPy developers. *Kaiser window FIR design and partial symmetric eigenproblems*.
    [kaiserord](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.kaiserord.html),
    [eigsh](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigsh.html).
+9. NGSolve. *Linear Kirchhoff–Love and Reissner–Mindlin shells*.
+   [Mixed HHJ/Regge formulation](https://docu.ngsolve.org/ngs24/SaS/linear_KL_RM_shell_HHJ_TDNNS.html).
+10. Netgen/NGSolve. *Generating surface meshes* and *Installation*.
+    [Surface meshes](https://docu.ngsolve.org/latest/i-tutorials/unit-6.1.1-surfacemeshes/surface_meshes.html),
+    [installation](https://ngsolve.org/installation.html).
+
+Online references checked 6–8 October 2026. BibTeX is in [references.bib](references.bib).
+The NGSolve derivations support the mathematical model, not an endorsement or
+validation of this implementation. NGSolve is an optional external-study dependency;
+ordinary simulation/audio/Blender playback does not depend on it.

@@ -79,12 +79,12 @@ does not repeat the structural solve.
 
 ```bash
 python -m pip install -e '.[numerical]'  # optional NumPy backend
-python tools/run_dry_basin.py --profile contact_100hz --preview --view
-python tools/run_dry_basin.py --profile contact_100hz --preview --render
+python tools/run_dry_basin.py --profile contact_200hz --preview --view
+python tools/run_dry_basin.py --profile contact_200hz --preview --render
 ```
 
 Press Space in Blender for synchronized playback. Rendering produces an MP4 with
-audio under `prototypes/001_resonant_surface/renders/contact_100hz/` and requires FFmpeg.
+audio under `prototypes/001_resonant_surface/renders/contact_200hz/` and requires FFmpeg.
 Without `--view` or `--render`, the command exports audio/data without Blender.
 Use `--experiment 003_soft_supports` or `--config path/to/configuration.json` for
 reproducible variations. Preview reduces presentation cost, not structural physics.
@@ -114,6 +114,29 @@ physical assumptions. It is not measured vessel sound or a full audible-spectrum
 The profile checks its evidence before export; physical/contact/damping edits require
 new verification. The [paper](docs/research/dry_basin/paper.md) explains the scope.
 
+The newer [200 Hz study](docs/research/dry_basin/contact_bandwidth.md) adds separate
+20–40, 40–80, 80–160 and 160–200 Hz checks, preventing strong lower resonances from
+hiding upper-band errors. It selects **18 × 18 cells and 128 playback modes**, with
+a 512-mode reference/truncation bank. The worst interval transfer difference is
+5.38%; filtered-impulse difference is 1.70%. Audio passes through 160 Hz and reaches
+its stop band at 200 Hz. Audio evaluation uses bounded time chunks and cached modes.
+The earlier `contact_100hz` profile remains available with sixteen modes and its
+original broader-band criteria. Neither profile predicts calibrated vessel sound.
+
+[Support/mount sensitivity](docs/research/dry_basin/sensitivity/comparison.md),
+[external solver exchange](docs/research/dry_basin/external_validation.md) and a
+[dry-vessel measurement plan](docs/research/dry_basin/measurement_plan.md) address
+the validation stages. Physical measurements remain deferred; the exchange tool
+keeps measured observations distinct from computed predictions.
+
+A separate [NGSolve external-shell study](studies/plates/003_external_shell/README.md)
+passes its analytical-plate, independent-refinement and six-path comparison gates
+for the configured dry basin over **20–200 Hz**. The worst interval complex-response
+difference is **5.39%**, and the largest matched frequency difference is **0.084%**.
+See the [results and plots](docs/research/dry_basin/external_results.md).
+It uses an optional `.[external]` environment; simulation and Blender playback do
+not require it. Numerical agreement does not calibrate a fabricated vessel.
+
 The original 8 × 8 exploratory configuration remains available by omitting
 `--profile`. Its [contact evidence](docs/research/dry_basin/convergence.md) supports
 only 10 Hz and its default WAV is unfiltered. Numerical assembly uses bounded
@@ -125,6 +148,7 @@ To reproduce refinement and select a passing profile:
 
 ```bash
 python tools/validate_dry_basin.py --refine-contacts --select-band 100 --profile-output data/fem/001_resonant_surface/contact_100hz.json
+python tools/validate_dry_basin.py --extend-contacts --select-band 200 --profile-output data/fem/001_resonant_surface/contact_200hz.json
 ```
 
 ## Run the artistic water prototype

@@ -37,8 +37,8 @@ There are now two runnable versions of this sculpture:
 | [Numerical dry basin](dry/README.md) | Linear curved metal shell, local spring supports and housing masses | Model-derived contact-velocity WAV and synchronized Blender/MP4 |
 
 ```bash
-python tools/run_dry_basin.py --profile contact_100hz --preview --view
-python tools/run_dry_basin.py --profile contact_100hz --preview --render
+python tools/run_dry_basin.py --profile contact_200hz --preview --view
+python tools/run_dry_basin.py --profile contact_200hz --preview --render
 ```
 
 The numerical version has no water. Its visible pickups represent metal contact
@@ -46,8 +46,10 @@ sensors rather than hydrophones. Profile, thickness, supports and mounting masse
 affect its eigenmodes; a shared modal response generates audio and motion. The
 [technical paper](../../docs/research/dry_basin/paper.md) documents this transition
 and its verification limits. The original version is preserved below.
-The saved dry profile passes numerical contact-response criteria through 100 Hz;
-its listening filter passes through 80 Hz and reaches a stop band at 100 Hz.
+The newer saved dry profile passes numerical contact-response criteria through
+200 Hz, including separate upper-interval gates. Its listening filter passes through
+160 Hz and reaches a stop band at 200 Hz. `contact_100hz` remains a smaller sixteen-mode
+alternative checked under the earlier broader-band criteria.
 Omitting `--profile` retains the original exploratory dry configuration.
 
 Version 1 is a geometric prototype and a visual wave/interference simulation.

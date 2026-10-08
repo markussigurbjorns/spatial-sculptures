@@ -164,9 +164,9 @@
     "verified_sampled_transfer_band_hz": 100.0,
     "audio_passband_hz": 80.0,
     "audio_stopband_hz": 100.0,
-    "filtered_impulse_maximum_relative_L2": 0.021432853644063426,
+    "filtered_impulse_maximum_relative_L2": 0.021432853644063415,
     "selection": "smallest tested DOF count, then smallest passing retained bank",
     "report_path": "docs/research/dry_basin/contact_refinement.json",
-    "report_sha256": "086d71328f1391a0ee079d07256e9a76bb658b58c7c8e52c5343ebd1e0eb1025"
+    "report_sha256": "74110fea773d8a2450a1cca1ef924b79bcfc3d189eb22ceaa2c6743ae2902dc8"
   }
 }

@@ -1,0 +1,3095 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "solver_result_available": true,
+  "runtime": {
+    "available": true,
+    "ngsolve": "6.2.2608",
+    "numpy": "2.2.6",
+    "scipy": "1.18.1"
+  },
+  "policy": {
+    "plate_frequency_relative": 0.005,
+    "external_frequency_relative": 0.0025,
+    "external_minimum_subspace_MAC": 0.995,
+    "mesh_response_relative_L2": 0.05,
+    "modal_truncation_relative_L2": 0.05,
+    "quadrature_response_relative_L2": 0.01,
+    "rim_response_relative_L2": 0.01,
+    "frequency_grid_relative_L2": 0.01,
+    "production_frequency_relative": 0.01,
+    "production_minimum_subspace_MAC": 0.99,
+    "production_response_relative_L2": 0.1
+  },
+  "parameters": {
+    "surface": {
+      "radius_x": 0.72,
+      "radius_y": 0.58,
+      "rise": 0.12,
+      "asymmetry": 0.006,
+      "center_z": 0.72,
+      "domain": "ellipse"
+    },
+    "material": {
+      "youngs_modulus": 193000000000.0,
+      "density": 8030.0,
+      "poisson_ratio": 0.3
+    },
+    "thickness": 0.005,
+    "supports": [
+      {
+        "patch": {
+          "x": -0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": -0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      }
+    ],
+    "exciters": [
+      {
+        "patch": {
+          "x": -0.34,
+          "y": 0.14,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 59.0,
+        "phase": 0.0,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.31,
+          "y": 0.13,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 61.3,
+        "phase": 1.7,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.02,
+          "y": -0.32,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 57.8,
+        "phase": 3.1,
+        "start": 0.0
+      }
+    ],
+    "impulses": [
+      {
+        "exciter": 0,
+        "time": 0.0,
+        "impulse_ns": 0.03
+      }
+    ],
+    "pickups": [
+      [
+        -0.2,
+        -0.04
+      ],
+      [
+        0.25,
+        -0.1
+      ]
+    ],
+    "elements": [
+      18,
+      18
+    ],
+    "gauss_order": 5,
+    "mode_count": 128,
+    "eigensolver": "numpy",
+    "patch_refinement": 0,
+    "damping_ratio": 0.005,
+    "water_depth_m": 0.0,
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "audio_stop_hz": 200.0,
+    "fps": 30,
+    "visual_gain": 1500.0,
+    "exposure_fraction": 0.5,
+    "exposure_samples": 8,
+    "resolution": [
+      720,
+      540
+    ],
+    "rings": 16,
+    "segments": 64
+  },
+  "request_sha256": "7af090262bbc17d3d0f22689edaa0c47b2b9e1774b52b3fcb47c0ba1c83b23f1",
+  "solver_source_sha256": {
+    "studies/plates/003_external_shell/model.py": "57c9163b4d9facf48d3ee0dcab876975aedf59ac205d83b6c43a99c8c13ded32",
+    "tools/validate_external_dry_basin.py": "9b59e67708b26b2b2b4ee3a41bb28834cd06958b598018a0ba59cf2cf36477c9"
+  },
+  "modal_artifacts_sha256": {
+    "mesh_1_modes.npz": "75fdee41656cee6a978d6d096b658728d8a72d0717c880ae88e57d7021ad211f",
+    "mesh_2_modes.npz": "c79ac3ddef6778b46ce9e02fb4fa1ada04e2013b9a4ee0167107b5b9120077fe",
+    "mesh_3_modes.npz": "3026fa4dd99ce92edca6bb7c13b232172f4495bd7a1c2253fd47f2e7997568f0",
+    "quadrature_modes.npz": "96c7f5f04e39ca088de18bc9240dd5f349ec091bbc56fe212defeab143a25a45",
+    "rim_modes.npz": "265af1a1d4012e99891e55356bdadd1fc485e645591b8bbf23160f461254f113"
+  },
+  "plate": {
+    "analytical_frequencies_hz": [
+      14.278513162374741,
+      31.13611199656822,
+      40.256453815305484,
+      57.114052649498966,
+      59.23211005355736,
+      83.55302157019004
+    ],
+    "external_frequencies_hz": [
+      14.278513163597884,
+      31.136112006502074,
+      40.25645379138098,
+      57.11405273378572,
+      59.23210990634213,
+      83.55302159529022
+    ],
+    "maximum_relative_frequency_difference": 2.4853956670511934e-09,
+    "tolerance": 0.005,
+    "passed": true,
+    "diagnostics": {
+      "ngsolve_version": "6.2.2608",
+      "scipy_version": "1.18.1",
+      "numpy_version": "2.2.6",
+      "surface_triangles": 1076,
+      "mixed_dofs": 39255,
+      "displacement_dofs": 14142,
+      "massless_rotation_dofs": 4971,
+      "shell_area_m2": 1.6703999999999692,
+      "shell_mass_kg": 67.06655999999876,
+      "contact_areas_m2": {},
+      "matrix_symmetry_relative": 2.0404713440291013e-16,
+      "maximum_eigen_residual": 6.207854179999479e-11,
+      "maximum_mass_orthogonality_error": 4.551914400963142e-15,
+      "elapsed_seconds": 2.094989976962097,
+      "membrane": "Regge interpolation, order displacement-1",
+      "rim": "simply supported rectangle"
+    }
+  },
+  "external_checks": {
+    "mesh_1_to_2": {
+      "tolerance": 0.05,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.09282974674629517,
+          "per_path_relative_L2": [
+            [
+              0.08835403390749945,
+              0.0866570928130262,
+              0.0773100960251824
+            ],
+            [
+              0.09282974674629517,
+              0.08947305522169358,
+              0.0776793229484267
+            ]
+          ],
+          "passed": false
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 0.08861873324751263,
+          "per_path_relative_L2": [
+            [
+              0.08798792487391086,
+              0.08606307765040341,
+              0.0777320425611007
+            ],
+            [
+              0.08861873324751263,
+              0.08629026892728853,
+              0.07767474748006772
+            ]
+          ],
+          "passed": false
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 0.21572788566399642,
+          "per_path_relative_L2": [
+            [
+              0.13244579636533382,
+              0.18368718308378432,
+              0.07680073703272831
+            ],
+            [
+              0.21572788566399642,
+              0.19684191667860637,
+              0.09126274525034363
+            ]
+          ],
+          "passed": false
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 0.10699557978783647,
+          "per_path_relative_L2": [
+            [
+              0.019492101561765153,
+              0.045100697670904404,
+              0.010367730233353026
+            ],
+            [
+              0.10699557978783647,
+              0.03191365987897928,
+              0.017402403550383014
+            ]
+          ],
+          "passed": false
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.016184418214174854,
+          "per_path_relative_L2": [
+            [
+              0.0033595240065419545,
+              0.006152095654604919,
+              0.0018067103526068714
+            ],
+            [
+              0.016184418214174854,
+              0.003524467053867078,
+              0.005508838125756832
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": false
+    },
+    "mesh_1_to_2_shapes": {
+      "groups": [
+        {
+          "reference_indices": [
+            0,
+            1
+          ],
+          "candidate_indices": [
+            0,
+            1
+          ],
+          "minimum_subspace_MAC": 0.9999999997308273,
+          "maximum_relative_frequency_difference": 0.0006180145019702987,
+          "individual_MAC": [
+            0.9999999996523639,
+            0.9999999999058504
+          ],
+          "reference_frequencies_hz": [
+            4.2978753741946205,
+            4.298233654240428
+          ]
+        },
+        {
+          "reference_indices": [
+            2
+          ],
+          "candidate_indices": [
+            2
+          ],
+          "minimum_subspace_MAC": 0.9999999996604376,
+          "maximum_relative_frequency_difference": 0.0012264787456159887,
+          "individual_MAC": [
+            0.9999999996604405
+          ],
+          "reference_frequencies_hz": [
+            5.346957823698556
+          ]
+        },
+        {
+          "reference_indices": [
+            3
+          ],
+          "candidate_indices": [
+            3
+          ],
+          "minimum_subspace_MAC": 0.9999993824528025,
+          "maximum_relative_frequency_difference": 0.0007816256079593575,
+          "individual_MAC": [
+            0.9999993824528014
+          ],
+          "reference_frequencies_hz": [
+            14.488922488559899
+          ]
+        },
+        {
+          "reference_indices": [
+            4
+          ],
+          "candidate_indices": [
+            4
+          ],
+          "minimum_subspace_MAC": 0.9999998607971214,
+          "maximum_relative_frequency_difference": 0.0005892627066959033,
+          "individual_MAC": [
+            0.9999998607971199
+          ],
+          "reference_frequencies_hz": [
+            16.968182612657927
+          ]
+        },
+        {
+          "reference_indices": [
+            5
+          ],
+          "candidate_indices": [
+            5
+          ],
+          "minimum_subspace_MAC": 0.9999962460809226,
+          "maximum_relative_frequency_difference": 0.0005631016264120436,
+          "individual_MAC": [
+            0.9999962460809233
+          ],
+          "reference_frequencies_hz": [
+            22.227652475027533
+          ]
+        },
+        {
+          "reference_indices": [
+            6
+          ],
+          "candidate_indices": [
+            6
+          ],
+          "minimum_subspace_MAC": 0.9999998269812639,
+          "maximum_relative_frequency_difference": 0.0007762656395697842,
+          "individual_MAC": [
+            0.999999826981265
+          ],
+          "reference_frequencies_hz": [
+            24.382362326237157
+          ]
+        },
+        {
+          "reference_indices": [
+            7
+          ],
+          "candidate_indices": [
+            7
+          ],
+          "minimum_subspace_MAC": 0.9999994662617343,
+          "maximum_relative_frequency_difference": 0.00147793955461073,
+          "individual_MAC": [
+            0.9999994662617345
+          ],
+          "reference_frequencies_hz": [
+            40.738921677544866
+          ]
+        },
+        {
+          "reference_indices": [
+            8
+          ],
+          "candidate_indices": [
+            8
+          ],
+          "minimum_subspace_MAC": 0.9999994983566157,
+          "maximum_relative_frequency_difference": 0.0012989464200765521,
+          "individual_MAC": [
+            0.9999994983566186
+          ],
+          "reference_frequencies_hz": [
+            44.16981581449376
+          ]
+        },
+        {
+          "reference_indices": [
+            9
+          ],
+          "candidate_indices": [
+            9
+          ],
+          "minimum_subspace_MAC": 0.9999997209105579,
+          "maximum_relative_frequency_difference": 0.0016964578857867618,
+          "individual_MAC": [
+            0.9999997209105579
+          ],
+          "reference_frequencies_hz": [
+            54.830604746155124
+          ]
+        },
+        {
+          "reference_indices": [
+            10
+          ],
+          "candidate_indices": [
+            10
+          ],
+          "minimum_subspace_MAC": 0.9999997593737868,
+          "maximum_relative_frequency_difference": 0.0013053660993331828,
+          "individual_MAC": [
+            0.9999997593737864
+          ],
+          "reference_frequencies_hz": [
+            69.32171158584227
+          ]
+        },
+        {
+          "reference_indices": [
+            11
+          ],
+          "candidate_indices": [
+            11
+          ],
+          "minimum_subspace_MAC": 0.9999996574679841,
+          "maximum_relative_frequency_difference": 0.0015080923107579913,
+          "individual_MAC": [
+            0.9999996574679844
+          ],
+          "reference_frequencies_hz": [
+            76.53474868993176
+          ]
+        },
+        {
+          "reference_indices": [
+            12
+          ],
+          "candidate_indices": [
+            12
+          ],
+          "minimum_subspace_MAC": 0.9999998164081185,
+          "maximum_relative_frequency_difference": 0.0011313537170001275,
+          "individual_MAC": [
+            0.9999998164081172
+          ],
+          "reference_frequencies_hz": [
+            102.18259612901362
+          ]
+        },
+        {
+          "reference_indices": [
+            13
+          ],
+          "candidate_indices": [
+            13
+          ],
+          "minimum_subspace_MAC": 0.9999997389374703,
+          "maximum_relative_frequency_difference": 0.0014289631392092605,
+          "individual_MAC": [
+            0.9999997389374721
+          ],
+          "reference_frequencies_hz": [
+            109.2985691362882
+          ]
+        },
+        {
+          "reference_indices": [
+            14
+          ],
+          "candidate_indices": [
+            14
+          ],
+          "minimum_subspace_MAC": 0.9999995275087036,
+          "maximum_relative_frequency_difference": 0.0011888561184227875,
+          "individual_MAC": [
+            0.9999995275087031
+          ],
+          "reference_frequencies_hz": [
+            144.74456074368135
+          ]
+        },
+        {
+          "reference_indices": [
+            15
+          ],
+          "candidate_indices": [
+            15
+          ],
+          "minimum_subspace_MAC": 0.9999996411640502,
+          "maximum_relative_frequency_difference": 0.0012116918724220938,
+          "individual_MAC": [
+            0.999999641164051
+          ],
+          "reference_frequencies_hz": [
+            145.94826537372245
+          ]
+        },
+        {
+          "reference_indices": [
+            16
+          ],
+          "candidate_indices": [
+            16
+          ],
+          "minimum_subspace_MAC": 0.9999995046096367,
+          "maximum_relative_frequency_difference": 0.0010888438615941354,
+          "individual_MAC": [
+            0.9999995046096392
+          ],
+          "reference_frequencies_hz": [
+            189.11256876817734
+          ]
+        },
+        {
+          "reference_indices": [
+            17
+          ],
+          "candidate_indices": [
+            17
+          ],
+          "minimum_subspace_MAC": 0.9999994137542192,
+          "maximum_relative_frequency_difference": 0.0012048882236872505,
+          "individual_MAC": [
+            0.9999994137542179
+          ],
+          "reference_frequencies_hz": [
+            192.86059015557117
+          ]
+        },
+        {
+          "reference_indices": [
+            18
+          ],
+          "candidate_indices": [
+            18
+          ],
+          "minimum_subspace_MAC": 0.9999977333878133,
+          "maximum_relative_frequency_difference": 0.0011016757298851765,
+          "individual_MAC": [
+            0.9999977333878106
+          ],
+          "reference_frequencies_hz": [
+            241.97379054442837
+          ]
+        }
+      ],
+      "matched_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "cluster_relative_gap": 0.002,
+      "frequency_tolerance": 0.0025,
+      "minimum_subspace_MAC": 0.995,
+      "passed": true,
+      "scope": "Physical-area-weighted XYZ shapes; sampled MAC is not measured accuracy."
+    },
+    "mesh_2_to_3": {
+      "tolerance": 0.05,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.02348880728507741,
+          "per_path_relative_L2": [
+            [
+              0.022350844206616764,
+              0.021921073938397987,
+              0.019591563677464664
+            ],
+            [
+              0.02348880728507741,
+              0.02263768827596357,
+              0.019683054654885082
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 0.02241498122412266,
+          "per_path_relative_L2": [
+            [
+              0.022256159360837493,
+              0.021769087062041975,
+              0.01969675402359121
+            ],
+            [
+              0.02241498122412266,
+              0.021825324056426405,
+              0.019681350885428942
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 0.054777724738349715,
+          "per_path_relative_L2": [
+            [
+              0.03365804580741693,
+              0.04666560885670432,
+              0.019523635143625616
+            ],
+            [
+              0.054777724738349715,
+              0.05000691718313035,
+              0.023139033261600793
+            ]
+          ],
+          "passed": false
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 0.027348816768548438,
+          "per_path_relative_L2": [
+            [
+              0.004962208590423254,
+              0.011510174699445434,
+              0.002684350696895444
+            ],
+            [
+              0.027348816768548438,
+              0.008149727749188316,
+              0.004464235691583415
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.005151316704858968,
+          "per_path_relative_L2": [
+            [
+              0.0013662769727164246,
+              0.0008697629637930628,
+              0.0009228503609316547
+            ],
+            [
+              0.005151316704858968,
+              0.0008674065071953468,
+              0.0015979490145873315
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": false
+    },
+    "mesh_2_to_3_shapes": {
+      "groups": [
+        {
+          "reference_indices": [
+            0,
+            1
+          ],
+          "candidate_indices": [
+            0,
+            1
+          ],
+          "minimum_subspace_MAC": 0.9999999999830331,
+          "maximum_relative_frequency_difference": 0.0001544273699261023,
+          "individual_MAC": [
+            0.9999999999575271,
+            0.9999999999734777
+          ],
+          "reference_frequencies_hz": [
+            4.297211874241961,
+            4.297569991809519
+          ]
+        },
+        {
+          "reference_indices": [
+            2
+          ],
+          "candidate_indices": [
+            2
+          ],
+          "minimum_subspace_MAC": 0.9999999999785951,
+          "maximum_relative_frequency_difference": 0.000306442424489628,
+          "individual_MAC": [
+            0.9999999999785971
+          ],
+          "reference_frequencies_hz": [
+            5.345319790942147
+          ]
+        },
+        {
+          "reference_indices": [
+            3
+          ],
+          "candidate_indices": [
+            3
+          ],
+          "minimum_subspace_MAC": 0.9999999614184313,
+          "maximum_relative_frequency_difference": 0.00019742540362122085,
+          "individual_MAC": [
+            0.9999999614184288
+          ],
+          "reference_frequencies_hz": [
+            14.486062571809779
+          ]
+        },
+        {
+          "reference_indices": [
+            4
+          ],
+          "candidate_indices": [
+            4
+          ],
+          "minimum_subspace_MAC": 0.9999999914006148,
+          "maximum_relative_frequency_difference": 0.0001495282822110422,
+          "individual_MAC": [
+            0.999999991400613
+          ],
+          "reference_frequencies_hz": [
+            16.965645768789518
+          ]
+        },
+        {
+          "reference_indices": [
+            5
+          ],
+          "candidate_indices": [
+            5
+          ],
+          "minimum_subspace_MAC": 0.9999997654977235,
+          "maximum_relative_frequency_difference": 0.0001421929770648589,
+          "individual_MAC": [
+            0.9999997654977246
+          ],
+          "reference_frequencies_hz": [
+            22.224492308302462
+          ]
+        },
+        {
+          "reference_indices": [
+            6
+          ],
+          "candidate_indices": [
+            6
+          ],
+          "minimum_subspace_MAC": 0.999999989416813,
+          "maximum_relative_frequency_difference": 0.0001959581546151501,
+          "individual_MAC": [
+            0.9999999894168135
+          ],
+          "reference_frequencies_hz": [
+            24.377585339600035
+          ]
+        },
+        {
+          "reference_indices": [
+            7
+          ],
+          "candidate_indices": [
+            7
+          ],
+          "minimum_subspace_MAC": 0.9999999676551297,
+          "maximum_relative_frequency_difference": 0.000370730310590206,
+          "individual_MAC": [
+            0.9999999676551286
+          ],
+          "reference_frequencies_hz": [
+            40.72382412157985
+          ]
+        },
+        {
+          "reference_indices": [
+            8
+          ],
+          "candidate_indices": [
+            8
+          ],
+          "minimum_subspace_MAC": 0.9999999683316056,
+          "maximum_relative_frequency_difference": 0.00032751322170665453,
+          "individual_MAC": [
+            0.9999999683316083
+          ],
+          "reference_frequencies_hz": [
+            44.155354352134296
+          ]
+        },
+        {
+          "reference_indices": [
+            9
+          ],
+          "candidate_indices": [
+            9
+          ],
+          "minimum_subspace_MAC": 0.9999999825174234,
+          "maximum_relative_frequency_difference": 0.0004257639118716572,
+          "individual_MAC": [
+            0.9999999825174221
+          ],
+          "reference_frequencies_hz": [
+            54.807269788570935
+          ]
+        },
+        {
+          "reference_indices": [
+            10
+          ],
+          "candidate_indices": [
+            10
+          ],
+          "minimum_subspace_MAC": 0.9999999853209425,
+          "maximum_relative_frequency_difference": 0.00033104737345390767,
+          "individual_MAC": [
+            0.9999999853209414
+          ],
+          "reference_frequencies_hz": [
+            69.29877040991448
+          ]
+        },
+        {
+          "reference_indices": [
+            11
+          ],
+          "candidate_indices": [
+            11
+          ],
+          "minimum_subspace_MAC": 0.9999999789381825,
+          "maximum_relative_frequency_difference": 0.0003809011204840562,
+          "individual_MAC": [
+            0.9999999789381836
+          ],
+          "reference_frequencies_hz": [
+            76.50560761826665
+          ]
+        },
+        {
+          "reference_indices": [
+            12
+          ],
+          "candidate_indices": [
+            12
+          ],
+          "minimum_subspace_MAC": 0.9999999889070901,
+          "maximum_relative_frequency_difference": 0.0002896157256322418,
+          "individual_MAC": [
+            0.9999999889070896
+          ],
+          "reference_frequencies_hz": [
+            102.15301101060426
+          ]
+        },
+        {
+          "reference_indices": [
+            13
+          ],
+          "candidate_indices": [
+            13
+          ],
+          "minimum_subspace_MAC": 0.9999999834230439,
+          "maximum_relative_frequency_difference": 0.00036251674736798023,
+          "individual_MAC": [
+            0.999999983423045
+          ],
+          "reference_frequencies_hz": [
+            109.25896093314991
+          ]
+        },
+        {
+          "reference_indices": [
+            14
+          ],
+          "candidate_indices": [
+            14
+          ],
+          "minimum_subspace_MAC": 0.9999999705658134,
+          "maximum_relative_frequency_difference": 0.0003049606445224562,
+          "individual_MAC": [
+            0.9999999705658136
+          ],
+          "reference_frequencies_hz": [
+            144.70043280643003
+          ]
+        },
+        {
+          "reference_indices": [
+            15
+          ],
+          "candidate_indices": [
+            15
+          ],
+          "minimum_subspace_MAC": 0.999999977036771,
+          "maximum_relative_frequency_difference": 0.0003097131225817673,
+          "individual_MAC": [
+            0.9999999770367728
+          ],
+          "reference_frequencies_hz": [
+            145.90307727606498
+          ]
+        },
+        {
+          "reference_indices": [
+            16
+          ],
+          "candidate_indices": [
+            16
+          ],
+          "minimum_subspace_MAC": 0.9999999672070536,
+          "maximum_relative_frequency_difference": 0.0002802778425161634,
+          "individual_MAC": [
+            0.9999999672070534
+          ],
+          "reference_frequencies_hz": [
+            189.05957955711204
+          ]
+        },
+        {
+          "reference_indices": [
+            17
+          ],
+          "candidate_indices": [
+            17
+          ],
+          "minimum_subspace_MAC": 0.9999999604116032,
+          "maximum_relative_frequency_difference": 0.00030953027287528023,
+          "individual_MAC": [
+            0.9999999604116032
+          ],
+          "reference_frequencies_hz": [
+            192.80091243653408
+          ]
+        },
+        {
+          "reference_indices": [
+            18
+          ],
+          "candidate_indices": [
+            18
+          ],
+          "minimum_subspace_MAC": 0.9999999442397477,
+          "maximum_relative_frequency_difference": 0.0002846040167026054,
+          "individual_MAC": [
+            0.9999999442397446
+          ],
+          "reference_frequencies_hz": [
+            241.90494342586916
+          ]
+        }
+      ],
+      "matched_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "cluster_relative_gap": 0.002,
+      "frequency_tolerance": 0.0025,
+      "minimum_subspace_MAC": 0.995,
+      "passed": true,
+      "scope": "Physical-area-weighted XYZ shapes; sampled MAC is not measured accuracy."
+    },
+    "quadrature": {
+      "tolerance": 0.01,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 9.071809333725995e-09,
+          "per_path_relative_L2": [
+            [
+              8.28670814229628e-09,
+              8.619793714983178e-09,
+              9.071809333725995e-09
+            ],
+            [
+              8.194154832751932e-09,
+              8.498097776543476e-09,
+              9.01799199475218e-09
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 9.17788779503484e-09,
+          "per_path_relative_L2": [
+            [
+              8.29764286878175e-09,
+              8.603648545427268e-09,
+              9.17788779503484e-09
+            ],
+            [
+              8.212975931279978e-09,
+              8.54231485592057e-09,
+              9.176073350534757e-09
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 1.2357874035509846e-08,
+          "per_path_relative_L2": [
+            [
+              8.769727379242173e-09,
+              1.2357874035509846e-08,
+              5.831340432298575e-09
+            ],
+            [
+              7.273027924244796e-09,
+              6.8293541628041345e-09,
+              5.5443573825503384e-09
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 2.470086785410404e-10,
+          "per_path_relative_L2": [
+            [
+              6.059360948315174e-11,
+              2.0188859750984076e-10,
+              9.003940525900476e-11
+            ],
+            [
+              2.470086785410404e-10,
+              1.0460536532358288e-10,
+              9.506721040459056e-11
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 3.9572470501471945e-10,
+          "per_path_relative_L2": [
+            [
+              7.214130075729775e-11,
+              3.2781436532650663e-10,
+              6.321185978682842e-11
+            ],
+            [
+              3.9572470501471945e-10,
+              1.212704908508492e-10,
+              8.150875569381083e-11
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "quadrature_shapes": {
+      "groups": [
+        {
+          "reference_indices": [
+            0,
+            1
+          ],
+          "candidate_indices": [
+            0,
+            1
+          ],
+          "minimum_subspace_MAC": 0.9999999999999998,
+          "maximum_relative_frequency_difference": 9.5570862335137e-10,
+          "individual_MAC": [
+            0.9999999999933145,
+            0.9999999999933151
+          ],
+          "reference_frequencies_hz": [
+            4.297211874241961,
+            4.297569991809519
+          ]
+        },
+        {
+          "reference_indices": [
+            2
+          ],
+          "candidate_indices": [
+            2
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 9.341047935151892e-10,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            5.345319790942147
+          ]
+        },
+        {
+          "reference_indices": [
+            3
+          ],
+          "candidate_indices": [
+            3
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 3.433076045666894e-11,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            14.486062571809779
+          ]
+        },
+        {
+          "reference_indices": [
+            4
+          ],
+          "candidate_indices": [
+            4
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 1.386246673007463e-11,
+          "individual_MAC": [
+            0.9999999999999998
+          ],
+          "reference_frequencies_hz": [
+            16.965645768789518
+          ]
+        },
+        {
+          "reference_indices": [
+            5
+          ],
+          "candidate_indices": [
+            5
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 6.631206694862612e-11,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            22.224492308302462
+          ]
+        },
+        {
+          "reference_indices": [
+            6
+          ],
+          "candidate_indices": [
+            6
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 1.110156411243679e-11,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            24.377585339600035
+          ]
+        },
+        {
+          "reference_indices": [
+            7
+          ],
+          "candidate_indices": [
+            7
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 6.747935543671701e-13,
+          "individual_MAC": [
+            0.9999999999999993
+          ],
+          "reference_frequencies_hz": [
+            40.72382412157985
+          ]
+        },
+        {
+          "reference_indices": [
+            8
+          ],
+          "candidate_indices": [
+            8
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 1.510302993779078e-10,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            44.155354352134296
+          ]
+        },
+        {
+          "reference_indices": [
+            9
+          ],
+          "candidate_indices": [
+            9
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 1.0885070622634885e-11,
+          "individual_MAC": [
+            0.9999999999999991
+          ],
+          "reference_frequencies_hz": [
+            54.807269788570935
+          ]
+        },
+        {
+          "reference_indices": [
+            10
+          ],
+          "candidate_indices": [
+            10
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 6.233458194060404e-12,
+          "individual_MAC": [
+            0.9999999999999993
+          ],
+          "reference_frequencies_hz": [
+            69.29877040991448
+          ]
+        },
+        {
+          "reference_indices": [
+            11
+          ],
+          "candidate_indices": [
+            11
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 2.843947299879801e-11,
+          "individual_MAC": [
+            0.9999999999999993
+          ],
+          "reference_frequencies_hz": [
+            76.50560761826665
+          ]
+        },
+        {
+          "reference_indices": [
+            12
+          ],
+          "candidate_indices": [
+            12
+          ],
+          "minimum_subspace_MAC": 0.9999999999999998,
+          "maximum_relative_frequency_difference": 2.687849942617504e-13,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            102.15301101060426
+          ]
+        },
+        {
+          "reference_indices": [
+            13
+          ],
+          "candidate_indices": [
+            13
+          ],
+          "minimum_subspace_MAC": 0.9999999999999993,
+          "maximum_relative_frequency_difference": 2.262634524186069e-13,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            109.25896093314991
+          ]
+        },
+        {
+          "reference_indices": [
+            14
+          ],
+          "candidate_indices": [
+            14
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 1.602273869139026e-12,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            144.70043280643003
+          ]
+        },
+        {
+          "reference_indices": [
+            15
+          ],
+          "candidate_indices": [
+            15
+          ],
+          "minimum_subspace_MAC": 0.9999999999999996,
+          "maximum_relative_frequency_difference": 4.514055795823424e-11,
+          "individual_MAC": [
+            1.0
+          ],
+          "reference_frequencies_hz": [
+            145.90307727606498
+          ]
+        },
+        {
+          "reference_indices": [
+            16
+          ],
+          "candidate_indices": [
+            16
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 3.0344393664449854e-11,
+          "individual_MAC": [
+            0.9999999999999998
+          ],
+          "reference_frequencies_hz": [
+            189.05957955711204
+          ]
+        },
+        {
+          "reference_indices": [
+            17
+          ],
+          "candidate_indices": [
+            17
+          ],
+          "minimum_subspace_MAC": 1.0,
+          "maximum_relative_frequency_difference": 3.61710661422876e-13,
+          "individual_MAC": [
+            0.9999999999999993
+          ],
+          "reference_frequencies_hz": [
+            192.80091243653408
+          ]
+        },
+        {
+          "reference_indices": [
+            18
+          ],
+          "candidate_indices": [
+            18
+          ],
+          "minimum_subspace_MAC": 0.9999999999999998,
+          "maximum_relative_frequency_difference": 3.990252572805275e-12,
+          "individual_MAC": [
+            0.9999999999999991
+          ],
+          "reference_frequencies_hz": [
+            241.90494342586916
+          ]
+        }
+      ],
+      "matched_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "cluster_relative_gap": 0.002,
+      "frequency_tolerance": 0.0025,
+      "minimum_subspace_MAC": 0.995,
+      "passed": true,
+      "scope": "Physical-area-weighted XYZ shapes; sampled MAC is not measured accuracy."
+    },
+    "rim": {
+      "tolerance": 0.01,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.005940672603596988,
+          "per_path_relative_L2": [
+            [
+              0.005656919862243039,
+              0.005549772154184752,
+              0.004967952337305872
+            ],
+            [
+              0.005940672603596988,
+              0.0057276160906780975,
+              0.004990546574730583
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 0.005673503875450707,
+          "per_path_relative_L2": [
+            [
+              0.0056338381970086355,
+              0.00551204066239446,
+              0.004995670128848031
+            ],
+            [
+              0.005673503875450707,
+              0.005525779469709153,
+              0.0049917794317572055
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 0.013763973960180349,
+          "per_path_relative_L2": [
+            [
+              0.008458450920196533,
+              0.011726760423804152,
+              0.004902573261151213
+            ],
+            [
+              0.013763973960180349,
+              0.012565798294728264,
+              0.005814672136083088
+            ]
+          ],
+          "passed": false
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 0.006895603141886608,
+          "per_path_relative_L2": [
+            [
+              0.0012430318925026485,
+              0.0029185527812616,
+              0.000674538503216617
+            ],
+            [
+              0.006895603141886608,
+              0.0020866140751532487,
+              0.0012140127979784828
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.001697812245171016,
+          "per_path_relative_L2": [
+            [
+              0.00010831469355894418,
+              0.0008181923536000517,
+              0.00018555816376701896
+            ],
+            [
+              0.001697812245171016,
+              0.0006355312288070036,
+              0.0009695999343025387
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": false
+    },
+    "rim_shapes": {
+      "groups": [
+        {
+          "reference_indices": [
+            0,
+            1
+          ],
+          "candidate_indices": [
+            0,
+            1
+          ],
+          "minimum_subspace_MAC": 0.9999999999989293,
+          "maximum_relative_frequency_difference": 3.860057064197786e-05,
+          "individual_MAC": [
+            0.9999999999943299,
+            0.9999999999953348
+          ],
+          "reference_frequencies_hz": [
+            4.297211874241961,
+            4.297569991809519
+          ]
+        },
+        {
+          "reference_indices": [
+            2
+          ],
+          "candidate_indices": [
+            2
+          ],
+          "minimum_subspace_MAC": 0.9999999999986591,
+          "maximum_relative_frequency_difference": 7.659299492535077e-05,
+          "individual_MAC": [
+            0.9999999999986575
+          ],
+          "reference_frequencies_hz": [
+            5.345319790942147
+          ]
+        },
+        {
+          "reference_indices": [
+            3
+          ],
+          "candidate_indices": [
+            3
+          ],
+          "minimum_subspace_MAC": 0.9999999976047991,
+          "maximum_relative_frequency_difference": 4.958502868812609e-05,
+          "individual_MAC": [
+            0.9999999976047964
+          ],
+          "reference_frequencies_hz": [
+            14.486062571809779
+          ]
+        },
+        {
+          "reference_indices": [
+            4
+          ],
+          "candidate_indices": [
+            4
+          ],
+          "minimum_subspace_MAC": 0.9999999994506097,
+          "maximum_relative_frequency_difference": 3.78173762979328e-05,
+          "individual_MAC": [
+            0.9999999994506095
+          ],
+          "reference_frequencies_hz": [
+            16.965645768789518
+          ]
+        },
+        {
+          "reference_indices": [
+            5
+          ],
+          "candidate_indices": [
+            5
+          ],
+          "minimum_subspace_MAC": 0.9999999854499066,
+          "maximum_relative_frequency_difference": 3.603172155830503e-05,
+          "individual_MAC": [
+            0.9999999854499064
+          ],
+          "reference_frequencies_hz": [
+            22.224492308302462
+          ]
+        },
+        {
+          "reference_indices": [
+            6
+          ],
+          "candidate_indices": [
+            6
+          ],
+          "minimum_subspace_MAC": 0.9999999993342936,
+          "maximum_relative_frequency_difference": 4.950348666032944e-05,
+          "individual_MAC": [
+            0.9999999993342932
+          ],
+          "reference_frequencies_hz": [
+            24.377585339600035
+          ]
+        },
+        {
+          "reference_indices": [
+            7
+          ],
+          "candidate_indices": [
+            7
+          ],
+          "minimum_subspace_MAC": 0.9999999979081251,
+          "maximum_relative_frequency_difference": 9.31570051414532e-05,
+          "individual_MAC": [
+            0.9999999979081236
+          ],
+          "reference_frequencies_hz": [
+            40.72382412157985
+          ]
+        },
+        {
+          "reference_indices": [
+            8
+          ],
+          "candidate_indices": [
+            8
+          ],
+          "minimum_subspace_MAC": 0.9999999979740481,
+          "maximum_relative_frequency_difference": 8.226805190947317e-05,
+          "individual_MAC": [
+            0.9999999979740481
+          ],
+          "reference_frequencies_hz": [
+            44.155354352134296
+          ]
+        },
+        {
+          "reference_indices": [
+            9
+          ],
+          "candidate_indices": [
+            9
+          ],
+          "minimum_subspace_MAC": 0.9999999988805826,
+          "maximum_relative_frequency_difference": 0.00010687669873021832,
+          "individual_MAC": [
+            0.9999999988805812
+          ],
+          "reference_frequencies_hz": [
+            54.807269788570935
+          ]
+        },
+        {
+          "reference_indices": [
+            10
+          ],
+          "candidate_indices": [
+            10
+          ],
+          "minimum_subspace_MAC": 0.9999999990658837,
+          "maximum_relative_frequency_difference": 8.325813827569917e-05,
+          "individual_MAC": [
+            0.9999999990658839
+          ],
+          "reference_frequencies_hz": [
+            69.29877040991448
+          ]
+        },
+        {
+          "reference_indices": [
+            11
+          ],
+          "candidate_indices": [
+            11
+          ],
+          "minimum_subspace_MAC": 0.9999999985412631,
+          "maximum_relative_frequency_difference": 9.563930250588992e-05,
+          "individual_MAC": [
+            0.9999999985412633
+          ],
+          "reference_frequencies_hz": [
+            76.50560761826665
+          ]
+        },
+        {
+          "reference_indices": [
+            12
+          ],
+          "candidate_indices": [
+            12
+          ],
+          "minimum_subspace_MAC": 0.9999999990872126,
+          "maximum_relative_frequency_difference": 7.29393026801528e-05,
+          "individual_MAC": [
+            0.9999999990872142
+          ],
+          "reference_frequencies_hz": [
+            102.15301101060426
+          ]
+        },
+        {
+          "reference_indices": [
+            13
+          ],
+          "candidate_indices": [
+            13
+          ],
+          "minimum_subspace_MAC": 0.9999999987174342,
+          "maximum_relative_frequency_difference": 9.121703820980098e-05,
+          "individual_MAC": [
+            0.9999999987174368
+          ],
+          "reference_frequencies_hz": [
+            109.25896093314991
+          ]
+        },
+        {
+          "reference_indices": [
+            14
+          ],
+          "candidate_indices": [
+            14
+          ],
+          "minimum_subspace_MAC": 0.9999999973344664,
+          "maximum_relative_frequency_difference": 7.692516737567434e-05,
+          "individual_MAC": [
+            0.9999999973344664
+          ],
+          "reference_frequencies_hz": [
+            144.70043280643003
+          ]
+        },
+        {
+          "reference_indices": [
+            15
+          ],
+          "candidate_indices": [
+            15
+          ],
+          "minimum_subspace_MAC": 0.9999999980086274,
+          "maximum_relative_frequency_difference": 7.810291236098887e-05,
+          "individual_MAC": [
+            0.9999999980086265
+          ],
+          "reference_frequencies_hz": [
+            145.90307727606498
+          ]
+        },
+        {
+          "reference_indices": [
+            16
+          ],
+          "candidate_indices": [
+            16
+          ],
+          "minimum_subspace_MAC": 0.9999999964050281,
+          "maximum_relative_frequency_difference": 7.087192065857728e-05,
+          "individual_MAC": [
+            0.9999999964050295
+          ],
+          "reference_frequencies_hz": [
+            189.05957955711204
+          ]
+        },
+        {
+          "reference_indices": [
+            17
+          ],
+          "candidate_indices": [
+            17
+          ],
+          "minimum_subspace_MAC": 0.99999999538064,
+          "maximum_relative_frequency_difference": 7.814907343184352e-05,
+          "individual_MAC": [
+            0.9999999953806424
+          ],
+          "reference_frequencies_hz": [
+            192.80091243653408
+          ]
+        },
+        {
+          "reference_indices": [
+            18
+          ],
+          "candidate_indices": [
+            18
+          ],
+          "minimum_subspace_MAC": 0.9999999926247614,
+          "maximum_relative_frequency_difference": 7.201921095079111e-05,
+          "individual_MAC": [
+            0.9999999926247598
+          ],
+          "reference_frequencies_hz": [
+            241.90494342586916
+          ]
+        }
+      ],
+      "matched_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "cluster_relative_gap": 0.002,
+      "frequency_tolerance": 0.0025,
+      "minimum_subspace_MAC": 0.995,
+      "passed": true,
+      "scope": "Physical-area-weighted XYZ shapes; sampled MAC is not measured accuracy."
+    },
+    "truncation": {
+      "tolerance": 0.05,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.0003623755782062861,
+          "per_path_relative_L2": [
+            [
+              0.00016544704148329826,
+              6.840471359415881e-05,
+              4.0619576490376695e-05
+            ],
+            [
+              1.1683408609778388e-05,
+              2.4177787486354553e-05,
+              0.0003623755782062861
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 3.102253583489995e-05,
+          "per_path_relative_L2": [
+            [
+              1.3922866361070803e-05,
+              5.733964401678959e-06,
+              3.436236319919994e-06
+            ],
+            [
+              9.853717654073996e-07,
+              2.0440121541048306e-06,
+              3.102253583489995e-05
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 0.0004701194645150812,
+          "per_path_relative_L2": [
+            [
+              0.00040330254516964117,
+              0.0002557824526649183,
+              6.598812343727321e-05
+            ],
+            [
+              1.9659023606130826e-05,
+              4.1914896701084735e-05,
+              0.0004701194645150812
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 0.0024439797761674387,
+          "per_path_relative_L2": [
+            [
+              0.002050259805369338,
+              0.0022183516933925716,
+              0.00030634825140631066
+            ],
+            [
+              0.0004603819658563302,
+              0.00032116783515023583,
+              0.0024439797761674387
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.0055845588278669814,
+          "per_path_relative_L2": [
+            [
+              0.00404584021819016,
+              0.0055845588278669814,
+              0.0005603443927142408
+            ],
+            [
+              0.0013504539848631847,
+              0.0005163819550232701,
+              0.004474775548488059
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "frequency_grid": {
+      "tolerance": 0.01,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.0013406441587309815,
+          "per_path_relative_L2": [
+            [
+              0.0013339547617241066,
+              0.0013406441587309815,
+              0.0012857515782226598
+            ],
+            [
+              0.0013326715135053729,
+              0.0013276792241352113,
+              0.0012753969858175576
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 0.0013435196339034628,
+          "per_path_relative_L2": [
+            [
+              0.001342132633835056,
+              0.00134311696981408,
+              0.0013059475305031258
+            ],
+            [
+              0.0013435196339034628,
+              0.0013405230867700021,
+              0.001304964449286173
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 0.0006091415891510728,
+          "per_path_relative_L2": [
+            [
+              0.0004370534442912693,
+              0.0006091415891510728,
+              0.0002527300206473112
+            ],
+            [
+              0.0006014108070778021,
+              0.0005513731539503657,
+              0.0002762938554900666
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 0.00010330428930361009,
+          "per_path_relative_L2": [
+            [
+              1.8542317232983622e-05,
+              4.3176766738756085e-05,
+              8.84381981120537e-06
+            ],
+            [
+              0.00010330428930361009,
+              3.077886620851288e-05,
+              1.643184273388924e-05
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 6.720002697540641e-06,
+          "per_path_relative_L2": [
+            [
+              3.6934128596469773e-07,
+              1.2526716766973148e-06,
+              6.064651422131466e-07
+            ],
+            [
+              6.720002697540641e-06,
+              1.2314780224690704e-06,
+              2.1172830427148807e-06
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  },
+  "truncation_banks": {
+    "256": {
+      "tolerance": 0.05,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.0005587346264833193,
+          "per_path_relative_L2": [
+            [
+              9.996571214961982e-05,
+              0.00023879552900835945,
+              0.00034574708490381936
+            ],
+            [
+              0.00029970755415464087,
+              0.0005587346264833193,
+              0.0003184174995601493
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 4.7184342657929314e-05,
+          "per_path_relative_L2": [
+            [
+              8.466832739051646e-06,
+              1.997149144895513e-05,
+              2.92757692788815e-05
+            ],
+            [
+              2.5251964933723113e-05,
+              4.7184342657929314e-05,
+              2.720404739500079e-05
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 0.0009677173391174655,
+          "per_path_relative_L2": [
+            [
+              0.0002450400882075144,
+              0.0008911740147011562,
+              0.0005621272302653536
+            ],
+            [
+              0.000503867926986452,
+              0.0009677173391174655,
+              0.0004123696957115099
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 0.01180627971878641,
+          "per_path_relative_L2": [
+            [
+              0.0012412582592350647,
+              0.007738708122843127,
+              0.002608316923058997
+            ],
+            [
+              0.01180627971878641,
+              0.007419514609027516,
+              0.002146177321595408
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.0346560037265682,
+          "per_path_relative_L2": [
+            [
+              0.0024383120635034774,
+              0.019512661189029324,
+              0.004767846246662552
+            ],
+            [
+              0.0346560037265682,
+              0.011938420188074037,
+              0.003935098364305635
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "384": {
+      "tolerance": 0.05,
+      "intervals": [
+        {
+          "interval_hz": [
+            20.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.0003623755782062861,
+          "per_path_relative_L2": [
+            [
+              0.00016544704148329826,
+              6.840471359415881e-05,
+              4.0619576490376695e-05
+            ],
+            [
+              1.1683408609778388e-05,
+              2.4177787486354553e-05,
+              0.0003623755782062861
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            20.0,
+            40.0
+          ],
+          "maximum_relative_L2": 3.102253583489995e-05,
+          "per_path_relative_L2": [
+            [
+              1.3922866361070803e-05,
+              5.733964401678959e-06,
+              3.436236319919994e-06
+            ],
+            [
+              9.853717654073996e-07,
+              2.0440121541048306e-06,
+              3.102253583489995e-05
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            40.0,
+            80.0
+          ],
+          "maximum_relative_L2": 0.0004701194645150812,
+          "per_path_relative_L2": [
+            [
+              0.00040330254516964117,
+              0.0002557824526649183,
+              6.598812343727321e-05
+            ],
+            [
+              1.9659023606130826e-05,
+              4.1914896701084735e-05,
+              0.0004701194645150812
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            80.0,
+            160.0
+          ],
+          "maximum_relative_L2": 0.0024439797761674387,
+          "per_path_relative_L2": [
+            [
+              0.002050259805369338,
+              0.0022183516933925716,
+              0.00030634825140631066
+            ],
+            [
+              0.0004603819658563302,
+              0.00032116783515023583,
+              0.0024439797761674387
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "interval_hz": [
+            160.0,
+            200.0
+          ],
+          "maximum_relative_L2": 0.0055845588278669814,
+          "per_path_relative_L2": [
+            [
+              0.00404584021819016,
+              0.0055845588278669814,
+              0.0005603443927142408
+            ],
+            [
+              0.0013504539848631847,
+              0.0005163819550232701,
+              0.004474775548488059
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  },
+  "production_shape_comparison": {
+    "groups": [
+      {
+        "reference_indices": [
+          0,
+          1
+        ],
+        "candidate_indices": [
+          0,
+          1
+        ],
+        "minimum_subspace_MAC": 0.9999999999672842,
+        "maximum_relative_frequency_difference": 5.08598862285492e-05,
+        "individual_MAC": [
+          0.9999816900279039,
+          0.9999816900711563
+        ],
+        "reference_frequencies_hz": [
+          4.297211874241961,
+          4.297569991809519
+        ]
+      },
+      {
+        "reference_indices": [
+          2
+        ],
+        "candidate_indices": [
+          2
+        ],
+        "minimum_subspace_MAC": 0.9999999999822182,
+        "maximum_relative_frequency_difference": 0.0001022862772748212,
+        "individual_MAC": [
+          0.9999999999822178
+        ],
+        "reference_frequencies_hz": [
+          5.345319790942147
+        ]
+      },
+      {
+        "reference_indices": [
+          3
+        ],
+        "candidate_indices": [
+          3
+        ],
+        "minimum_subspace_MAC": 0.9999998020041709,
+        "maximum_relative_frequency_difference": 5.2694056435154124e-05,
+        "individual_MAC": [
+          0.9999998020041694
+        ],
+        "reference_frequencies_hz": [
+          14.486062571809779
+        ]
+      },
+      {
+        "reference_indices": [
+          4
+        ],
+        "candidate_indices": [
+          4
+        ],
+        "minimum_subspace_MAC": 0.9999999750395389,
+        "maximum_relative_frequency_difference": 0.0002298806031160172,
+        "individual_MAC": [
+          0.9999999750395371
+        ],
+        "reference_frequencies_hz": [
+          16.965645768789518
+        ]
+      },
+      {
+        "reference_indices": [
+          5
+        ],
+        "candidate_indices": [
+          5
+        ],
+        "minimum_subspace_MAC": 0.9999996373144546,
+        "maximum_relative_frequency_difference": 0.00031524213653777444,
+        "individual_MAC": [
+          0.9999996373144571
+        ],
+        "reference_frequencies_hz": [
+          22.224492308302462
+        ]
+      },
+      {
+        "reference_indices": [
+          6
+        ],
+        "candidate_indices": [
+          6
+        ],
+        "minimum_subspace_MAC": 0.9999998138867343,
+        "maximum_relative_frequency_difference": 0.0002741302382527344,
+        "individual_MAC": [
+          0.9999998138867368
+        ],
+        "reference_frequencies_hz": [
+          24.377585339600035
+        ]
+      },
+      {
+        "reference_indices": [
+          7
+        ],
+        "candidate_indices": [
+          7
+        ],
+        "minimum_subspace_MAC": 0.9999999423284084,
+        "maximum_relative_frequency_difference": 0.00031937816275551256,
+        "individual_MAC": [
+          0.9999999423284064
+        ],
+        "reference_frequencies_hz": [
+          40.72382412157985
+        ]
+      },
+      {
+        "reference_indices": [
+          8
+        ],
+        "candidate_indices": [
+          8
+        ],
+        "minimum_subspace_MAC": 0.9999998147818109,
+        "maximum_relative_frequency_difference": 0.0001335147858085861,
+        "individual_MAC": [
+          0.999999814781812
+        ],
+        "reference_frequencies_hz": [
+          44.155354352134296
+        ]
+      },
+      {
+        "reference_indices": [
+          9
+        ],
+        "candidate_indices": [
+          9
+        ],
+        "minimum_subspace_MAC": 0.9999999132855583,
+        "maximum_relative_frequency_difference": 0.00021883319760473974,
+        "individual_MAC": [
+          0.9999999132855578
+        ],
+        "reference_frequencies_hz": [
+          54.807269788570935
+        ]
+      },
+      {
+        "reference_indices": [
+          10
+        ],
+        "candidate_indices": [
+          10
+        ],
+        "minimum_subspace_MAC": 0.9999999333359932,
+        "maximum_relative_frequency_difference": 5.4606580684124495e-05,
+        "individual_MAC": [
+          0.9999999333359915
+        ],
+        "reference_frequencies_hz": [
+          69.29877040991448
+        ]
+      },
+      {
+        "reference_indices": [
+          11
+        ],
+        "candidate_indices": [
+          11
+        ],
+        "minimum_subspace_MAC": 0.9999999164198556,
+        "maximum_relative_frequency_difference": 0.00013573020644064293,
+        "individual_MAC": [
+          0.9999999164198552
+        ],
+        "reference_frequencies_hz": [
+          76.50560761826665
+        ]
+      },
+      {
+        "reference_indices": [
+          12
+        ],
+        "candidate_indices": [
+          12
+        ],
+        "minimum_subspace_MAC": 0.9999998967100503,
+        "maximum_relative_frequency_difference": 0.00013440322292535,
+        "individual_MAC": [
+          0.9999998967100521
+        ],
+        "reference_frequencies_hz": [
+          102.15301101060426
+        ]
+      },
+      {
+        "reference_indices": [
+          13
+        ],
+        "candidate_indices": [
+          13
+        ],
+        "minimum_subspace_MAC": 0.9999998545372073,
+        "maximum_relative_frequency_difference": 0.00014972623067488477,
+        "individual_MAC": [
+          0.9999998545372115
+        ],
+        "reference_frequencies_hz": [
+          109.25896093314991
+        ]
+      },
+      {
+        "reference_indices": [
+          14
+        ],
+        "candidate_indices": [
+          14
+        ],
+        "minimum_subspace_MAC": 0.9999996100138151,
+        "maximum_relative_frequency_difference": 0.0002673958162056067,
+        "individual_MAC": [
+          0.9999996100138169
+        ],
+        "reference_frequencies_hz": [
+          144.70043280643003
+        ]
+      },
+      {
+        "reference_indices": [
+          15
+        ],
+        "candidate_indices": [
+          15
+        ],
+        "minimum_subspace_MAC": 0.9999997567370172,
+        "maximum_relative_frequency_difference": 0.00024687758091324064,
+        "individual_MAC": [
+          0.9999997567370188
+        ],
+        "reference_frequencies_hz": [
+          145.90307727606498
+        ]
+      },
+      {
+        "reference_indices": [
+          16
+        ],
+        "candidate_indices": [
+          16
+        ],
+        "minimum_subspace_MAC": 0.9999991916924721,
+        "maximum_relative_frequency_difference": 0.00043911834192966737,
+        "individual_MAC": [
+          0.9999991916924701
+        ],
+        "reference_frequencies_hz": [
+          189.05957955711204
+        ]
+      },
+      {
+        "reference_indices": [
+          17
+        ],
+        "candidate_indices": [
+          17
+        ],
+        "minimum_subspace_MAC": 0.9999991378195903,
+        "maximum_relative_frequency_difference": 0.00045204456054981357,
+        "individual_MAC": [
+          0.9999991378195909
+        ],
+        "reference_frequencies_hz": [
+          192.80091243653408
+        ]
+      },
+      {
+        "reference_indices": [
+          18
+        ],
+        "candidate_indices": [
+          18
+        ],
+        "minimum_subspace_MAC": 0.9999975889401442,
+        "maximum_relative_frequency_difference": 0.0007388571220450224,
+        "individual_MAC": [
+          0.9999975889401425
+        ],
+        "reference_frequencies_hz": [
+          241.90494342586916
+        ]
+      }
+    ],
+    "matched_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "cluster_relative_gap": 0.002,
+    "frequency_tolerance": 0.01,
+    "minimum_subspace_MAC": 0.99,
+    "passed": true,
+    "scope": "Physical-area-weighted XYZ shapes; sampled MAC is not measured accuracy."
+  },
+  "production_response_comparison": {
+    "schema": 1,
+    "source": {
+      "kind": "external_solver",
+      "source": "NGSolve 6.2.2608, hybrid HHJ/Regge graph shell",
+      "units": "(m/s)/N",
+      "harmonic_convention": "exp(+i*2*pi*f*t)",
+      "request_sha256": "7af090262bbc17d3d0f22689edaa0c47b2b9e1774b52b3fcb47c0ba1c83b23f1",
+      "data_sha256": "9347c0ee378809ba37b6400d32f225679b279f9979b6955abd2a4dab8be9a57e",
+      "solver_source_sha256": {
+        "studies/plates/003_external_shell/model.py": "57c9163b4d9facf48d3ee0dcab876975aedf59ac205d83b6c43a99c8c13ded32",
+        "tools/validate_external_dry_basin.py": "9b59e67708b26b2b2b4ee3a41bb28834cd06958b598018a0ba59cf2cf36477c9"
+      },
+      "external_refinement_checks_passed": false,
+      "notes": "Independently assembled shell; polygon rim and Regge membrane approximation. Agreement is provisional unless plate, mesh, modal, rim, quadrature and grid gates pass."
+    },
+    "request_sha256": "7af090262bbc17d3d0f22689edaa0c47b2b9e1774b52b3fcb47c0ba1c83b23f1",
+    "parameters": {
+      "surface": {
+        "radius_x": 0.72,
+        "radius_y": 0.58,
+        "rise": 0.12,
+        "asymmetry": 0.006,
+        "center_z": 0.72,
+        "domain": "ellipse"
+      },
+      "material": {
+        "youngs_modulus": 193000000000.0,
+        "density": 8030.0,
+        "poisson_ratio": 0.3
+      },
+      "thickness": 0.005,
+      "supports": [
+        {
+          "patch": {
+            "x": -0.48,
+            "y": -0.32,
+            "width": 0.035
+          },
+          "stiffness": [
+            10000.0,
+            10000.0,
+            300000.0
+          ]
+        },
+        {
+          "patch": {
+            "x": -0.48,
+            "y": 0.32,
+            "width": 0.035
+          },
+          "stiffness": [
+            10000.0,
+            10000.0,
+            300000.0
+          ]
+        },
+        {
+          "patch": {
+            "x": 0.48,
+            "y": -0.32,
+            "width": 0.035
+          },
+          "stiffness": [
+            10000.0,
+            10000.0,
+            300000.0
+          ]
+        },
+        {
+          "patch": {
+            "x": 0.48,
+            "y": 0.32,
+            "width": 0.035
+          },
+          "stiffness": [
+            10000.0,
+            10000.0,
+            300000.0
+          ]
+        }
+      ],
+      "exciters": [
+        {
+          "patch": {
+            "x": -0.34,
+            "y": 0.14,
+            "width": 0.05
+          },
+          "added_mass_kg": 0.12,
+          "direction": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "force_n": 0.0,
+          "frequency_hz": 59.0,
+          "phase": 0.0,
+          "start": 0.0
+        },
+        {
+          "patch": {
+            "x": 0.31,
+            "y": 0.13,
+            "width": 0.05
+          },
+          "added_mass_kg": 0.12,
+          "direction": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "force_n": 0.0,
+          "frequency_hz": 61.3,
+          "phase": 1.7,
+          "start": 0.0
+        },
+        {
+          "patch": {
+            "x": 0.02,
+            "y": -0.32,
+            "width": 0.05
+          },
+          "added_mass_kg": 0.12,
+          "direction": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "force_n": 0.0,
+          "frequency_hz": 57.8,
+          "phase": 3.1,
+          "start": 0.0
+        }
+      ],
+      "impulses": [
+        {
+          "exciter": 0,
+          "time": 0.0,
+          "impulse_ns": 0.03
+        }
+      ],
+      "pickups": [
+        [
+          -0.2,
+          -0.04
+        ],
+        [
+          0.25,
+          -0.1
+        ]
+      ],
+      "elements": [
+        18,
+        18
+      ],
+      "gauss_order": 5,
+      "mode_count": 128,
+      "eigensolver": "numpy",
+      "patch_refinement": 0,
+      "damping_ratio": 0.005,
+      "water_depth_m": 0.0,
+      "duration": 2.0,
+      "sample_rate": 48000,
+      "audio_stop_hz": 200.0,
+      "fps": 30,
+      "visual_gain": 1500.0,
+      "exposure_fraction": 0.5,
+      "exposure_samples": 8,
+      "resolution": [
+        720,
+        540
+      ],
+      "rings": 16,
+      "segments": 64
+    },
+    "units": "(m/s)/N",
+    "tolerance": 0.1,
+    "frequency_sample_count": 8872,
+    "intervals": [
+      {
+        "interval_hz": [
+          20.0,
+          200.0
+        ],
+        "per_path_relative_L2": [
+          [
+            0.043255511534578996,
+            0.043821448641496646,
+            0.04302230584387835
+          ],
+          [
+            0.04332308209645829,
+            0.04346547700579815,
+            0.042698770756748015
+          ]
+        ],
+        "maximum_relative_L2": 0.043821448641496646,
+        "passed": true
+      },
+      {
+        "interval_hz": [
+          20.0,
+          40.0
+        ],
+        "per_path_relative_L2": [
+          [
+            0.04349593779054716,
+            0.04388785047231174,
+            0.0436528750384895
+          ],
+          [
+            0.043471373318222484,
+            0.04372869388844177,
+            0.04363296902572155
+          ]
+        ],
+        "maximum_relative_L2": 0.04388785047231174,
+        "passed": true
+      },
+      {
+        "interval_hz": [
+          40.0,
+          80.0
+        ],
+        "per_path_relative_L2": [
+          [
+            0.01946799184137447,
+            0.026594301102152912,
+            0.009487427819010198
+          ],
+          [
+            0.03548774196875933,
+            0.032277652169495935,
+            0.014387736516900118
+          ]
+        ],
+        "maximum_relative_L2": 0.03548774196875933,
+        "passed": true
+      },
+      {
+        "interval_hz": [
+          80.0,
+          160.0
+        ],
+        "per_path_relative_L2": [
+          [
+            0.008806937079528432,
+            0.005885945979467587,
+            0.014480892211637569
+          ],
+          [
+            0.019010957841825136,
+            0.005988344511394186,
+            0.005621856382250077
+          ]
+        ],
+        "maximum_relative_L2": 0.019010957841825136,
+        "passed": true
+      },
+      {
+        "interval_hz": [
+          160.0,
+          200.0
+        ],
+        "per_path_relative_L2": [
+          [
+            0.016531971069409415,
+            0.006098622541113431,
+            0.02632900333269205
+          ],
+          [
+            0.041792101664426866,
+            0.007480655845998306,
+            0.009545125902307832
+          ]
+        ],
+        "maximum_relative_L2": 0.041792101664426866,
+        "passed": true
+      }
+    ],
+    "sampled_agreement_passed": true,
+    "scope": "Sampled agreement only; provenance labels do not establish physical validity.",
+    "limitations": [
+      "No normalization, fitted phase, automatic fitting or independent solver execution.",
+      "Unknown narrow resonances may need a denser common grid and repeated measurements.",
+      "WAV/amplifier voltage is not calibrated velocity per applied newton."
+    ]
+  },
+  "external_meshes": [
+    {
+      "settings": {
+        "maxh": 0.12,
+        "rim_segments": 64,
+        "order": 3,
+        "bonus_intorder": 6,
+        "mode_count": 512,
+        "eigen_tolerance": 1e-09
+      },
+      "ngsolve_version": "6.2.2608",
+      "scipy_version": "1.18.1",
+      "numpy_version": "2.2.6",
+      "surface_triangles": 504,
+      "mixed_dofs": 18531,
+      "displacement_dofs": 7095,
+      "massless_rotation_dofs": 2364,
+      "shell_area_m2": 1.354953774406193,
+      "shell_mass_kg": 54.40139404240865,
+      "contact_areas_m2": {
+        "support_1": 0.0012891677098317551,
+        "support_2": 0.0012891677098317456,
+        "support_3": 0.0012823434573386934,
+        "support_4": 0.0012823434573386839,
+        "exciter_1": 0.0025429857817410905,
+        "exciter_2": 0.0025371243683519817,
+        "exciter_3": 0.0025645986672656208
+      },
+      "matrix_symmetry_relative": 2.9709473832815115e-16,
+      "maximum_eigen_residual": 1.8644476072865656e-08,
+      "maximum_mass_orthogonality_error": 7.105427357601002e-15,
+      "elapsed_seconds": 33.46866631601006,
+      "membrane": "Regge interpolation, order displacement-1",
+      "rim": "free inscribed polygon"
+    },
+    {
+      "settings": {
+        "maxh": 0.085,
+        "rim_segments": 128,
+        "order": 3,
+        "bonus_intorder": 6,
+        "mode_count": 512,
+        "eigen_tolerance": 1e-09
+      },
+      "ngsolve_version": "6.2.2608",
+      "scipy_version": "1.18.1",
+      "numpy_version": "2.2.6",
+      "surface_triangles": 906,
+      "mixed_dofs": 33387,
+      "displacement_dofs": 12810,
+      "massless_rotation_dofs": 4269,
+      "shell_area_m2": 1.3566411386819814,
+      "shell_mass_kg": 54.46914171808156,
+      "contact_areas_m2": {
+        "support_1": 0.0012891677098317614,
+        "support_2": 0.0012891677098317463,
+        "support_3": 0.0012823434573387056,
+        "support_4": 0.0012823434573386873,
+        "exciter_1": 0.002542985781741074,
+        "exciter_2": 0.002537124368351972,
+        "exciter_3": 0.0025645986672656086
+      },
+      "matrix_symmetry_relative": 3.315640013114482e-16,
+      "maximum_eigen_residual": 4.335391941189324e-08,
+      "maximum_mass_orthogonality_error": 6.217248937900877e-15,
+      "elapsed_seconds": 60.95919436705299,
+      "membrane": "Regge interpolation, order displacement-1",
+      "rim": "free inscribed polygon"
+    },
+    {
+      "settings": {
+        "maxh": 0.06,
+        "rim_segments": 256,
+        "order": 3,
+        "bonus_intorder": 6,
+        "mode_count": 512,
+        "eigen_tolerance": 1e-09
+      },
+      "ngsolve_version": "6.2.2608",
+      "scipy_version": "1.18.1",
+      "numpy_version": "2.2.6",
+      "surface_triangles": 1834,
+      "mixed_dofs": 67563,
+      "displacement_dofs": 25914,
+      "massless_rotation_dofs": 8637,
+      "shell_area_m2": 1.35706319399944,
+      "shell_mass_kg": 54.48608723907751,
+      "contact_areas_m2": {
+        "support_1": 0.0012891677098317625,
+        "support_2": 0.0012891677098317473,
+        "support_3": 0.0012823434573387125,
+        "support_4": 0.001282343457338712,
+        "exciter_1": 0.002542985781741049,
+        "exciter_2": 0.002537124368351999,
+        "exciter_3": 0.0025645986672656346
+      },
+      "matrix_symmetry_relative": 3.451205502438431e-16,
+      "maximum_eigen_residual": 8.399599319163414e-08,
+      "maximum_mass_orthogonality_error": 1.4765966227514582e-14,
+      "elapsed_seconds": 131.46051754208747,
+      "membrane": "Regge interpolation, order displacement-1",
+      "rim": "free inscribed polygon"
+    }
+  ],
+  "scope": "Numerical cross-validation of a provisional dry shell; no vessel measurement.",
+  "limitations": [
+    "No water, prestress, shear/rotary inertia or mounting compliance.",
+    "Finite refinement/sampling evidence is not an exact error bound.",
+    "A failure is retained; no fitted gain, phase or relaxed thresholds."
+  ]
+}

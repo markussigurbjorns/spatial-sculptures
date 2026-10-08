@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "date": "2026-10-08",
+  "status": "passed",
+  "solver_result_available": true,
+  "scope": "Numerical cross-validation of a provisional dry shell; no vessel measurement.",
+  "runtime": {
+    "available": true,
+    "ngsolve": "6.2.2608",
+    "numpy": "2.2.6",
+    "scipy": "1.18.1"
+  },
+  "report": "docs/research/dry_basin/external/report.json",
+  "report_sha256": "b9a39cd24e93b72045426a3d276072070284b9c8a14d0c5b4908cd40b4a403b9",
+  "provenance": "docs/research/dry_basin/external/provenance.json",
+  "solver_source_sha256": {
+    "studies/plates/003_external_shell/model.py": "ec8544dc3fb2ba3c6ada231d33ebe3a697666f5a8b2e34e190736e34d1a2d763",
+    "tools/validate_external_dry_basin.py": "98afce44726f7d9e31d1490508caa81068124dd32784346669429db7a8fc9357"
+  },
+  "checks": {
+    "ordinary_compilation": "passed",
+    "ruff_lint": "passed",
+    "ruff_format": "passed (99 files)",
+    "unit_tests_with_numerical_dependencies": {
+      "total": 111,
+      "passed": 110,
+      "skipped": 1,
+      "skip_reason": "sandbox UDP socket restriction"
+    },
+    "unit_tests_without_numerical_dependencies": {
+      "total": 111,
+      "passed": 62,
+      "skipped": 49
+    },
+    "production_contact_200hz_evidence": "passed: current source/report hashes and profile selection",
+    "external_ngsolve_plate_test": "passed",
+    "external_basin_assembly_and_refinement": "passed",
+    "production_to_external_agreement": "passed",
+    "curated_artifact_hashes": "passed",
+    "curated_complex_curves_equal_generated_csv": "passed"
+  },
+  "results": {
+    "band_hz": [
+      20,
+      200
+    ],
+    "contact_paths": 6,
+    "maximum_relative_contact_difference": 0.053862927794148266,
+    "maximum_relative_frequency_difference": 0.0008401936264805787,
+    "minimum_subspace_MAC": 0.9999974965742533,
+    "reference_modes_compared": 19
+  },
+  "historical_failed_trial": "docs/research/dry_basin/external/linear_rim_report.json",
+  "reproduce": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python tools/validate_external_dry_basin.py",
+  "limitations": [
+    "No water, prestress, shear/rotary inertia or mounting compliance.",
+    "Finite refinement/sampling evidence is not an exact error bound.",
+    "A failure is retained; no fitted gain, phase or relaxed thresholds.",
+    "Physical calibration deferred; no real-vessel measurements supplied.",
+    "Only the configured dry shell and sampled 20\u2013200 Hz band are compared."
+  ]
+}

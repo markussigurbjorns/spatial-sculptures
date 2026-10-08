@@ -84,8 +84,7 @@ def export_run(
         kernel = lowpass_kernel(config.sample_rate, config.audio_stop_hz)
         guard = len(kernel) // 2
     audio_times = np.arange(sample_count + guard) / config.sample_rate
-    _, velocities = simulation.trace(audio_times)
-    channels = simulation.pickup_velocities(velocities)
+    channels = simulation.pickup_trace(audio_times)
     raw_peaks = np.max(np.abs(channels[:, :sample_count]), axis=1)
     if kernel is not None:
         channels = filter_zero_phase(channels, kernel, output_samples=sample_count)

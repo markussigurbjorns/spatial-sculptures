@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "parameters": {
+    "surface": {
+      "radius_x": 0.72,
+      "radius_y": 0.58,
+      "rise": 0.12,
+      "asymmetry": 0.006,
+      "center_z": 0.72,
+      "domain": "ellipse"
+    },
+    "material": {
+      "youngs_modulus": 193000000000.0,
+      "density": 8030.0,
+      "poisson_ratio": 0.3
+    },
+    "thickness": 0.005,
+    "supports": [
+      {
+        "patch": {
+          "x": -0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": -0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": -0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      },
+      {
+        "patch": {
+          "x": 0.48,
+          "y": 0.32,
+          "width": 0.035
+        },
+        "stiffness": [
+          10000.0,
+          10000.0,
+          300000.0
+        ]
+      }
+    ],
+    "exciters": [
+      {
+        "patch": {
+          "x": -0.34,
+          "y": 0.14,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 59.0,
+        "phase": 0.0,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.31,
+          "y": 0.13,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 61.3,
+        "phase": 1.7,
+        "start": 0.0
+      },
+      {
+        "patch": {
+          "x": 0.02,
+          "y": -0.32,
+          "width": 0.05
+        },
+        "added_mass_kg": 0.12,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "force_n": 0.0,
+        "frequency_hz": 57.8,
+        "phase": 3.1,
+        "start": 0.0
+      }
+    ],
+    "impulses": [
+      {
+        "exciter": 0,
+        "time": 0.0,
+        "impulse_ns": 0.03
+      }
+    ],
+    "pickups": [
+      [
+        -0.2,
+        -0.04
+      ],
+      [
+        0.25,
+        -0.1
+      ]
+    ],
+    "elements": [
+      18,
+      18
+    ],
+    "gauss_order": 5,
+    "mode_count": 128,
+    "eigensolver": "numpy",
+    "patch_refinement": 0,
+    "damping_ratio": 0.005,
+    "water_depth_m": 0.0,
+    "duration": 2.0,
+    "sample_rate": 48000,
+    "audio_stop_hz": 200.0,
+    "fps": 30,
+    "visual_gain": 1500.0,
+    "exposure_fraction": 0.5,
+    "exposure_samples": 8,
+    "resolution": [
+      720,
+      540
+    ],
+    "rings": 16,
+    "segments": 64
+  },
+  "units": "(m/s)/N",
+  "harmonic_convention": "exp(+i*2*pi*f*t)",
+  "frequency_interval_hz": [
+    20.0,
+    200.0
+  ],
+  "frequency_sample_count": 8872,
+  "csv_columns": [
+    "pickup",
+    "exciter",
+    "frequency_hz",
+    "real_m_per_s_per_n",
+    "imag_m_per_s_per_n"
+  ],
+  "model_mobility_sha256": "677255fd98fa5552849cd62c60d365b5acd64b1a58a99cf10d9f79eaeab1a5e8",
+  "model_cache_key": "98917fc350267a99f4648101b1b38da11e07f32a91ae29deb2e5e98e654d64c0",
+  "model_provenance": {
+    "splines.py": "acbb125e2a37cf03758e3a8c837c18b831076abfe0ff11e595b8f10cbf9ae7bf",
+    "structures.py": "11ef0ae2415a9bc4cfc3dc81770434b329bcb02ceecd631bdc7072f899d5fce6",
+    "mode_cache.py": "f5f32d5dd08814408832873eca5ad00ab6bd4ab9961cbcdab70b5dfb980b5f86"
+  },
+  "profile_verification": {
+    "elements_per_axis": 18,
+    "mode_count": 128,
+    "verified_sampled_transfer_band_hz": 200.0,
+    "audio_passband_hz": 160.0,
+    "audio_stopband_hz": 200.0,
+    "filtered_impulse_maximum_relative_L2": 0.016993964670913343,
+    "selection": "smallest tested DOF count, then smallest passing retained bank",
+    "report_path": "docs/research/dry_basin/contact_bandwidth.json",
+    "report_sha256": "cf5439e1bd9102d2166fb8d9cd77390ba7d087e14c1843e955fc2541030cc55f"
+  },
+  "assumptions": [
+    "Dry linear Kirchhoff-Love graph shell; free rim; translational consistent mass.",
+    "Each support is a spring on patch-mean displacement: K_patch=k*mean(N)*mean(N)^T.",
+    "Attached housings add rigid patch-mean translational inertia in X/Y/Z.",
+    "Force is one total newton along the exciter direction, area-weighted over its patch.",
+    "Pickups measure point global-Z velocity; damping is a constant modal ratio.",
+    "No water, prestress, rotary inertia, glue compliance or electrical actuator model."
+  ],
+  "source_sha256": {
+    "tools/check_dry_response.py": "3bf482755aae3cadf30ca0628baa2704865b765e5bc31701cb3da28a2320c5d9",
+    "tools/validate_dry_basin.py": "c8ae51aade81db6fd6c22f76f9b43de7f914200a527415a2dec13f073ba29e14",
+    "src/spatial_sculptures/simulation/convergence.py": "2f5bae17caecc0ae5f657e6bc199e4e1125f8ad97b917b0a89682f251d861c2d"
+  }
+}

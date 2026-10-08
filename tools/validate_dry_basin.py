@@ -56,7 +56,10 @@ def transfer(modes, config, sample_hz, count):
 def bands_for(comparison, cutoff, policy=POLICY, *, reference=False):
     groups = [g for g in comparison["groups"] if min(g["reference_frequencies_hz"]) <= cutoff]
     if not groups:
-        return False
+        # A supported structure may have its first resonance above the cutoff.
+        # Its off-resonance transfer still has to pass all response gates below.
+        # An entirely absent mode comparison remains insufficient evidence.
+        return bool(comparison["groups"])
     frequency = policy["reference_frequency_relative" if reference else "frequency_relative"]
     mac = policy["reference_minimum_subspace_MAC" if reference else "minimum_subspace_MAC"]
     return all(
@@ -104,17 +107,17 @@ def run_validation(
     signal_rate=4096,
     resonance_samples=8,
     quadrature_check=True,
+    interval_edges=(),
 ):
     """Independent physical-unit evidence. Failed accuracy criteria remain recorded failures."""
     import numpy as np
 
     from spatial_sculptures.simulation.convergence import (
         compare_modes,
+        contact_impulses,
         resonance_grid,
         trapezoid_weights,
     )
-    from spatial_sculptures.simulation.modal import Mode
-    from spatial_sculptures.simulation.mode_bank import ModalResponse
 
     model = importlib.import_module("prototypes.001_resonant_surface.dry.model")
     reference = importlib.import_module("studies.plates.002_curved_shell_reference.ritz")
@@ -143,6 +146,13 @@ def run_validation(
         raise ValueError(
             "Increasing positive bands and sufficiently fine frequency sampling required"
         )
+    if interval_edges and (
+        tuple(sorted(set(interval_edges))) != tuple(interval_edges)
+        or len(interval_edges) < 2
+        or interval_edges[0] != 20.0
+        or interval_edges[-1] != max(bands)
+    ):
+        raise ValueError("Interval edges must increase from 20 Hz to the maximum tested band")
     parameters = asdict(config)
     maximum_modes = max(counts)
     references, reference_rows = [], []
@@ -164,24 +174,37 @@ def run_validation(
             }
         )
     finest = references[-1]
+    # Shape correspondence covers the tested band plus the next complete cluster.
+    # Higher modes still contribute to transfer/truncation and impulse checks;
+    # matching all their shapes adds cost without establishing a wider contact band.
+    comparison_count = min(
+        maximum_modes,
+        max(16, int(np.searchsorted(finest.frequencies, max(bands), side="right")) + 1),
+    )
+    while (
+        comparison_count < maximum_modes
+        and finest.frequencies[comparison_count] / finest.frequencies[comparison_count - 1] - 1
+        <= POLICY["cluster_relative_gap"]
+    ):
+        comparison_count += 1
     # Comparison grid is independent polar quadrature, with vector and physical area weights.
     x, y, w = reference.disk_quadrature(
         parameters["surface"], max(20, degrees[-1] + 3), max(80, 4 * degrees[-1] + 12)
     )
     _, zx, zy, *_ = reference.geometry(parameters["surface"], x, y)
     w *= np.sqrt(1 + zx * zx + zy * zy)
-    reference_shapes = finest.weights(x, y)
+    reference_shapes = finest.weights(x, y)[..., :comparison_count]
     for modes, row in zip(references[:-1], reference_rows[:-1], strict=True):
         row["comparison_to_finest"] = add_frequencies(
             compare_modes(
-                finest.frequencies,
+                finest.frequencies[:comparison_count],
                 reference_shapes,
                 modes.frequencies,
                 modes.weights(x, y),
                 w,
                 cluster_gap=POLICY["cluster_relative_gap"],
             ),
-            finest.frequencies,
+            finest.frequencies[:comparison_count],
         )
     reference_comparison = reference_rows[-2]["comparison_to_finest"]
     rows, candidates = [], []
@@ -196,14 +219,14 @@ def run_validation(
         candidates.append(modes)
         comparisons = add_frequencies(
             compare_modes(
-                finest.frequencies,
+                finest.frequencies[:comparison_count],
                 reference_shapes,
                 modes.frequencies,
                 modes.weights(x, y),
                 w,
                 cluster_gap=POLICY["cluster_relative_gap"],
             ),
-            finest.frequencies,
+            finest.frequencies[:comparison_count],
         )
         rows.append(
             {
@@ -228,6 +251,7 @@ def run_validation(
                 samples_per_half_width=resonance_samples,
             ),
             bands,
+            interval_edges,
         ]
     )
     reference_transfer = transfer(finest, config, sample_hz, maximum_modes)
@@ -271,12 +295,13 @@ def run_validation(
                 samples_per_half_width=2 * resonance_samples,
             ),
             bands,
+            interval_edges,
         ]
     )
     dense_reference = transfer(finest, config, dense_hz, maximum_modes)
 
-    def interpolation_error(coarse, dense, band):
-        selected = dense_hz <= band + 1e-10
+    def interpolation_error(coarse, dense, band, lower=0.0):
+        selected = (dense_hz >= lower) & (dense_hz <= band + 1e-10)
         interpolated = np.asarray(
             [
                 [np.interp(dense_hz[selected], sample_hz, path) for path in pickup]
@@ -334,13 +359,13 @@ def run_validation(
                 independent = error_record(
                     reference_transfer[:, :, selected], response[:, :, selected], weights
                 )
-                # Also test the audible interval alone: supported body motion
-                # below 20 Hz must not hide disagreement in the listening band.
-                audible = (sample_hz >= 20) & selected
-                audible_checks = None
-                if np.count_nonzero(audible) >= 2:
-                    aw = trapezoid_weights(sample_hz[audible])
-                    audible_checks = {}
+
+                def interval_records(
+                    low, high, *, index=index, next_index=next_index, response=response
+                ):
+                    selected_interval = (sample_hz >= low) & (sample_hz <= high)
+                    interval_weights = trapezoid_weights(sample_hz[selected_interval])
+                    records = {}
                     for key, a, b, tolerance in (
                         (
                             "reference_refinement",
@@ -379,10 +404,55 @@ def run_validation(
                             "independent_transfer_relative_L2",
                         ),
                     ):
-                        audible_checks[key] = {
-                            **error_record(a[..., audible], b[..., audible], aw),
+                        records[key] = {
+                            **error_record(
+                                a[..., selected_interval],
+                                b[..., selected_interval],
+                                interval_weights,
+                            ),
                             "tolerance": POLICY[tolerance],
                         }
+                    return records
+
+                # Also test the audible interval alone: supported body motion
+                # below 20 Hz must not hide disagreement in the listening band.
+                audible_checks = interval_records(20.0, band) if band > 20.0 else None
+                # Strong lower resonances can still dominate a 20+ Hz integral.
+                # Extended studies additionally gate smaller frequency intervals.
+                interval_checks = []
+                for low, high in zip(interval_edges[:-1], interval_edges[1:], strict=True):
+                    high = min(high, band)
+                    if high <= low:
+                        continue
+                    records = interval_records(low, high)
+                    for key, coarse, dense in (
+                        ("reference_grid", reference_transfer, dense_reference),
+                        ("candidate_grid", response, dense_response),
+                    ):
+                        records[key] = {
+                            **interpolation_error(coarse, dense, high, low),
+                            "tolerance": POLICY["frequency_grid_relative_L2"],
+                        }
+                    if quadrature is not None:
+                        interval_mask = (sample_hz >= low) & (sample_hz <= high)
+                        iw = trapezoid_weights(sample_hz[interval_mask])
+                        for key, original, refined in (
+                            ("production_quadrature", fine_transfer, quadrature[0]),
+                            ("reference_quadrature", reference_transfer, quadrature[1]),
+                        ):
+                            records[key] = {
+                                **error_record(
+                                    original[..., interval_mask], refined[..., interval_mask], iw
+                                ),
+                                "tolerance": POLICY["quadrature_transfer_relative_L2"],
+                            }
+                    interval_checks.append(
+                        {
+                            "interval_hz": [low, high],
+                            "checks": records,
+                            "passed": all(within(v, v["tolerance"]) for v in records.values()),
+                        }
+                    )
                 # A retained cutoff must include all reference modes in the proposed band.
                 # Near-degenerate groups crossing the cutoff are not silently certified.
                 coverage = (
@@ -421,6 +491,7 @@ def run_validation(
                         audible_checks is None
                         or all(within(v, v["tolerance"]) for v in audible_checks.values())
                     )
+                    and all(interval["passed"] for interval in interval_checks)
                 )
                 checks.append(
                     {
@@ -440,6 +511,7 @@ def run_validation(
                         "independent_response": independent,
                         "audible_interval_hz": [20.0, band] if audible_checks is not None else None,
                         "audible_interval_checks": audible_checks,
+                        "interval_checks": interval_checks,
                     }
                 )
             row["retained_counts"].append(
@@ -476,30 +548,36 @@ def run_validation(
     kernel = lowpass_kernel(signal_rate, max(bands))
     extended_times = np.arange(len(times) + len(kernel) // 2) / signal_rate
 
-    def impulse_signals(modes, count, sample_times=extended_times):
-        pickups = modes.weights(*np.asarray(config.pickups).T)[:, 2, :count]
+    def impulse_signals(modes, retained_counts):
+        pickups = modes.weights(*np.asarray(config.pickups).T)[:, 2, :maximum_modes]
         is_spline = hasattr(modes, "masses")
-        masses = modes.masses[:count] if is_spline else np.ones(count)
-        bank = tuple(
-            Mode(str(i), float(f), float(mass), config.damping_ratio)
-            for i, (f, mass) in enumerate(zip(modes.frequencies[:count], masses, strict=True))
+        masses = modes.masses[:maximum_modes] if is_spline else np.ones(maximum_modes)
+        forces = np.asarray(
+            [
+                modes.patch_weights(
+                    exciter.patch if is_spline else asdict(exciter.patch), exciter.direction
+                )[:maximum_modes]
+                for exciter in config.exciters
+            ]
         )
-        signals = []
-        for exciter in config.exciters:
-            force = modes.patch_weights(
-                exciter.patch if is_spline else asdict(exciter.patch), exciter.direction
-            )[:count]
-            response = ModalResponse(bank, [[(0, float(v))] for v in force], [[] for _ in bank])
-            signals.append(pickups @ response.trace(sample_times, use_numpy=True)[1])
-        return np.asarray(signals).transpose(1, 0, 2)
+        return contact_impulses(
+            modes.frequencies[:maximum_modes],
+            masses,
+            pickups,
+            forces,
+            config.damping_ratio,
+            extended_times,
+            retained_counts,
+        )
 
-    reference_signal = impulse_signals(finest, maximum_modes)
+    reference_signal = impulse_signals(finest, (maximum_modes,))[maximum_modes]
     filtered_reference = filter_zero_phase(reference_signal, kernel, output_samples=len(times))
     for modes, row in zip(candidates, rows, strict=True):
-        full_signal = impulse_signals(modes, maximum_modes)
+        signals = impulse_signals(modes, counts)
+        full_signal = signals[maximum_modes]
         filtered_full = filter_zero_phase(full_signal, kernel, output_samples=len(times))
         for case in row["retained_counts"]:
-            signal = impulse_signals(modes, case["count"])
+            signal = signals[case["count"]]
             case["unfiltered_impulse"] = {
                 "vs_independent_reference": error_record(
                     reference_signal[..., : len(times)], signal[..., : len(times)]
@@ -567,6 +645,12 @@ def run_validation(
             },
             "maximum_hz": max(bands),
             "audible_interval_lower_hz": 20.0,
+            "interval_edges_hz": list(interval_edges),
+            "mode_correspondence_reference_count": comparison_count,
+            "mode_correspondence_scope": (
+                "All reference modes in the tested band and the next complete cluster; "
+                "higher modes remain in response/truncation calculations"
+            ),
             "impulse_duration_s": signal_duration,
             "impulse_sample_rate": signal_rate,
             "unit_impulse_ns": 1.0,
@@ -651,6 +735,15 @@ def write_summary(report, path: Path):
         *report["limitations"],
         "",
     ]
+    if report["sampling"].get("interval_edges_hz"):
+        edges = report["sampling"]["interval_edges_hz"]
+        lines += [
+            "",
+            f"Additional interval gates use edges {edges} Hz. Each interval repeats the "
+            "reference, mesh, truncation and independent-response criteria separately.",
+            "Strong lower-frequency resonances cannot compensate for a failed upper interval.",
+            "",
+        ]
     path.write_text("\n".join(lines))
 
 
@@ -732,14 +825,20 @@ def main():
         help="Check provenance and gate a saved report without solving again",
     )
     parser.add_argument("--output", type=Path)
-    parser.add_argument(
+    preset = parser.add_mutually_exclusive_group()
+    preset.add_argument(
         "--refine-contacts",
         action="store_true",
         help="Study meshes 14/18/22/26 and reference degrees 24/28/32/36 through 100 Hz",
     )
+    preset.add_argument(
+        "--extend-contacts",
+        action="store_true",
+        help="Test through 200 Hz with larger banks and separate 20/40/80/160/200 Hz intervals",
+    )
     parser.add_argument("--meshes", type=int, nargs="+")
     parser.add_argument("--degrees", type=int, nargs="+")
-    parser.add_argument("--counts", type=int, nargs="+", default=[16, 32, 48, 64])
+    parser.add_argument("--counts", type=int, nargs="+")
     parser.add_argument("--bands", type=float, nargs="+")
     parser.add_argument(
         "--select-band",
@@ -753,19 +852,42 @@ def main():
     )
     parser.add_argument("--step-hz", type=float, default=0.05)
     parser.add_argument("--resonance-samples", type=int, default=8)
+    parser.add_argument("--signal-rate", type=int, help="Unit-impulse sampling rate in Hz")
+    parser.add_argument(
+        "--interval-edges",
+        type=float,
+        nargs="+",
+        help="Separate transfer gates, increasing from 20 Hz to the maximum band",
+    )
     parser.add_argument(
         "--require-band",
         type=float,
         help="Return status 1 unless the configured default mesh/count supports this sampled band",
     )
     args = parser.parse_args()
-    args.meshes = args.meshes or ([14, 18, 22, 26] if args.refine_contacts else [8, 10, 12, 14])
-    args.degrees = args.degrees or ([24, 28, 32, 36] if args.refine_contacts else [12, 16, 18, 20])
+    refined = args.refine_contacts or args.extend_contacts
+    args.meshes = args.meshes or (
+        [18, 22, 26] if args.extend_contacts else [14, 18, 22, 26] if refined else [8, 10, 12, 14]
+    )
+    args.degrees = args.degrees or ([24, 28, 32, 36] if refined else [12, 16, 18, 20])
+    args.counts = args.counts or (
+        [32, 64, 128, 384, 512] if args.extend_contacts else [16, 32, 48, 64]
+    )
+    args.signal_rate = args.signal_rate or (48000 if args.extend_contacts else 4096)
     args.bands = args.bands or (
         [b for b in DEFAULT_BANDS if b <= 100] if args.refine_contacts else list(DEFAULT_BANDS)
     )
+    args.interval_edges = args.interval_edges or (
+        [v for v in (20.0, 40.0, 80.0, 160.0) if v < max(args.bands)] + [max(args.bands)]
+        if args.extend_contacts
+        else []
+    )
     args.output = args.output or ROOT / "data/fem/001_resonant_surface" / (
-        "contact_refinement.json" if args.refine_contacts else "convergence.json"
+        "contact_bandwidth.json"
+        if args.extend_contacts
+        else "contact_refinement.json"
+        if args.refine_contacts
+        else "convergence.json"
     )
     if args.profile_output and args.select_band is None:
         parser.error("--profile-output requires --select-band")
@@ -791,6 +913,8 @@ def main():
                 bands=tuple(args.bands),
                 sample_step_hz=args.step_hz,
                 resonance_samples=args.resonance_samples,
+                signal_rate=args.signal_rate,
+                interval_edges=tuple(args.interval_edges),
             )
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2, allow_nan=False))

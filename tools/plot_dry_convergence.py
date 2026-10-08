@@ -34,11 +34,17 @@ def main():
         plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 4), layout="constrained")
+    display_modes = max(
+        16,
+        sum(
+            f <= report["sampling"]["maximum_hz"] for f in report["reference"][-1]["frequencies_hz"]
+        ),
+    )
     for row in report["meshes"]:
         indices, errors, shape_errors = [], [], []
         for group in row["independent_mode_comparison"]["groups"]:
             for index in group["reference_indices"]:
-                if index >= 16:
+                if index >= display_modes:
                     continue
                 indices.append(index + 1)
                 errors.append(100 * group["maximum_relative_frequency_difference"])
@@ -150,6 +156,39 @@ def main():
             ax.legend()
             ax.grid(alpha=0.2)
         save(fig, "filtered_impulse_convergence")
+    if report["sampling"].get("interval_edges_hz"):
+        # Show why a cumulative check can accept an undersized bank: smaller
+        # intervals expose the omitted-mode contribution away from strong peaks.
+        row = report["meshes"][0]
+        fig, axes = plt.subplots(1, 2, figsize=(10, 4), layout="constrained")
+        cases = row["retained_counts"]
+        intervals = cases[0]["bands"][-1]["interval_checks"]
+        for index, interval in enumerate(intervals):
+            low, high = interval["interval_hz"]
+            for ax, key in zip(axes, ("independent_response", "modal_truncation"), strict=True):
+                errors = [
+                    c["bands"][-1]["interval_checks"][index]["checks"][key]["maximum_relative_L2"]
+                    for c in cases
+                ]
+                ax.loglog(
+                    [c["count"] for c in cases],
+                    np.maximum(100 * np.array(errors), 1e-5),
+                    "o-",
+                    ms=3,
+                    label=f"{low:g}–{high:g} Hz",
+                )
+        axes[0].axhline(10, color="grey", linestyle="--")
+        axes[1].axhline(5, color="grey", linestyle="--")
+        axes[0].set_title("Separate intervals versus independent reference")
+        axes[1].set_title("Separate intervals versus full bank")
+        for ax in axes:
+            ax.set(
+                xlabel=f"Retained modes, {row['elements_per_axis']} cells per axis",
+                ylabel="Worst path complex relative L2 (%)",
+            )
+            ax.legend(fontsize=8)
+            ax.grid(alpha=0.2)
+        save(fig, "interval_convergence")
     (args.output / "convergence_provenance.json").write_text(
         json.dumps(
             {

@@ -11,6 +11,7 @@ try:
     from spatial_sculptures.simulation.convergence import (
         assignment,
         compare_modes,
+        contact_impulses,
         contact_transfer,
         relative_response_error,
         resonance_grid,
@@ -68,6 +69,64 @@ class ConvergenceTests(unittest.TestCase):
         np.testing.assert_allclose(relative_response_error(signal, signal * 1j), np.sqrt(2))
         self.assertEqual(float(relative_response_error(np.zeros(4), np.zeros(4))), 0)
         self.assertTrue(np.isinf(relative_response_error(np.zeros(4), np.ones(4))))
+
+    def test_batched_contacts_preserve_every_force_path_and_retained_bank(self):
+        from spatial_sculptures.simulation.modal import Mode
+        from spatial_sculptures.simulation.mode_bank import ModalResponse
+
+        frequencies, masses = [12, 47, 190], [3, 2, 0.4]
+        pickups = np.array([[0.4, -0.3, 0.1], [-0.2, 0.7, 0.5]])
+        forces = np.array([[0.7, 0.2, -0.6], [-0.1, 0.5, 0.3], [0.8, -0.5, 0.1]])
+        times = np.linspace(0, 0.13, 81)
+        actual = contact_impulses(
+            frequencies, masses, pickups, forces, 0.02, times, (1, 2, 3), chunk_samples=7
+        )
+        for count in (1, 2, 3):
+            bank = tuple(Mode(str(i), frequencies[i], masses[i], 0.02) for i in range(count))
+            for exciter, projection in enumerate(forces):
+                response = ModalResponse(
+                    bank, [[(0.0, float(v))] for v in projection[:count]], [[] for _ in bank]
+                )
+                expected = pickups[:, :count] @ response.trace(times, use_numpy=True)[1]
+                np.testing.assert_allclose(actual[count][:, exciter], expected, atol=2e-15)
+        with self.assertRaises(ValueError):
+            contact_impulses(frequencies, masses, pickups, forces, 0.02, times, (4,))
+        with self.assertRaises(ValueError):
+            contact_impulses(
+                frequencies, masses, pickups, forces, 0.02, times, (1,), chunk_samples=0
+            )
+
+    def test_batched_velocity_observations_preserve_drives_and_impulse_times(self):
+        from spatial_sculptures.simulation.modal import Mode
+        from spatial_sculptures.simulation.mode_bank import ModalResponse
+
+        response = ModalResponse(
+            (Mode("a", 13, 2, 0.005), Mode("b", 105, 0.7, 0.02)),
+            [[(0.003, 0.02), (0.06, -0.01)], [(0.021, -0.02)]],
+            [[(0.02, 35, 0.2, 0.4)], [(0.04, 79, -0.4, 0.8)]],
+        )
+        weights = np.array([[0.4, -0.6], [0.7, 0.2]])
+        times = np.linspace(0, 0.14, 157)
+        expected = weights @ response.trace(times, use_numpy=True)[1]
+        np.testing.assert_allclose(
+            response.velocity_trace(times, weights, chunk_samples=9), expected, atol=2e-15
+        )
+        with self.assertRaises(ValueError):
+            response.velocity_trace(times, [[1]], chunk_samples=9)
+        with self.assertRaises(ValueError):
+            response.velocity_trace(times, weights, chunk_samples=False)
+
+    def test_interval_errors_expose_response_hidden_by_strong_lower_resonance(self):
+        frequencies = np.array([20, 25, 30, 35, 40])
+        reference = np.array([1e6, 1e6, 1, 1, 1], dtype=complex)
+        candidate = reference.copy()
+        candidate[3:] *= 2
+        cumulative = relative_response_error(reference, candidate, trapezoid_weights(frequencies))
+        upper = relative_response_error(
+            reference[3:], candidate[3:], trapezoid_weights(frequencies[3:])
+        )
+        self.assertLess(float(cumulative), 0.01)
+        self.assertGreater(float(upper), 0.10)
 
     def test_disk_basis_orthogonality_and_derivatives(self):
         ritz = importlib.import_module("studies.plates.002_curved_shell_reference.ritz")
@@ -194,6 +253,7 @@ class ConvergenceTests(unittest.TestCase):
             counts=(8, 16),
             bands=(5.0, 10.0, 30.0),
             signal_duration=0.05,
+            interval_edges=(20.0, 25.0, 30.0),
         )
         json.dumps(result, allow_nan=False)
         self.assertEqual(result["parameters"]["water_depth_m"], 0)
@@ -202,6 +262,11 @@ class ConvergenceTests(unittest.TestCase):
             for case in row["retained_counts"]:
                 band = case["bands"][-1]
                 self.assertEqual(band["audible_interval_hz"], [20, 30])
+                self.assertEqual(
+                    [v["interval_hz"] for v in band["interval_checks"]], [[20, 25], [25, 30]]
+                )
+                if not all(v["passed"] for v in band["interval_checks"]):
+                    self.assertFalse(band["individual_band_checks_passed"])
                 if any(
                     v["maximum_relative_L2"] is None or v["maximum_relative_L2"] > v["tolerance"]
                     for v in band["audible_interval_checks"].values()
@@ -209,6 +274,15 @@ class ConvergenceTests(unittest.TestCase):
                     self.assertFalse(band["individual_band_checks_passed"])
         with self.assertRaises(ValueError):
             run_validation(config, meshes=(4, 4), degrees=(6, 8), counts=(8, 16), bands=(5.0, 10.0))
+        with self.assertRaisesRegex(ValueError, "Interval edges"):
+            run_validation(
+                config,
+                meshes=(4, 6),
+                degrees=(6, 8),
+                counts=(8, 16),
+                bands=(5.0, 30.0),
+                interval_edges=(20.0, 25.0),
+            )
 
     def test_accuracy_gate_rejects_failed_or_unexamined_band(self):
         from tools.validate_dry_basin import required_band_passes
@@ -219,6 +293,22 @@ class ConvergenceTests(unittest.TestCase):
         self.assertTrue(required_band_passes(report, 10))
         report["default_supported_sampled_band_hz"] = None
         self.assertFalse(required_band_passes(report, 10))
+
+    def test_band_below_first_resonance_still_allows_response_checks(self):
+        from tools.validate_dry_basin import bands_for
+
+        comparison = {
+            "groups": [
+                {
+                    "reference_frequencies_hz": [6.0],
+                    "maximum_relative_frequency_difference": 0.2,
+                    "minimum_subspace_MAC": 0.8,
+                }
+            ]
+        }
+        self.assertTrue(bands_for(comparison, 5))
+        self.assertFalse(bands_for(comparison, 10))
+        self.assertFalse(bands_for({"groups": []}, 5))
 
     def test_empty_responses_and_dependent_shapes_are_rejected(self):
         with self.assertRaises(ValueError):

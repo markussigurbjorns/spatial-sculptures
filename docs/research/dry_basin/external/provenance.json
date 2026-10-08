@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "report_sha256": "b9a39cd24e93b72045426a3d276072070284b9c8a14d0c5b4908cd40b4a403b9",
+  "request_sha256": "7af090262bbc17d3d0f22689edaa0c47b2b9e1774b52b3fcb47c0ba1c83b23f1",
+  "curves_sha256": "3fe700d9a675bdcdd2c7a38afc1172c567946d3997ec9065664d01588ecc4559",
+  "modal_artifacts_sha256": {
+    "mesh_1_modes.npz": "e2adb5a7a063ed271af0c8fb7383a873e7a4626db72d1490b644c337fdfedbe7",
+    "mesh_2_modes.npz": "85be67ead6a37f2a3315889dd2b99eafcf8a437a0865728ddf3942186f77bd2d",
+    "mesh_3_modes.npz": "67d732b9999130d993c1be14fdfaf03bd8b0eada18a1e9e58774cff7c8a5c1f7",
+    "quadrature_modes.npz": "7be67d8f064b2171f7bff91836deafa81476d9edb6e6a4cd7482e6c5f2714883",
+    "rim_modes.npz": "fb2d52f7248e99dbf611f080c3942b1c50ac04cd28bf98bbeaecf9b46f81151f"
+  },
+  "original_production_csv_sha256": "677255fd98fa5552849cd62c60d365b5acd64b1a58a99cf10d9f79eaeab1a5e8",
+  "original_external_source": {
+    "kind": "external_solver",
+    "source": "NGSolve 6.2.2608, hybrid HHJ/Regge graph shell",
+    "units": "(m/s)/N",
+    "harmonic_convention": "exp(+i*2*pi*f*t)",
+    "request_sha256": "7af090262bbc17d3d0f22689edaa0c47b2b9e1774b52b3fcb47c0ba1c83b23f1",
+    "data_sha256": "bbf7ca157b2b6da95ed502c796a7f2ea62659b9a4a93ca5c1309f3ef3455db6b",
+    "solver_source_sha256": {
+      "studies/plates/003_external_shell/model.py": "ec8544dc3fb2ba3c6ada231d33ebe3a697666f5a8b2e34e190736e34d1a2d763",
+      "tools/validate_external_dry_basin.py": "98afce44726f7d9e31d1490508caa81068124dd32784346669429db7a8fc9357"
+    },
+    "external_refinement_checks_passed": true,
+    "notes": "Independently assembled shell; refined rim geometry and Regge membrane strain. Agreement is provisional unless plate, mesh, modal, rim, quadrature and grid gates pass."
+  },
+  "plot_source_sha256": "417dc7da314dddcc26de6b893798e7a7619628029a1b61394ae08f3c5a5a83de",
+  "matplotlib_version": "3.10.9",
+  "figures_sha256": {
+    "contact_magnitude.png": "b952ba8b782262d97a4b45307b8208d0eddb32e13ba4b12cd381a307515b7ee7",
+    "contact_magnitude.pdf": "40958ea4bb8497eeb0fe44a26d064af2efe1359845e7c5881c71b0add3cb9261",
+    "contact_phase.png": "d2d66d75d18b07be0f872ea8f4f25bf1d2a3293aceefa1beb1449f7847445d76",
+    "contact_phase.pdf": "76f8f61fb0c33bbf3cb4553973d660785a6e034372e6f443729594b56ce03fda",
+    "refinement.png": "b0f39ce6725c6f2ace5c5761d801a0aa10f93fac5f3ec10d916f5d3dbc7288d5",
+    "refinement.pdf": "6ffff338a3bfaeaf0289e603935b06a8d3154515b5237212efe793c1c9c66e7e"
+  },
+  "units": "(m/s)/N",
+  "harmonic_convention": "exp(+i*2*pi*f*t)",
+  "presentation": "No gain/phase fit. Magnitude floor 1e-15 (m/s)/N; phase unwrapped."
+}

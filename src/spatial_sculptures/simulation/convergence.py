@@ -184,6 +184,69 @@ def relative_response_error(reference, candidate, weights=None):
     )
 
 
+def contact_impulses(
+    frequencies_hz,
+    masses,
+    pickup_weights,
+    force_weights,
+    damping,
+    times,
+    counts,
+    *,
+    chunk_samples=4096,
+):
+    """Raw contact velocities per unit impulse for several retained banks.
+
+    Returns ``{count: pickup x force x time}`` in (m/s)/(N s). Linearity lets
+    every force path share one unit modal response. Time chunks bound temporary
+    modal-history storage; output still contains all requested contact samples.
+    """
+    from .modal import Mode
+    from .mode_bank import ModalResponse
+
+    frequencies, masses = np.asarray(frequencies_hz), np.asarray(masses)
+    pickups, forces = np.asarray(pickup_weights), np.asarray(force_weights)
+    times = np.asarray(times)
+    # Use the same modal-data validation as harmonic contact response.
+    contact_transfer(frequencies, masses, pickups, forces, damping, [0.0])
+    if (
+        times.ndim != 1
+        or not len(times)
+        or not np.all(np.isfinite(times))
+        or np.any(times < 0)
+        or not counts
+        or len(set(counts)) != len(counts)
+        or any(
+            not isinstance(n, int) or isinstance(n, bool) or not 0 < n <= len(frequencies)
+            for n in counts
+        )
+        or not isinstance(chunk_samples, int)
+        or isinstance(chunk_samples, bool)
+        or chunk_samples < 1
+    ):
+        raise ValueError(
+            "Finite nonnegative times, valid retained counts and positive chunks required"
+        )
+    modes = tuple(
+        Mode(str(i), float(f), float(m), damping)
+        for i, (f, m) in enumerate(zip(frequencies, masses, strict=True))
+    )
+    response = ModalResponse(modes, [[(0.0, 1.0)] for _ in modes], [[] for _ in modes])
+    signals = {n: np.empty((len(pickups), len(forces), len(times))) for n in counts}
+    for start in range(0, len(times), chunk_samples):
+        stop = min(len(times), start + chunk_samples)
+        velocities = response.trace(times[start:stop], use_numpy=True)[1]
+        for count in counts:
+            signals[count][..., start:stop] = np.einsum(
+                "pm,em,mt->pet",
+                pickups[:, :count],
+                forces[:, :count],
+                velocities[:count],
+                optimize=True,
+            )
+    return signals
+
+
 def resonance_grid(frequency_banks, damping, maximum_hz, base_step_hz, *, samples_per_half_width=8):
     """Common frequency grid with extra samples around every candidate/reference resonance.
 

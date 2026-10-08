@@ -1,0 +1,33 @@
+{
+  "status": "unmeasured",
+  "specimen_id": null,
+  "material": {
+    "name": null,
+    "evidence": null,
+    "youngs_modulus_pa": null,
+    "density_kg_per_m3": null,
+    "poisson_ratio": null
+  },
+  "geometry": {
+    "coordinate_system_notes": null,
+    "profile_or_scan_path": null,
+    "mass_kg": null,
+    "radius_x_m": null,
+    "radius_y_m": null,
+    "rise_m": null,
+    "thickness_samples": [],
+    "rim_construction": null
+  },
+  "supports": [],
+  "exciter_mounts": [],
+  "sensor_positions_and_calibration": [],
+  "acquisition": {
+    "sample_rate_hz": null,
+    "force_calibration": null,
+    "response_calibration": null,
+    "channel_timing_and_polarity": null,
+    "raw_record_paths": [],
+    "repeat_identifiers": []
+  },
+  "notes": "Record observed values and uncertainty. This is a record template, not a simulation configuration."
+}

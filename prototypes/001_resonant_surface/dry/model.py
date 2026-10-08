@@ -230,3 +230,7 @@ class DryBasinSimulation:
     def pickup_velocities(self, modal_velocities):
         """Global vertical velocity in m/s; ideal metal contacts, not hydrophones."""
         return self.pickup_weights @ modal_velocities
+
+    def pickup_trace(self, times):
+        """Sample contact audio without storing complete audio-rate modal histories."""
+        return self.response.velocity_trace(times, self.pickup_weights)

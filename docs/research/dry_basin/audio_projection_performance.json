@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-07",
+  "scope": "One fresh Linux process per method; cached 18 × 18 / 128-mode profile; raw audio projection only.",
+  "method": "OPENBLAS_NUM_THREADS=1; resource.ru_maxrss in KiB; excludes structural assembly/eigensolve, FIR, Blender and encoding. Other numerical work ran concurrently; times are indicative single runs.",
+  "runs": [
+    {
+      "method": "full_history",
+      "mode_count": 128,
+      "observations": 2,
+      "duration_s": 2,
+      "sample_rate_hz": 48000,
+      "elapsed_projection_s": 1.1552791809663177,
+      "process_peak_rss_kib": 244860,
+      "squared_velocity_sum": 0.037959816466021076,
+      "peak_velocity_m_per_s": [
+        0.007552417392355779,
+        0.00939510778957112
+      ],
+      "cache_key": "98917fc350267a99f4648101b1b38da11e07f32a91ae29deb2e5e98e654d64c0",
+      "python": "3.13.13",
+      "numpy": "2.2.6",
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "9f070957be969f2607233a311f688adec5232e3c16ea12adeb4ca486930cccc5",
+        "prototypes/001_resonant_surface/dry/model.py": "691190f9899a65124f0e05301ff521559099f593d69a24944da68da0044ec328"
+      }
+    },
+    {
+      "method": "chunked",
+      "mode_count": 128,
+      "observations": 2,
+      "duration_s": 2,
+      "sample_rate_hz": 48000,
+      "elapsed_projection_s": 0.9061225909972563,
+      "process_peak_rss_kib": 51752,
+      "squared_velocity_sum": 0.037959816466021076,
+      "peak_velocity_m_per_s": [
+        0.007552417392355779,
+        0.00939510778957112
+      ],
+      "cache_key": "98917fc350267a99f4648101b1b38da11e07f32a91ae29deb2e5e98e654d64c0",
+      "python": "3.13.13",
+      "numpy": "2.2.6",
+      "source_sha256": {
+        "src/spatial_sculptures/simulation/mode_bank.py": "9f070957be969f2607233a311f688adec5232e3c16ea12adeb4ca486930cccc5",
+        "prototypes/001_resonant_surface/dry/model.py": "691190f9899a65124f0e05301ff521559099f593d69a24944da68da0044ec328"
+      }
+    }
+  ],
+  "benchmark_script": "import hashlib\nimport importlib\nimport json\nimport resource\nimport sys\nimport time\nfrom pathlib import Path\n\nimport numpy as np\n\nroot = Path('/home/maggi/Documents/spatial-sculptures')\nsys.path[:0] = [str(root), str(root / 'src')]\nconfig_module = importlib.import_module('prototypes.001_resonant_surface.dry.config')\nmodel = importlib.import_module('prototypes.001_resonant_surface.dry.model')\nconfig = config_module.load_config(root / 'prototypes/001_resonant_surface/dry/profiles/contact_200hz.json')\nmodes = model.get_modes(config, root / 'data/fem/001_resonant_surface')[0]\nsimulation = model.DryBasinSimulation(config, modes)\ntimes = np.arange(96000) / 48000\nstarted = time.perf_counter()\nif sys.argv[1] == 'full_history':\n    positions, velocities = simulation.trace(times)\n    channels = simulation.pickup_velocities(velocities)\nelse:\n    channels = simulation.pickup_trace(times)\nelapsed = time.perf_counter() - started\nprint(json.dumps({\n    'method': sys.argv[1], 'mode_count': config.mode_count, 'observations': len(config.pickups),\n    'duration_s': 2, 'sample_rate_hz': 48000, 'elapsed_projection_s': elapsed,\n    'process_peak_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,\n    'squared_velocity_sum': float(np.sum(channels**2)),\n    'peak_velocity_m_per_s': np.max(np.abs(channels),axis=1).tolist(),\n    'cache_key': modes.metadata['cache_key'], 'python': sys.version.split()[0], 'numpy': np.__version__,\n    'source_sha256': {name: hashlib.sha256((root/name).read_bytes()).hexdigest() for name in\n        ('src/spatial_sculptures/simulation/mode_bank.py', 'prototypes/001_resonant_surface/dry/model.py')},\n}))\n",
+  "reproduction": "Save benchmark_script to a temporary .py file, update its repository root, then run once with full_history and once with chunked."
+}

@@ -19,10 +19,10 @@ python -m pip install -e '.[numerical]'
 python tools/run_dry_basin.py --preview
 
 # Open a lightweight Blender scene; press Space to play picture and audio.
-python tools/run_dry_basin.py --profile contact_100hz --preview --view
+python tools/run_dry_basin.py --profile contact_200hz --preview --view
 
 # Render a two-second movie with audio; requires Blender and FFmpeg.
-python tools/run_dry_basin.py --profile contact_100hz --preview --render
+python tools/run_dry_basin.py --profile contact_200hz --preview --render
 ```
 
 Outputs default to `../renders/dry/`: `dry_basin.mp4` when rendered,
@@ -32,8 +32,8 @@ resolves source paths relative to itself and returns subprocess failures.
 Use a different `--output` directory to retain each run; an existing movie is only
 replaced by a successful render, so changing parameters without rendering leaves
 that older movie in place.
-Named profiles instead default to `../renders/<profile>/`; the checked profile's
-movie is `../renders/contact_100hz/dry_basin.mp4`.
+Named profiles instead default to `../renders/<profile>/`; the newer profile's
+movie is `../renders/contact_200hz/dry_basin.mp4`.
 
 The first run solves the eigenproblem. Later runs reuse matching modes in
 `data/fem/001_resonant_surface/`. Structural settings and solver source are hashed;
@@ -41,6 +41,37 @@ changing forces, duration, damping, pickups or display settings does not require
 another solve. `--rebuild` forces one. Cached mode arrays use NumPy archives without
 pickle. A smaller playback bank can reuse the leading modes of a matching larger
 research bank. Cache files, generated audio and renders are ignored by Git.
+
+## Checked 200 Hz contact profile
+
+[contact_200hz.json](profiles/contact_200hz.json) uses an 18 × 18 mesh and 128 modes.
+The [bandwidth study](../../../docs/research/dry_basin/contact_bandwidth.md) retains
+512 modes in the full reference/production banks and checks reference truncation
+from 384 to 512. Independent reference degrees 32 and 36, the last mesh pair,
+candidate refinement, quadrature, frequency sampling and filtered impulses must
+all pass. The initial 32-mode candidate passes the broad integral but fails the
+upper intervals. Separate 20–40, 40–80, 80–160 and 160–200 Hz gates prevent that
+masking. The selected 128-mode bank has a worst interval transfer difference of
+5.38%, upper-interval truncation difference 4.54% and filtered-impulse difference
+1.70%, under the existing 10%/5% criteria.
+
+Listening passes to 160 Hz and reaches a stop band at 200 Hz. The same noncausal
+offline FIR, SI units, shared normalization and common visual/audio clock apply.
+Generated files default to `../renders/contact_200hz/`. Audio projection uses time
+chunks rather than holding complete audio-rate modal histories; Blender still
+receives precomputed coordinates. No fluid, pressure or physical calibration is added.
+
+```bash
+python tools/validate_dry_basin.py --extend-contacts --select-band 200
+python tools/validate_dry_basin.py --check-report docs/research/dry_basin/contact_bandwidth.json --select-band 200
+```
+
+`--extend-contacts` selects meshes 18/22/26, reference degrees 24/28/32/36, mode counts
+32/64/128/384/512, impulse sampling at 48 kHz and the separate frequency intervals.
+The larger bank is for offline research; cached playback uses the selected subset.
+This establishes sampled agreement between computed models, not full-spectrum or
+real-vessel accuracy. The smaller 100 Hz profile retains its earlier broader-band
+criteria and is described below.
 
 ## Checked 100 Hz contact profile
 
@@ -78,8 +109,9 @@ python tools/run_dry_basin.py --config data/fem/001_resonant_surface/contact_100
 The initial solve is offline; repeated playback reads cached modes. Assembly uses
 bounded local-support batches. Optional `eigensolver="scipy"` uses a partial sparse
 eigensolve (`python -m pip install -e '.[solver]'`), while K/M remain dense. NumPy
-alone supports the checked profile. The SciPy branch was unavailable for runtime
-comparison on this machine.
+alone supports the checked profile. A six-mode plate check now verifies the SciPy
+branch against NumPy, including mass orthogonality and eigenproblem residuals;
+the full checked 200 Hz profile still uses NumPy.
 
 ## Configurable assumptions
 
@@ -188,5 +220,33 @@ python tools/validate_dry_basin.py --check-report docs/research/dry_basin/conver
 ```
 
 This returns status 1 for the baseline's unmet 20 Hz criterion. The refined saved
-profile passes through 100 Hz. Higher bandwidth, external shell benchmarks,
-dry-vessel measurements, water loading and pressure sensing remain subsequent work.
+profile passes through 100 Hz under its earlier broader-band criteria. External
+shell benchmarks, dry-vessel measurements, water loading and pressure sensing
+remain subsequent work.
+
+The new 200 Hz profile extends that evidence with separate interval gates.
+Support/mount variants now have an explicit [sensitivity study](sensitivity.py):
+
+```bash
+python tools/study_dry_sensitivity.py
+```
+
+Each case receives its own convergence report and a playback profile only if it
+passes. Support cases scale total X/Y/Z spring stiffness together; mount cases
+change the footprint while retaining housing mass and total force. These are
+assumption studies, not measured uncertainty estimates or glue-compliance models.
+See the [recorded comparison](../../../docs/research/dry_basin/sensitivity/comparison.md).
+
+The [external comparison tool](../../../docs/research/dry_basin/external_validation.md)
+exports all six complex velocity/force paths and checks supplied SI observations
+without fitted gain or phase. A [measurement plan](../../../docs/research/dry_basin/measurement_plan.md)
+and blank specimen record prepare real-vessel calibration. No measured vessel
+result is supplied.
+
+The independent numerical check is implemented in a separate
+[NGSolve study](../../../studies/plates/003_external_shell/README.md). It rebuilds
+the shell independently, checks an analytical plate and external refinement, then
+compares modes and all six complex contact paths. It now passes the configured
+20–200 Hz study: worst interval response difference 5.39%, largest matched frequency
+difference 0.084%. See the [external results](../../../docs/research/dry_basin/external_results.md).
+Physical calibration is deferred; no basin is needed for this software check.

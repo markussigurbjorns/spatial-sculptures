@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "baseline_report_sha256": "cf5439e1bd9102d2166fb8d9cd77390ba7d087e14c1843e955fc2541030cc55f",
+  "baseline_first_frequency_hz": 4.296993318534938,
+  "scope": "One-factor provisional sensitivity; no measured calibration.",
+  "records": [
+    {
+      "case": "support_half",
+      "change": [
+        "support_scale",
+        0.5
+      ],
+      "first_frequency_hz": 3.0385269087220665,
+      "first_twelve_frequencies_hz": [
+        3.0385269087220665,
+        3.0387783383887825,
+        3.7793787247075445,
+        13.243440354269618,
+        14.33028302609985,
+        18.65863703455793,
+        19.565031358480596,
+        31.904938543430216,
+        40.689936469403875,
+        46.76117097040345,
+        67.70868070505786,
+        71.6588447932647
+      ],
+      "comparison_interval_hz": [
+        20,
+        200.0
+      ],
+      "physical_response_change_per_path_relative_L2": [
+        [
+          1.045973512193473,
+          0.99537050469786,
+          0.9523698029569648
+        ],
+        [
+          1.00721413623193,
+          1.048829671077461,
+          0.9523251720127469
+        ]
+      ],
+      "maximum_physical_response_change_relative_L2": 1.048829671077461,
+      "convergence_report_sha256": "9b78e1c7c467f8cc2963ada4c4b81248034a6c401befd6b02fcb9e54b0400814",
+      "passing_profile": {
+        "elements_per_axis": 18,
+        "mode_count": 128,
+        "verified_sampled_transfer_band_hz": 200.0,
+        "audio_passband_hz": 160.0,
+        "audio_stopband_hz": 200.0,
+        "filtered_impulse_maximum_relative_L2": 0.008904244897462953,
+        "selection": "smallest tested DOF count, then smallest passing retained bank",
+        "report_path": "docs/research/dry_basin/sensitivity/support_half/convergence.json",
+        "report_sha256": "9b78e1c7c467f8cc2963ada4c4b81248034a6c401befd6b02fcb9e54b0400814"
+      }
+    },
+    {
+      "case": "support_double",
+      "change": [
+        "support_scale",
+        2.0
+      ],
+      "first_frequency_hz": 6.076475350345539,
+      "first_twelve_frequencies_hz": [
+        6.076475350345539,
+        6.077004621583571,
+        7.558454991820918,
+        14.9178859346105,
+        18.82032316633875,
+        26.58017269737048,
+        27.79315097188672,
+        50.26934409972169,
+        50.30686453260841,
+        67.26222655364622,
+        73.67610928286217,
+        85.00220391904789
+      ],
+      "comparison_interval_hz": [
+        20,
+        200.0
+      ],
+      "physical_response_change_per_path_relative_L2": [
+        [
+          1.3475617989310393,
+          1.3659295556182343,
+          1.5850219810945012
+        ],
+        [
+          1.3273365499666903,
+          1.3846858642342355,
+          1.618798290697568
+        ]
+      ],
+      "maximum_physical_response_change_relative_L2": 1.618798290697568,
+      "convergence_report_sha256": "59d8cecad94957d04daca6b2356d7c7b158b344069321935129b69177ac9f8ce",
+      "passing_profile": {
+        "elements_per_axis": 18,
+        "mode_count": 128,
+        "verified_sampled_transfer_band_hz": 200.0,
+        "audio_passband_hz": 160.0,
+        "audio_stopband_hz": 200.0,
+        "filtered_impulse_maximum_relative_L2": 0.029035857694761805,
+        "selection": "smallest tested DOF count, then smallest passing retained bank",
+        "report_path": "docs/research/dry_basin/sensitivity/support_double/convergence.json",
+        "report_sha256": "59d8cecad94957d04daca6b2356d7c7b158b344069321935129b69177ac9f8ce"
+      }
+    },
+    {
+      "case": "mount_narrow",
+      "change": [
+        "mount_width_scale",
+        0.5
+      ],
+      "first_frequency_hz": 4.296993301528091,
+      "first_twelve_frequencies_hz": [
+        4.296993301528091,
+        4.297352125782605,
+        5.34477397237843,
+        14.486851529489043,
+        16.96956341007594,
+        22.23146315585638,
+        24.384240137897745,
+        40.7368426567191,
+        44.161280390685,
+        54.819230306512594,
+        69.30248573002561,
+        76.5160796988446
+      ],
+      "comparison_interval_hz": [
+        20,
+        200.0
+      ],
+      "physical_response_change_per_path_relative_L2": [
+        [
+          0.0005342065412962711,
+          0.0004405449665660845,
+          0.0005944348891066396
+        ],
+        [
+          0.00041111963811697847,
+          0.0005963569961796823,
+          0.0007724887923664953
+        ]
+      ],
+      "maximum_physical_response_change_relative_L2": 0.0007724887923664953,
+      "convergence_report_sha256": "55e2e528057eb74f63714321f13cbcf411ebdbae41e51463e49bc28127485535",
+      "passing_profile": {
+        "elements_per_axis": 18,
+        "mode_count": 128,
+        "verified_sampled_transfer_band_hz": 200.0,
+        "audio_passband_hz": 160.0,
+        "audio_stopband_hz": 200.0,
+        "filtered_impulse_maximum_relative_L2": 0.01699727264024853,
+        "selection": "smallest tested DOF count, then smallest passing retained bank",
+        "report_path": "docs/research/dry_basin/sensitivity/mount_narrow/convergence.json",
+        "report_sha256": "55e2e528057eb74f63714321f13cbcf411ebdbae41e51463e49bc28127485535"
+      }
+    },
+    {
+      "case": "mount_wide",
+      "change": [
+        "mount_width_scale",
+        1.5
+      ],
+      "first_frequency_hz": 4.296993341150933,
+      "first_twelve_frequencies_hz": [
+        4.296993341150933,
+        4.297352153137682,
+        5.344771436186819,
+        14.486783159340055,
+        16.969516546096155,
+        22.231556821196016,
+        24.384314124062186,
+        40.736809554422884,
+        44.161198224929485,
+        54.819317224834585,
+        69.30266816679034,
+        76.51584379159361
+      ],
+      "comparison_interval_hz": [
+        20,
+        200.0
+      ],
+      "physical_response_change_per_path_relative_L2": [
+        [
+          0.0008691902390613712,
+          0.0007247511121844894,
+          0.000978149993683643
+        ],
+        [
+          0.0006813254484926935,
+          0.0009738646623479279,
+          0.0012674808492704338
+        ]
+      ],
+      "maximum_physical_response_change_relative_L2": 0.0012674808492704338,
+      "convergence_report_sha256": "faf29640070ea0d8919e0d7ede6b4e0594a38df59a697ebe56e88bc08deb08df",
+      "passing_profile": {
+        "elements_per_axis": 18,
+        "mode_count": 128,
+        "verified_sampled_transfer_band_hz": 200.0,
+        "audio_passband_hz": 160.0,
+        "audio_stopband_hz": 200.0,
+        "filtered_impulse_maximum_relative_L2": 0.016992238278349024,
+        "selection": "smallest tested DOF count, then smallest passing retained bank",
+        "report_path": "docs/research/dry_basin/sensitivity/mount_wide/convergence.json",
+        "report_sha256": "faf29640070ea0d8919e0d7ede6b4e0594a38df59a697ebe56e88bc08deb08df"
+      }
+    }
+  ],
+  "source_sha256": {
+    "tools/study_dry_sensitivity.py": "0fe549f351064fe4d1297e277d3e53aa9adb10ad5e55aeddf724c691e743c1ae",
+    "prototypes/001_resonant_surface/dry/sensitivity.py": "411978f66cd8ff064f8f8f76a40e56750c8838f34143cbbd130c3341e832a085"
+  }
+}

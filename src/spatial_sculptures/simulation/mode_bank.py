@@ -64,6 +64,37 @@ class ModalResponse:
         )
         return self.state
 
+    def velocity_trace(self, times, weights, *, chunk_samples: int = 4096):
+        """Project modal velocities onto observations using bounded NumPy time chunks.
+
+        ``weights`` is observation x mode; the result is observation x time.
+        Equations and physical times are identical to ``trace``. Only temporary
+        storage changes, making long audio/contact traces practical with more modes.
+        NumPy remains optional until this offline helper is called.
+        """
+        import numpy as np
+
+        times, weights = np.asarray(times, dtype=float), np.asarray(weights, dtype=float)
+        if (
+            times.ndim != 1
+            or not len(times)
+            or not np.all(np.isfinite(times))
+            or np.any(times < 0)
+            or weights.ndim != 2
+            or not len(weights)
+            or weights.shape[1] != len(self.modes)
+            or not np.all(np.isfinite(weights))
+            or not isinstance(chunk_samples, int)
+            or isinstance(chunk_samples, bool)
+            or chunk_samples < 1
+        ):
+            raise ValueError("Finite trace times, observation weights and positive chunks required")
+        result = np.empty((len(weights), len(times)))
+        for start in range(0, len(times), chunk_samples):
+            stop = min(len(times), start + chunk_samples)
+            result[:, start:stop] = weights @ self.trace(times[start:stop], use_numpy=True)[1]
+        return result
+
     def trace(self, times, *, use_numpy: bool | None = None):
         """Return mode-by-time displacement/velocity arrays, or lists without NumPy.
 
