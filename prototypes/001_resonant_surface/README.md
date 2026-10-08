@@ -29,12 +29,26 @@ specification or a prediction of its sound.
 
 ## Current simulation status
 
-There are now two runnable versions of this sculpture:
+There are now three runnable versions of this sculpture:
 
 | Version | What it models | Listening output |
 | --- | --- | --- |
 | Original `build.py` | Artistic waves on water and sculpture geometry | Optional SuperCollider resonant-noise sketch driven by control values |
 | [Numerical dry basin](dry/README.md) | Linear curved metal shell, local spring supports and housing masses | Model-derived contact-velocity WAV and synchronized Blender/MP4 |
+| [Numerical wet basin](wet/README.md) | Dry shell plus nonlocal pressure-release fluid inertia and kinematic elevation | Model-derived hydrophone-pressure WAV and synchronized metal/water Blender/MP4 |
+
+For the latest water stage:
+
+```bash
+python tools/run_wet_basin.py --preview --view
+python tools/run_wet_basin.py --preview --render
+```
+
+The wet model passes separate numerical response checks through 80 Hz; its listening
+filter passes through 64 Hz and stops at 80 Hz. Its pressure and geometry share one
+modal state. Gravity/capillary waves, moving contact lines, acoustic radiation and
+physical calibration remain future stages. The [wet research note](../../docs/research/wet_basin/study.md)
+documents the equations, primary references and evidence.
 
 ```bash
 python tools/run_dry_basin.py --profile contact_200hz --preview --view
@@ -54,8 +68,9 @@ Omitting `--profile` retains the original exploratory dry configuration.
 
 A separate [water-loading study](water_loading/README.md) now computes provisional
 metal mode changes from configurable water depth and density. It has analytical
-and optional NGSolve reference checks, but no hydrophone pressure or validated
-wet audio/render export. The dry playback commands above retain their dry model.
+and optional NGSolve reference checks. It remains the earlier local-inertia
+approximation; the new wet implementation adds nonlocal inertia and pressure.
+The dry playback commands above retain their dry model.
 
 Version 1 is a geometric prototype and a visual wave/interference simulation.
 It is **not CFD, not FEM, and not a physically correct acoustic simulation**.

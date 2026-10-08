@@ -1,0 +1,9 @@
+{
+  "report_sha256": "b417e25c9cedb79a59a3bd70d0fbd9672231be47f27df06d9e3a24fe95f00dd1",
+  "plot_source_sha256": "8d0c4ec75611f98d83f4eeca178ed9adfcba5dd2bbd334396f9eb018e15d89e0",
+  "artifact_sha256": {
+    ".png": "239a64cf1bfc4b996d5acf78e234669fd159221f28d15e1ca564e402637f36ad",
+    ".pdf": "55af95664d10052586854518d8252df2f9d1cf2eea54e58782430ae779bcdc62"
+  },
+  "scope": "Sampled numerical convergence for a linear pressure-release wet model; no measured calibration"
+}

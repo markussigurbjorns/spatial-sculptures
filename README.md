@@ -69,6 +69,30 @@ Its `simulation.py` produces state independently of Blender. Its
 mesh. Its `supercollider/` directory holds an optional receiver and a small
 resonant-noise listening sketch.
 
+## Run the numerical wet basin
+
+The [wet-basin model](prototypes/001_resonant_surface/wet/README.md) adds nonlocal
+three-dimensional fluid inertia and actual simulated hydrophone pressure. Metal
+motion, kinematic water elevation and pressure WAV derive from one physical modal
+response. Python loads the saved passing bank; Blender only displays arrays.
+
+```bash
+python tools/run_wet_basin.py --preview --view
+python tools/run_wet_basin.py --preview --render
+```
+
+Playback needs NumPy and Blender; rendering also needs FFmpeg. SuperCollider and
+NGSolve are unnecessary for playback. Without `--view` or `--render`, export creates
+the two-channel `hydrophones.wav` and data under `prototypes/001_resonant_surface/renders/wet/`.
+The selected wet evidence passes numerical checks through **80 Hz**, with a listening
+pass band through **64 Hz**. Higher intervals failed and remain recorded.
+
+The [research note and evidence](docs/research/wet_basin/study.md) explain the
+pressure-release approximation: spatial fluid inertia and pressure are modeled,
+while gravity/capillary surface resonances, moving contact lines, fluid damping and
+physical calibration remain future work. This is a separate stage from the
+artistic water sketch and dry contact-velocity audio.
+
 ## Run the numerical dry basin
 
 The new [dry-basin model](prototypes/001_resonant_surface/dry/README.md) computes
@@ -141,8 +165,9 @@ The first [water-loading study](prototypes/001_resonant_surface/water_loading/RE
 now adds configurable shallow-column water inertia to that dry structure. It checks
 water volume, zero-depth recovery, integration and a separate finite-depth fluid
 reference before reporting provisional loaded metal modes. See its
-[research note and plots](docs/research/water_loading/study.md). It does not yet
-produce hydrophone pressure or a certified wet audio/visual simulation.
+[research note and plots](docs/research/water_loading/study.md). That column study
+remains an earlier approximation; the newer wet model above adds pressure and
+separate response checks.
 
 The original 8 × 8 exploratory configuration remains available by omitting
 `--profile`. Its [contact evidence](docs/research/dry_basin/convergence.md) supports
