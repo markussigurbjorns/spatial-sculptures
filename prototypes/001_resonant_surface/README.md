@@ -29,26 +29,34 @@ specification or a prediction of its sound.
 
 ## Current simulation status
 
-There are now three runnable versions of this sculpture:
+There are now four runnable versions of this sculpture:
 
 | Version | What it models | Listening output |
 | --- | --- | --- |
 | Original `build.py` | Artistic waves on water and sculpture geometry | Optional SuperCollider resonant-noise sketch driven by control values |
 | [Numerical dry basin](dry/README.md) | Linear curved metal shell, local spring supports and housing masses | Model-derived contact-velocity WAV and synchronized Blender/MP4 |
 | [Numerical wet basin](wet/README.md) | Dry shell plus nonlocal pressure-release fluid inertia and kinematic elevation | Model-derived hydrophone-pressure WAV and synchronized metal/water Blender/MP4 |
+| [Dynamic free surface](free_surface/README.md) | Frozen dry shell coupled to independent gravity/capillary water modes | Shared model-derived pressure WAV, metal and water Blender/MP4 |
 
 For the latest water stage:
 
 ```bash
-python tools/run_wet_basin.py --preview --view
-python tools/run_wet_basin.py --preview --render
+python tools/run_free_surface.py --preview --view
+python tools/run_free_surface.py --preview --render
 ```
 
-The wet model passes separate numerical response checks through 80 Hz; its listening
-filter passes through 64 Hz and stops at 80 Hz. Its pressure and geometry share one
-modal state. Gravity/capillary waves, moving contact lines, acoustic radiation and
-physical calibration remain future stages. The [wet research note](../../docs/research/wet_basin/study.md)
-documents the equations, primary references and evidence.
+The free-surface stage adds water restoring forces and reciprocal water/metal
+inertia. Its [research note](../../docs/research/free_surface/study.md) explains
+the mean-volume constraint, pressure gauge, validation and frozen-shell limits.
+Depth, gravity, surface tension, damping and resolution are editable assumptions.
+The six-second preview uses cached modes; no numerical solve happens in Blender.
+
+The earlier pressure-release model remains runnable with `tools/run_wet_basin.py`.
+It passes separate response checks through 80 Hz, with a listening filter that
+passes through 64 Hz and stops at 80 Hz. Its [wet research note](../../docs/research/wet_basin/study.md)
+documents the prior approximation without gravity/capillary restoring forces.
+Moving shoreline, hydrostatic prestress, acoustic radiation and physical
+calibration remain future stages for both models.
 
 ```bash
 python tools/run_dry_basin.py --profile contact_200hz --preview --view

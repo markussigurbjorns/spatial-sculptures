@@ -42,6 +42,8 @@ are ordinary Python and do not import `bpy` or know about meshes.
 sampled displacement metrics, and a drop-impact envelope. Consumers choose how
 to display or sonify it. The current `total_energy` is explicitly an artistic
 mean-squared-displacement proxy in m², not physical energy in joules.
+The separate numerical modal exports record model energy in joules and pressure
+perturbations in pascals; those units do not apply to the artistic OSC sketch.
 
 ## Layout and boundaries
 
@@ -69,7 +71,32 @@ Its `simulation.py` produces state independently of Blender. Its
 mesh. Its `supercollider/` directory holds an optional receiver and a small
 resonant-noise listening sketch.
 
-## Run the numerical wet basin
+## Run water with gravity and surface tension
+
+The [dynamic free-surface model](prototypes/001_resonant_surface/free_surface/README.md)
+adds independent water-wave coordinates and reciprocal fluid inertia coupling to
+the metal. Metal motion, water elevation and hydrophone pressure share one Python
+modal response. Blender only displays precomputed arrays.
+
+```bash
+python tools/run_free_surface.py --preview --view
+python tools/run_free_surface.py --preview --render
+```
+
+The default is six physical seconds. Preview lowers mesh/render cost; it keeps
+the same physics. Without `--view` or `--render`, export writes a two-channel
+`hydrophones.wav`, SI pressure data and frame states under
+`prototypes/001_resonant_surface/renders/free_surface/`. Playback needs NumPy;
+Blender is needed for viewing and FFmpeg for the MP4. Neither NGSolve nor an
+audio server is needed for playback. Press Space in Blender to play.
+
+The [research note](docs/research/free_surface/study.md) gives the equations,
+references, validation scope and remaining assumptions. The shell is frozen at
+its dry equilibrium: this is a small-amplitude gravity/capillary reference,
+without hydrostatic prestress, moving shoreline or measured calibration.
+Earlier dry and pressure-release models remain available as comparison stages.
+
+## Run the pressure-release wet basin
 
 The [wet-basin model](prototypes/001_resonant_surface/wet/README.md) adds nonlocal
 three-dimensional fluid inertia and actual simulated hydrophone pressure. Metal
@@ -89,7 +116,8 @@ pass band through **64 Hz**. Higher intervals failed and remain recorded.
 
 The [research note and evidence](docs/research/wet_basin/study.md) explain the
 pressure-release approximation: spatial fluid inertia and pressure are modeled,
-while gravity/capillary surface resonances, moving contact lines, fluid damping and
+while gravity/capillary surface resonances are implemented in the separate
+free-surface stage above. Moving contact lines, fluid damping and
 physical calibration remain future work. This is a separate stage from the
 artistic water sketch and dry contact-velocity audio.
 

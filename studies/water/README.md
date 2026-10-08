@@ -9,8 +9,14 @@ It computes water volume and loaded metal modes.
 interior pressure and kinematic pressure-release surface observations, with
 manufactured bowl fields, separated cosine solutions and independent NGSolve
 fluid-cell checks. Its basin convergence study supports a separate 80 Hz playback
-band. Gravity/capillary surface modes and moving contact lines remain future work.
+band. It deliberately omits gravity/capillary restoring forces.
 
-Future isolated investigations: standing waves, capillary waves, droplets and
-coupled free-surface dynamics. Record geometry, depth, temperature, excitation and
+[003_free_surface](003_free_surface/README.md) adds dynamic gravity/capillary
+surface coordinates coupled to the shell through reciprocal fluid inertia.
+Analytical and independent NGSolve cells check inertia, pressure and dispersion.
+Its resting footprint and dry shell equilibrium remain fixed; hydrostatic
+prestress and a physical moving-contact-line law remain future work.
+
+Future isolated investigations: menisci, shoreline behavior, dissipation,
+droplet forcing and hydrostatic coupling. Record geometry, depth, temperature, excitation and
 measurement units. Numerical checks do not replace physical measurements.

@@ -1,0 +1,9 @@
+{
+  "validation_sha256": "27b5c64bdd2f1f965ff7087d5afa676482efc9865fa55fa9d2023451c5f2e87a",
+  "plot_source_sha256": "5248a1d980f4d9c77558af639310a67d1c7a4b57cc53ed1101395823b94f1f22",
+  "artifacts": {
+    "modes.png": "5584f13451f01c184ef5f0450dcd4559a0e914ca7b8a777e337c0b209ef3783a",
+    "modes.pdf": "3649dad1d94a608238d02398829caca3181dd06fdbb99cd820a100e8d118c715"
+  },
+  "notes": "Mode shapes independently normalized for display; no physical amplitude implied"
+}
